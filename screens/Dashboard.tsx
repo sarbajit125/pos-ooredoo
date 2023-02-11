@@ -1,107 +1,84 @@
-import { StyleSheet, Text, View } from 'react-native'
-import React, { useEffect, useState } from 'react'
-import { APIManager } from '../AppManger/ApiManger'
-import { POSAppManger, POSUserDetailsDAO } from '../AppManger/POSAppManager'
-import { NativeStackScreenProps } from '@react-navigation/native-stack'
-import { RootStackParamList } from '../types'
-import DashbordNav from '../components/dashboard/DashbordNav'
-import DashboardGreeting from '../components/dashboard/DashboardGreeting'
-type LoginScreenProps = NativeStackScreenProps<RootStackParamList, "Dashboard">
-const Dashboard = (props: LoginScreenProps) => {
-    const [name, setName] = useState('')
-    useEffect (()=>{
-       APIManager.sharedInstance().userDetails().then((response) => {
-        POSAppManger.sharedInstance().currentRole = response.currentRole
-        POSAppManger.sharedInstance().SalesChannelIdList = response.salesChannelIdList
-        POSAppManger.sharedInstance().UserDetails = new POSUserDetailsDAO(response.userId,
-            response.userCredentials.username,
-            response.userFirstName,
-            response.userAddress.contactNumber,
-            response.userCredentials.userDesc,
-            response.userLastName)
-        POSAppManger.sharedInstance().FaisaWallets = response.walletNumbers.MFaisa.map((item)=> {
-            return {
-                walletid: item,
-                type: "Faisa"
-            }
-        })
-        POSAppManger.sharedInstance().RastasWallets = response.walletNumbers.Raastas.map((id) => (
-            {
-                walletid: id,
-                type: 'Rastas'
-            }
-        ))
-        setName(response.userCredentials.userDesc)
-
-       }).catch ((err) => {
-        props.navigation.goBack()
-       })
-    },[])
+import { StyleSheet, View } from "react-native";
+import React, { useContext, useEffect } from "react";
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { RootStackParamList } from "../types";
+import DashbordNav from "../components/dashboard/DashbordNav";
+import DashboardGreeting from "../components/dashboard/DashboardGreeting";
+import DashboardBalance from "../components/dashboard/DashboardBalance";
+import { observer } from "mobx-react";
+import { StoresContext } from "../store/RootStore";
+type LoginScreenProps = NativeStackScreenProps<RootStackParamList, "Dashboard">;
+const Dashboard = observer((props: LoginScreenProps) => {
+  const userStore = useContext(StoresContext).userDetailStore;
+  useEffect(() => {
+    userStore.fetchSelfDetails();
+  }, []);
   return (
     <View style={styles.container}>
       <View style={styles.topBar}>
-        <DashbordNav profileTapped={function (): void {
-                 // Laucnh Profile section
-              } } notificationTapped={function (): void {
-                  // Launch notification 
-              } } />
+        <DashbordNav
+          profileTapped={function (): void {
+            // Laucnh Profile section
+          }}
+          notificationTapped={function (): void {
+            // Launch notification
+          }}
+        />
       </View>
-      <View style={styles.greetingView} >
-        <DashboardGreeting name={name} />
+      <View style={styles.greetingView}>
+        <DashboardGreeting />
       </View>
       <View style={styles.balanceView}>
-
+        <DashboardBalance
+          stockBalancePressed={function (): void {
+            console.log("open stocks screen");
+          }}
+        />
       </View>
-      <View style={styles.kpiView}>
-
-      </View>
-      <View style={styles.graphView}>
-
-      </View>
+      <View style={styles.kpiView}></View>
+      <View style={styles.graphView}></View>
       <View style={styles.servicesView}>
-        <View style={styles.tabView}>
-        </View>
+        <View style={styles.tabView}></View>
       </View>
     </View>
-  )
-}
+  );
+});
 
-export default Dashboard
+export default Dashboard;
 
 const styles = StyleSheet.create({
-    container:{
-        marginTop: 60,
-        marginBottom: 20,
-        marginLeft: 10,
-        marginRight:10,
-    },
-    topBar:{
-        height: 80,
-    },
-    greetingView:{
-        height:80,
-    },
-    balanceView:{
-        backgroundColor:'yellow',
-        height:160,
-    },
-    kpiView:{
-        backgroundColor:'green',
-        height:80,
-    },
-    graphView:{
-        backgroundColor:'orange',
-        height:300,
-    },
-    servicesView:{
-        backgroundColor:'gold',
-    },
-    tabView:{
-        backgroundColor:"pink",
-        position: 'absolute',
-        width: '80%',
-        bottom: 90,
-        height: 60,
-        alignSelf:"center",
-    },
-})
+  container: {
+    marginTop: 60,
+    marginBottom: 20,
+    marginLeft: 10,
+    marginRight: 10,
+  },
+  topBar: {
+    height: 80,
+  },
+  greetingView: {
+    height: 80,
+  },
+  balanceView: {
+    height: 160,
+  },
+  kpiView: {
+    backgroundColor: "green",
+    height: 80,
+  },
+  graphView: {
+    backgroundColor: "orange",
+    height: 300,
+  },
+  servicesView: {
+    backgroundColor: "gold",
+  },
+  tabView: {
+    backgroundColor: "pink",
+    position: "absolute",
+    width: "80%",
+    bottom: 90,
+    height: 60,
+    alignSelf: "center",
+  },
+});

@@ -6,8 +6,8 @@ import {
   SafeAreaView,
 } from "react-native";
 import React, { useState } from "react";
-import Title26Noto from "../components/Title26Noto";
-import Header14RubikLbl from "../components/Header14RubikLbl";
+import Title26Noto from "../components/OoredooFonts/Noto/Title26Noto";
+import Header14RubikLbl from "../components/OoredooFonts/Rubik/Header14RubikLbl";
 import { Formik } from "formik";
 import * as yup from "yup";
 import OoredooPayBtn from "../components/OoredooPayBtn";

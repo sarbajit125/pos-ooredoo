@@ -1,6 +1,6 @@
 import { StyleSheet, Text, TextProps, View } from 'react-native'
 import React from 'react'
-import { ColorConstants } from '../constants/Colors'
+import { ColorConstants } from '../../../constants/Colors'
 
 const Header14Noto = (props:TextProps) => {
   return (
