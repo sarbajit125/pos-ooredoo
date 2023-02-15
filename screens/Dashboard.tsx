@@ -7,6 +7,7 @@ import DashboardGreeting from "../components/dashboard/DashboardGreeting";
 import DashboardBalance from "../components/dashboard/DashboardBalance";
 import { observer } from "mobx-react";
 import { StoresContext } from "../store/RootStore";
+import DashboardKPI from "../components/dashboard/DashboardKPI";
 type LoginScreenProps = NativeStackScreenProps<RootStackParamList, "Dashboard">;
 const Dashboard = observer((props: LoginScreenProps) => {
   const userStore = useContext(StoresContext).userDetailStore;
@@ -35,8 +36,9 @@ const Dashboard = observer((props: LoginScreenProps) => {
           }}
         />
       </View>
-      <View style={styles.kpiView}></View>
-      <View style={styles.graphView}></View>
+      <View style={styles.kpiView}>
+        <DashboardKPI />
+      </View>
       <View style={styles.servicesView}>
         <View style={styles.tabView}></View>
       </View>
@@ -63,12 +65,7 @@ const styles = StyleSheet.create({
     height: 160,
   },
   kpiView: {
-    backgroundColor: "green",
-    height: 80,
-  },
-  graphView: {
-    backgroundColor: "orange",
-    height: 300,
+    height: 380,
   },
   servicesView: {
     backgroundColor: "gold",

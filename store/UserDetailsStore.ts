@@ -22,8 +22,9 @@ export default class UserDetailsStore {
     type: "Faisa",
   };
   currentRole: string = "";
-  selecetedRastasBalance: string  = "0.00";;
-  selectedFaisaBalance: string  = "0.00";;
+  selecetedRastasBalance: string  = "0.00";
+  selectedFaisaBalance: string  = "0.00";
+  userId: string = "";
   rootStore: RootStore;
   public constructor(rootStore: RootStore) {
     this.rootStore = rootStore;
@@ -103,6 +104,7 @@ export default class UserDetailsStore {
           this.setDefaultRastasWallet(undefined);
           this.setDefaultFaisaWallet(undefined);
           this.currentRole = response.currentRole;
+          this.userId = response.userId
         })
       );
   };

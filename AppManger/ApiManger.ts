@@ -1,5 +1,7 @@
 import axios, { AxiosError, AxiosHeaders } from "axios";
+import { DashboardKPI } from "../responseModels/DashboardKPIResponse";
 import { FetchWalletBalanceResponse } from "../responseModels/FetchWalletbalanceResponse";
+import * as AxiosLogger from 'axios-logger';
 import {
   APIError,
   LoginSuccessfull,
@@ -11,8 +13,12 @@ import { POSWalletDAO } from "./POSAppManager";
 export class APIManager {
   private static instance: APIManager;
   private constructor() {
-    axios.defaults.baseURL = "http://10.10.9.113:9080";
-    axios.defaults.headers.common["x-auth-token"] = "";
+  axios.defaults.baseURL = "http://10.10.9.113:9080";
+  axios.defaults.headers.common["x-auth-token"] = "";
+  axios.interceptors.request.use(request => {
+    console.log('Starting Request', JSON.stringify(request, null, 2))
+    return request
+  })
   }
   public static sharedInstance(): APIManager {
     if (!APIManager.instance) {
@@ -91,6 +97,27 @@ export class APIManager {
       throw this.errorhandling(error);
     }
   };
+  fetchDashboardGraph = async (date:string, posCode: string) => {
+    try {
+      const response = await axios.get(`app/api/pos/get/last/analytics`,{
+        params:{
+          date: date,
+          posCode: posCode
+        }
+      })
+      if (response.status != 200) {
+        throw new APIError(
+          "recived response status code invalid",
+          response.status
+        );
+      } else {
+        this.printJSON(response.data);
+        return response.data as DashboardKPI;
+      }
+    } catch (error) {
+      throw this.errorhandling(error);
+    }
+  }
   errorhandling = (error: unknown): APIError | UnauthorizedError => {
     console.log(error);
     if (error instanceof AxiosError) {

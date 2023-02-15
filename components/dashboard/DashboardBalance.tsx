@@ -7,7 +7,9 @@ import NotoRegular12 from "../OoredooFonts/Noto/NotoRegular12";
 import { StoresContext } from "../../store/RootStore";
 import { observer } from "mobx-react";
 import OoredooPinModal from "../OoredooPinModal";
-
+import CryptoES from 'crypto-es';
+import Crypto from 'react-native-quick-crypto'
+import { AppConstants } from "../../constants/AppConstants";
 const DashboardBalance = observer((props: DashboardBalanceProps) => {
   const userStore = useContext(StoresContext).userDetailStore;
   const [switchState, setSwitch] = useState(false);
@@ -21,7 +23,8 @@ const DashboardBalance = observer((props: DashboardBalanceProps) => {
   };
   const handleFaisaPin = (pin: string) => {
     setModal(false)
-    userStore.fetchBalance(userStore.selectedFaisaWallet, pin);
+    const digest = CryptoES.AES.encrypt(pin, AppConstants.aesKey, {padding:CryptoES.pad.Pkcs7, mode: CryptoES.mode.ECB})
+    userStore.fetchBalance(userStore.selectedFaisaWallet, digest.toString());
   };
   return (
     <View style={styles.container}>
