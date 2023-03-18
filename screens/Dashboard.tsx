@@ -8,42 +8,63 @@ import DashboardBalance from "../components/dashboard/DashboardBalance";
 import { observer } from "mobx-react";
 import { StoresContext } from "../store/RootStore";
 import DashboardKPI from "../components/dashboard/DashboardKPI";
+import { useQuery } from "react-query";
+import { APIManager } from "../AppManger/ApiManger";
+import OoredooActivityView from "../components/OoredooActivityView";
+import OoredooBadReqView from "../components/errors/OoredooBadReqView";
 type LoginScreenProps = NativeStackScreenProps<RootStackParamList, "Dashboard">;
 const Dashboard = observer((props: LoginScreenProps) => {
   const userStore = useContext(StoresContext).userDetailStore;
-  useEffect(() => {
-    userStore.fetchSelfDetails();
-  }, []);
-  return (
-    <View style={styles.container}>
-      <View style={styles.topBar}>
-        <DashbordNav
-          profileTapped={function (): void {
-            // Laucnh Profile section
-          }}
-          notificationTapped={function (): void {
-            // Launch notification
-          }}
-        />
+  const {data, isSuccess, isError, isLoading} = useQuery({
+    queryKey:['selfDetails'],
+    queryFn: () => APIManager.sharedInstance().userDetails()
+  })
+   if (isSuccess) {
+    userStore.fetchSelfDetails(data)
+    return (
+      <View style={styles.container}>
+        <View style={styles.topBar}>
+          <DashbordNav
+            profileTapped={function (): void {
+              // Laucnh Profile section
+            }}
+            notificationTapped={function (): void {
+              // Launch notification
+            }}
+          />
+        </View>
+        <View style={styles.greetingView}>
+          <DashboardGreeting />
+        </View>
+        <View style={styles.balanceView}>
+          <DashboardBalance
+            stockBalancePressed={function (): void {
+              console.log("open stocks screen");
+            }}
+          />
+        </View>
+        <View style={styles.kpiView}>
+          <DashboardKPI />
+        </View>
+        <View style={styles.servicesView}>
+          <View style={styles.tabView}></View>
+        </View>
       </View>
-      <View style={styles.greetingView}>
-        <DashboardGreeting />
+    );
+   } else if (isLoading) {
+    return (
+      <View style={styles.container}>
+        <OoredooActivityView />
       </View>
-      <View style={styles.balanceView}>
-        <DashboardBalance
-          stockBalancePressed={function (): void {
-            console.log("open stocks screen");
-          }}
-        />
+    )
+   } else {
+    return (
+      <View style={styles.container}>
+        <OoredooBadReqView modalVisible={true} action={ () => props.navigation.goBack()} title={"API error"} />
       </View>
-      <View style={styles.kpiView}>
-        <DashboardKPI />
-      </View>
-      <View style={styles.servicesView}>
-        <View style={styles.tabView}></View>
-      </View>
-    </View>
-  );
+    )
+   }
+
 });
 
 export default Dashboard;

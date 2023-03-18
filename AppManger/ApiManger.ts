@@ -1,7 +1,9 @@
 import axios, { AxiosError, AxiosHeaders } from "axios";
 import { DashboardKPI } from "../responseModels/DashboardKPIResponse";
-import { FetchWalletBalanceResponse } from "../responseModels/FetchWalletbalanceResponse";
-import * as AxiosLogger from 'axios-logger';
+import {
+  FetchWalletBalanceResponse,
+  WalletBalanceDAO,
+} from "../responseModels/FetchWalletbalanceResponse";
 import {
   APIError,
   LoginSuccessfull,
@@ -13,12 +15,12 @@ import { POSWalletDAO } from "./POSAppManager";
 export class APIManager {
   private static instance: APIManager;
   private constructor() {
-  axios.defaults.baseURL = "http://10.10.9.113:9080";
-  axios.defaults.headers.common["x-auth-token"] = "";
-  axios.interceptors.request.use(request => {
-    console.log('Starting Request', JSON.stringify(request, null, 2))
-    return request
-  })
+    axios.defaults.baseURL = "http://10.10.9.113:9080";
+    axios.defaults.headers.common["x-auth-token"] = "";
+    axios.interceptors.request.use((request) => {
+      console.log("Starting Request", JSON.stringify(request, null, 2));
+      return request;
+    });
   }
   public static sharedInstance(): APIManager {
     if (!APIManager.instance) {
@@ -70,7 +72,7 @@ export class APIManager {
     wallet: POSWalletDAO,
     salesChannelId: string,
     pin?: string
-  ): Promise<FetchWalletBalanceResponse> => {
+  ): Promise<WalletBalanceDAO> => {
     try {
       const requestBody = [
         {
@@ -80,7 +82,7 @@ export class APIManager {
           type: wallet.type,
         },
       ];
-      const response = await axios.post(
+      const response = await axios.post<FetchWalletBalanceResponse>(
         `/app/api/v1/wallet/balances/${salesChannelId}`,
         requestBody
       );
@@ -91,20 +93,31 @@ export class APIManager {
         );
       } else {
         this.printJSON(response.data);
-        return response.data as FetchWalletBalanceResponse;
+        if (
+          response.data.responseBody[0].type === wallet.type &&
+          response.data.responseBody[0].balance != undefined
+        ) {
+          return {
+            type: response.data.responseBody[0].type,
+            balance: response.data.responseBody[0].balance,
+            id: response.data.responseBody[0].id,
+          };
+        } else {
+          throw new APIError("Balance null", response.status);
+        }
       }
     } catch (error) {
       throw this.errorhandling(error);
     }
   };
-  fetchDashboardGraph = async (date:string, posCode: string) => {
+  fetchDashboardGraph = async (date: string, posCode: string) => {
     try {
-      const response = await axios.get(`app/api/pos/get/last/analytics`,{
-        params:{
+      const response = await axios.get(`app/api/pos/get/last/analytics`, {
+        params: {
           date: date,
-          posCode: posCode
-        }
-      })
+          posCode: posCode,
+        },
+      });
       if (response.status != 200) {
         throw new APIError(
           "recived response status code invalid",
@@ -117,7 +130,7 @@ export class APIManager {
     } catch (error) {
       throw this.errorhandling(error);
     }
-  }
+  };
   errorhandling = (error: unknown): APIError | UnauthorizedError => {
     console.log(error);
     if (error instanceof AxiosError) {

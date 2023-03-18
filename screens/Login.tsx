@@ -12,12 +12,14 @@ import { Formik } from "formik";
 import * as yup from "yup";
 import OoredooPayBtn from "../components/OoredooPayBtn";
 import OoredooTextInput from "../components/OoredooTextInput";
-import ValidationErrLbl from "../components/ValidationErrLbl";
 import { TextInput } from "react-native-paper";
 import { APIManager } from "../AppManger/ApiManger";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../types";
 import { useToast } from "react-native-toast-notifications";
+import { useMutation } from "react-query";
+import { APIError, UnauthorizedError } from "../responseModels/responseModels";
+import OoredooActivityView from "../components/OoredooActivityView";
 const loginValidationSchema = yup.object().shape({
   username: yup.string().required("Username is Required"),
   password: yup.string().required("Password is required"),
@@ -25,28 +27,40 @@ const loginValidationSchema = yup.object().shape({
 
 const Login = (props: LoginScreenProps) => {
   const [passwordVisibility, setPasswordVisibility] = useState(true);
-  const [loginSuccess, setLoginSuccess] = useState(false)
-  const [toastMessage, setToastMessage] = useState('')
   const toast = useToast();
   const handleForgetPassword = () => {
     console.log("Forget password");
   };
-
-  const handleLogin = (username:string, password: string) => {
-    APIManager.sharedInstance().loginAPI(username, password).then((value) => {
-      setToastMessage(value.message)
-      setLoginSuccess(true)
-     const successToast =  toast.show("Login Successfull", {
-        type:"success",
-        placement:"bottom",
+  const loginmutation = useMutation({
+    mutationFn: ({ username, password }: LoginReq) =>
+      APIManager.sharedInstance().loginAPI(username, password),
+    onSuccess(data, _variables, _context) {
+      toast.show(data.message, {
+        type: "success",
+        placement: "bottom",
         duration: 1000,
         animationType: "slide-in",
-      })
-      props.navigation.navigate('Dashboard')
-    }).catch((err) => {
-      setToastMessage(err.message)
-    })
-  }
+      });
+       props.navigation.navigate('Dashboard')
+    },
+    onError(error, _variables, _context) {
+      if (error instanceof UnauthorizedError) {
+        toast.show(error.message, {
+          type: "error",
+          placement: "bottom",
+          duration: 1000,
+          animationType: "slide-in",
+        });
+      } else {
+        toast.show("something went wrong", {
+          type: "error",
+          placement: "bottom",
+          duration: 1000,
+          animationType: "slide-in",
+        });
+      }
+    },
+  });
   return (
     <SafeAreaView style={styles.container}>
       <View>
@@ -61,13 +75,18 @@ const Login = (props: LoginScreenProps) => {
           </Header14RubikLbl>
         </View>
       </View>
-      <View >
+      <View>
         <Formik
           initialValues={{
             username: "",
             password: "",
           }}
-          onSubmit={(values) => handleLogin(values.username, values.password)}
+          onSubmit={(values) =>
+            loginmutation.mutate({
+              username: values.username,
+              password: values.password,
+            })
+          }
           validationSchema={loginValidationSchema}
         >
           {({
@@ -81,39 +100,38 @@ const Login = (props: LoginScreenProps) => {
           }) => (
             <View style={styles.formView}>
               <View>
-              <OoredooTextInput
-                onChangeText={handleChange("username")}
-                onBlur={handleBlur("username")}
-                value={values.username}
-                style={styles.userTF}
-                placeholder="UserName"
-              />
-              {errors.username && touched.username && (
-                <ValidationErrLbl>{errors.username}</ValidationErrLbl>
-              )}
-              <OoredooTextInput
-                onChangeText={handleChange("password")}
-                onBlur={handleBlur("password")}
-                value={values.password}
-                style={styles.passwordTF}
-                placeholder="Password"
-                secureTextEntry={passwordVisibility}
-                right={
-                  <TextInput.Icon
-                    icon="eye"
-                    onPress={() => setPasswordVisibility(!passwordVisibility)}
-                  />
-                }
-              />
-              {errors.password && touched.password && (
-                <ValidationErrLbl>{errors.password}</ValidationErrLbl>
-              )}
-              </View>  
+                <OoredooTextInput
+                  onChangeText={handleChange("username")}
+                  onBlur={handleBlur("username")}
+                  value={values.username}
+                  style={styles.userTF}
+                  placeholder="UserName"
+                  showError={errors.username && touched.username}
+                  errorMsg={errors.username}
+                />
+                <OoredooTextInput
+                  onChangeText={handleChange("password")}
+                  onBlur={handleBlur("password")}
+                  value={values.password}
+                  style={styles.passwordTF}
+                  placeholder="Password"
+                  secureTextEntry={passwordVisibility}
+                  right={
+                    <TextInput.Icon
+                      icon="eye"
+                      onPress={() => setPasswordVisibility(!passwordVisibility)}
+                    />
+                  }
+                  showError={errors.password && touched.password}
+                  errorMsg={errors.password}
+                />
+              </View>
               <View style={styles.buttonView}>
                 <OoredooPayBtn
                   title="Login"
                   onPress={handleSubmit}
                   style={styles.paybtn}
+                  isDisabled={!isValid}
                 />
                 <TouchableOpacity
                   onPress={handleForgetPassword}
@@ -125,13 +143,13 @@ const Login = (props: LoginScreenProps) => {
             </View>
           )}
         </Formik>
+        {loginmutation.isLoading ? <OoredooActivityView /> : null}
       </View>
-     
     </SafeAreaView>
   );
 };
 
-type LoginScreenProps = NativeStackScreenProps<RootStackParamList, "Root">
+type LoginScreenProps = NativeStackScreenProps<RootStackParamList, "Root">;
 
 export default Login;
 
@@ -173,9 +191,13 @@ const styles = StyleSheet.create({
   },
   forgetPass: {
     marginTop: 20,
-    alignSelf:'center',
+    alignSelf: "center",
   },
-  toast:{
-    width: "80%"
-  }
+  toast: {
+    width: "80%",
+  },
 });
+interface LoginReq {
+  username: string;
+  password: string;
+}

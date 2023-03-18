@@ -7,24 +7,30 @@ import NotoRegular12 from "../OoredooFonts/Noto/NotoRegular12";
 import { StoresContext } from "../../store/RootStore";
 import { observer } from "mobx-react";
 import OoredooPinModal from "../OoredooPinModal";
-import CryptoES from 'crypto-es';
-import Crypto from 'react-native-quick-crypto'
-import { AppConstants } from "../../constants/AppConstants";
+import { walletBalanceHook } from "../../query-hooks/QueryHooks";
 const DashboardBalance = observer((props: DashboardBalanceProps) => {
   const userStore = useContext(StoresContext).userDetailStore;
+  const balanceMutation = walletBalanceHook();
   const [switchState, setSwitch] = useState(false);
   const [showModal, setModal] = useState(false);
-  const fetchBalance = async (isFaisa: boolean) => {
+  const fetchBalance = (isFaisa: boolean) => {
     if (isFaisa) {
       setModal(true);
     } else {
-      userStore.fetchBalance();
+      balanceMutation.mutate({
+        wallet: userStore.selectedRastasWallet,
+        salesChannelId: userStore.salesChannelList[0],
+        mpin: undefined,
+      });
     }
   };
   const handleFaisaPin = (pin: string) => {
-    setModal(false)
-    const digest = CryptoES.AES.encrypt(pin, AppConstants.aesKey, {padding:CryptoES.pad.Pkcs7, mode: CryptoES.mode.ECB})
-    userStore.fetchBalance(userStore.selectedFaisaWallet, digest.toString());
+    setModal(false);
+    balanceMutation.mutate({
+      wallet: userStore.selectedFaisaWallet,
+      salesChannelId: userStore.salesChannelList[0],
+      mpin: pin,
+    });
   };
   return (
     <View style={styles.container}>
@@ -52,7 +58,11 @@ const DashboardBalance = observer((props: DashboardBalanceProps) => {
         </Header14RubikLbl>
       </TouchableOpacity>
       <NotoRegular12>
-        {switchState && userStore.selecetedRastasBalance}
+        {switchState && balanceMutation.isSuccess
+          ? balanceMutation.data.type === "Rastas"
+            ? balanceMutation.data.balance
+            : "0.00"
+          : null}
       </NotoRegular12>
       <TouchableOpacity style={styles.btn} onPress={() => fetchBalance(true)}>
         <Header14RubikLbl>
@@ -60,17 +70,22 @@ const DashboardBalance = observer((props: DashboardBalanceProps) => {
         </Header14RubikLbl>
       </TouchableOpacity>
       <NotoRegular12>
-        {switchState && userStore.selectedFaisaBalance}
+        {switchState && balanceMutation.isSuccess
+          ? balanceMutation.data.type === "Faisa"
+            ? balanceMutation.data.balance
+            : "0.00"
+          : null}
       </NotoRegular12>
-      {showModal && <OoredooPinModal
-        show={showModal}
-        walledId={userStore.selectedFaisaWallet.walletid}
-        returnPrin={handleFaisaPin}
-        onDismiss={function (): void {
-          setModal(false);
-        }}
-      />}
-      
+      {showModal && (
+        <OoredooPinModal
+          show={showModal}
+          walledId={userStore.selectedFaisaWallet.walletid}
+          returnPrin={handleFaisaPin}
+          onDismiss={function (): void {
+            setModal(false);
+          }}
+        />
+      )}
     </View>
   );
 });

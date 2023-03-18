@@ -1,6 +1,7 @@
 import { action, makeAutoObservable } from "mobx";
 import { APIManager } from "../AppManger/ApiManger";
 import { POSWalletDAO } from "../AppManger/POSAppManager";
+import { SelfUserDetails } from "../responseModels/SelfUserDetailsResponse";
 import { RootStore } from "./RootStore";
 
 export default class UserDetailsStore {
@@ -82,14 +83,10 @@ export default class UserDetailsStore {
   @action setUserRole(role: string) {
     this.currentRole = role;
   }
-  fetchSelfDetails = () => {
+ fetchSelfDetails = (response: SelfUserDetails) => {
     this.salesChannelList = [];
     this.faisaWallets = Object.assign([], this.faisaWallets);
     this.rastasWallets = Object.assign([], this.rastasWallets);
-    APIManager.sharedInstance()
-      .userDetails()
-      .then(
-        action((response) => {
           this.setUserDetails(
             response.userFirstName,
             response.userCredentials.username,
@@ -105,8 +102,6 @@ export default class UserDetailsStore {
           this.setDefaultFaisaWallet(undefined);
           this.currentRole = response.currentRole;
           this.userId = response.userId
-        })
-      );
   };
 
   fetchBalance(wallet?: POSWalletDAO, pin?: string) {
@@ -116,9 +111,9 @@ export default class UserDetailsStore {
         .then(
           action((response) => {
             if (wallet.type === "Rastas") {
-              this.selecetedRastasBalance = response.responseBody[0].balance;
+              this.selecetedRastasBalance = response.balance;
             } else {
-              this.selectedFaisaBalance = response.responseBody[0].balance;
+              this.selectedFaisaBalance = response.balance;
             }
           })
         );
@@ -131,7 +126,7 @@ export default class UserDetailsStore {
         )
         .then(
           action((response) => {
-            this.selecetedRastasBalance = response.responseBody[0].balance;
+            this.selecetedRastasBalance = response.balance;
           })
         );
     }

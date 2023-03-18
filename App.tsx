@@ -6,9 +6,10 @@ import { useFonts } from 'expo-font';
 import { NotoSans_400Regular } from '@expo-google-fonts/noto-sans';
 import { ToastProvider } from 'react-native-toast-notifications'
 import { defaultStore, StoresContext } from './store/RootStore';
-
+import { QueryClient, QueryClientProvider } from 'react-query';
 export default function App() {
   const isLoadingComplete = useCachedResources();
+  const queryClient = new QueryClient()
   let [fontsLoaded] =  useFonts({
     Rubik_700Bold,
     NotoSans_400Regular,
@@ -21,11 +22,13 @@ export default function App() {
   } else {
     return (
       <StoresContext.Provider value={defaultStore}>
+        <QueryClientProvider client={queryClient}>
         <SafeAreaProvider>
          <ToastProvider>
          <Navigation/>
          </ToastProvider>
       </SafeAreaProvider>
+        </QueryClientProvider>
       </StoresContext.Provider>  
     );
   }
