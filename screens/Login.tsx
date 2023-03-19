@@ -18,7 +18,7 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../types";
 import { useToast } from "react-native-toast-notifications";
 import { useMutation } from "react-query";
-import { APIError, UnauthorizedError } from "../responseModels/responseModels";
+import { UnauthorizedError } from "../responseModels/responseModels";
 import OoredooActivityView from "../components/OoredooActivityView";
 const loginValidationSchema = yup.object().shape({
   username: yup.string().required("Username is Required"),
@@ -97,6 +97,7 @@ const Login = (props: LoginScreenProps) => {
             errors,
             isValid,
             touched,
+            dirty
           }) => (
             <View style={styles.formView}>
               <View>
@@ -131,7 +132,7 @@ const Login = (props: LoginScreenProps) => {
                   title="Login"
                   onPress={handleSubmit}
                   style={styles.paybtn}
-                  isDisabled={!isValid}
+                  isDisabled={!(isValid && dirty)}
                 />
                 <TouchableOpacity
                   onPress={handleForgetPassword}

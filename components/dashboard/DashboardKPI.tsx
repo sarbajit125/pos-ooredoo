@@ -1,4 +1,5 @@
 import {
+  Dimensions,
   FlatList,
   ListRenderItemInfo,
   StyleSheet,
@@ -8,23 +9,22 @@ import {
 } from "react-native";
 import React, { useContext, useEffect, useState } from "react";
 import { observer } from "mobx-react";
-import { APIManager } from "../../AppManger/ApiManger";
 import { StoresContext } from "../../store/RootStore";
-
 import { ColorConstants } from "../../constants/Colors";
 import { dashboardGraphHook } from "../../query-hooks/QueryHooks";
-import OoredooActivityView from "../OoredooActivityView";
-import OoredooBadReqView from "../errors/OoredooBadReqView";
+import { LineChart } from "react-native-chart-kit";
 const DashboardKPI = observer(() => {
   const userStore = useContext(StoresContext).userDetailStore;
   const [kpiList, setKPIList] = useState<kpiScroll[]>([]);
+  var [grossList, setGrossList] = useState<GraphData[]>([]);
+  var [primaryList, setPrimaryList] = useState<GraphData[]>([]);
+  var [secondaryList, setSecondaryList] = useState<GraphData[]>([]);
   const { data, isSuccess, isLoading, error } = dashboardGraphHook(
     userStore.userId
   );
   useEffect(() => {
     if (isSuccess) {
       const lastObj = data.responseBody.slice(-1).pop();
-      console.log(lastObj);
       let scrollArr: kpiScroll[] = [
         { type: "Gross Add", value: "0", isSelcted: true },
         { type: "Primary", value: "0", isSelcted: false },
@@ -51,9 +51,9 @@ const DashboardKPI = observer(() => {
         type: item.type,
         value: item.value,
       };
-      return obj
+      return obj;
     });
-    setKPIList(updatedArr)
+    setKPIList(updatedArr);
   };
   const renderCollectionCell = (item: ListRenderItemInfo<kpiScroll>) => {
     return (
@@ -78,6 +78,62 @@ const DashboardKPI = observer(() => {
       </TouchableOpacity>
     );
   };
+  const rendergraph = () => {
+    let grossArr: GraphData[] = [];
+    data?.responseBody.map((item) => {
+      item.filter((item) => item.kpiType === "Gross Add").forEach((item) => {
+        let graphObj: GraphData = { date: item.addDate, value: item.mtd };
+            grossArr.push(graphObj);
+      })
+      // setGrossList(grossArr);
+      // let primaryArr: GraphData[] = [];
+      // item.filter((item) => item.kpiType === scrollArr[1].type).forEach((item) => {
+      //   let graphObj: GraphData = { date: item.addDate, value: item.mtd };
+      //   primaryArr.push(graphObj);
+      // })
+      // setPrimaryList(primaryArr);
+      // let secondaryArr: GraphData[] = [];
+      // item.filter((item) => item.kpiType === scrollArr[2].type).forEach((item) => {
+      //   let graphObj: GraphData = { date: item.addDate, value: item.mtd };
+      //   secondaryArr.push(graphObj);
+      // })
+      // setSecondaryList(secondaryArr);
+    });
+    return (
+      <LineChart
+          width={Dimensions.get("window").width - 16}
+          height={200}
+          chartConfig={{
+            backgroundColor: "#e26a00",
+            backgroundGradientFrom: "white",
+            backgroundGradientTo: "white",        
+            decimalPlaces: 2, // optional, defaults to 2dp
+            color: (opacity = 1) => `rgba(176, 224, 32, 1)`,
+            labelColor: (opacity = 1) => `rgba(137, 137, 137, 1)`,
+
+            style: {
+              borderRadius: 16
+            },
+            propsForDots: {
+              r: "6",
+              strokeWidth: "2",
+              
+            }
+          }}
+          data={{
+            labels: ["!","2"],
+            legend: ['Gross'],
+            datasets:[
+              {
+                data: [1,2,3],
+                strokeWidth: 2,
+              },
+            ],
+          }}
+          style={{borderRadius: 16}}
+        />
+    )
+  }
   return (
     <View style={styles.container}>
       <View style={styles.scrollView}>
@@ -88,7 +144,9 @@ const DashboardKPI = observer(() => {
           renderItem={(item) => renderCollectionCell(item)}
         />
       </View>
-      <View style={styles.graphview}></View>
+      <View style={styles.graphview}>
+        {isSuccess ? rendergraph() : null }
+      </View>
     </View>
   );
 });
@@ -133,4 +191,9 @@ interface kpiScroll {
   type: string;
   value: string;
   isSelcted: boolean;
+}
+
+interface GraphData {
+  date: string;
+  value: string;
 }
