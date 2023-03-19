@@ -15,7 +15,8 @@ import { POSWalletDAO } from "./POSAppManager";
 export class APIManager {
   private static instance: APIManager;
   private constructor() {
-    axios.defaults.baseURL = "http://192.168.29.217:8000/pos";
+    //axios.defaults.baseURL = "http://192.168.29.217:8000/pos";
+    axios.defaults.baseURL = "http://10.10.9.113:9080";
     axios.defaults.headers.common["x-auth-token"] = "";
     axios.interceptors.request.use((request) => {
       console.log("Starting Request", JSON.stringify(request, null, 2));

@@ -9,11 +9,13 @@ export const walletBalanceHook = () =>
     mutationKey: ["walletbalance"],
     mutationFn: (reqObj: FetchbalanceReq) => {
       if (reqObj.wallet.type === "Faisa") {
-        const digest = CryptoES.AES.encrypt(reqObj.mpin, AppConstants.aesKey, {
+        let encodedPin = CryptoES.enc.Utf8.parse(reqObj.mpin)
+        let encodedKey = CryptoES.enc.Utf8.parse(AppConstants.aesKey)
+        const encoded = CryptoES.AES.encrypt(encodedPin, encodedKey, {
           padding: CryptoES.pad.Pkcs7,
           mode: CryptoES.mode.ECB,
         });
-        reqObj.mpin = digest.toString();
+        reqObj.mpin = encoded.ciphertext.toString(CryptoES.enc.Base64);
       }
       return APIManager.sharedInstance().fetchWalletBalance(
         reqObj.wallet,
