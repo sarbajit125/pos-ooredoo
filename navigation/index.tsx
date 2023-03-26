@@ -1,16 +1,17 @@
-/**
- * If you are not familiar with React Navigation, refer to the "Fundamentals" guide:
- * https://reactnavigation.org/docs/getting-started
- *
- */
-import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import * as React from 'react';
-import { ColorSchemeName } from 'react-native';
-import Dashboard from '../screens/Dashboard';
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { NavigationContainer } from "@react-navigation/native";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import * as React from "react";
+import { View, Image, TouchableHighlight } from "react-native";
+import NavigationBar from "../components/Core/NavigationBar";
+import { ColorConstants } from "../constants/Colors";
+import Dashboard from "../screens/Dashboard";
 
-import Login from '../screens/Login';
-import { RootStackParamList } from '../types';
+import Login from "../screens/Login";
+import Rewards from "../screens/Rewards";
+import Support from "../screens/Support";
+import ViewStock from "../screens/ViewStock";
+import { RootStackParamList, RootTabParamList } from "../types";
 
 export default function Navigation() {
   return (
@@ -28,9 +29,23 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 
 function RootNavigator() {
   return (
-    <Stack.Navigator>
-      <Stack.Screen name="Root" component={Login} options={{ headerShown: false }} />
-      <Stack.Screen name='Dashboard' component={Dashboard} options={{headerShown: false}} />
+    <Stack.Navigator   screenOptions={{
+      headerBackVisible:false,
+      header(props) {
+        return (<NavigationBar {...props}  />)
+      },
+    }}>
+      <Stack.Screen
+        name="Root"
+        component={Login}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="Home"
+        component={Home}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen name= "StockStatus" component={ViewStock}  />
     </Stack.Navigator>
   );
 }
@@ -39,57 +54,59 @@ function RootNavigator() {
  * A bottom tab navigator displays tab buttons on the bottom of the display to switch screens.
  * https://reactnavigation.org/docs/bottom-tab-navigator
  */
-// const BottomTab = createBottomTabNavigator<RootTabParamList>();
+const BottomTab = createBottomTabNavigator<RootTabParamList>();
 
-// function BottomTabNavigator() {
-//   const colorScheme = useColorScheme();
-
-//   return (
-//     <BottomTab.Navigator
-//       initialRouteName="TabOne"
-//       screenOptions={{
-//         tabBarActiveTintColor: Colors[colorScheme].tint,
-//       }}>
-//       <BottomTab.Screen
-//         name="TabOne"
-//         component={TabOneScreen}
-//         options={({ navigation }: RootTabScreenProps<'TabOne'>) => ({
-//           title: 'Tab One',
-//           tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
-//           headerRight: () => (
-//             <Pressable
-//               onPress={() => navigation.navigate('Modal')}
-//               style={({ pressed }) => ({
-//                 opacity: pressed ? 0.5 : 1,
-//               })}>
-//               <FontAwesome
-//                 name="info-circle"
-//                 size={25}
-//                 color={Colors[colorScheme].text}
-//                 style={{ marginRight: 15 }}
-//               />
-//             </Pressable>
-//           ),
-//         })}
-//       />
-//       <BottomTab.Screen
-//         name="TabTwo"
-//         component={TabTwoScreen}
-//         options={{
-//           title: 'Tab Two',
-//           tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
-//         }}
-//       />
-//     </BottomTab.Navigator>
-//   );
-// }
-
-// /**
-//  * You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
-//  */
-// function TabBarIcon(props: {
-//   name: React.ComponentProps<typeof FontAwesome>['name'];
-//   color: string;
-// }) {
-//   return <FontAwesome size={30} style={{ marginBottom: -3 }} {...props} />;
-// }
+function Home() {
+  return (
+    <BottomTab.Navigator
+      initialRouteName="Home"
+      screenOptions={{
+        headerShown: false,
+        tabBarActiveTintColor: ColorConstants.red_ED1,
+        tabBarInactiveTintColor: ColorConstants.grey_898,
+        tabBarStyle:{
+          marginBottom: 20,
+          height: 80,
+          borderRadius: 8,
+          borderWidth: 1,
+          shadowColor: ColorConstants.shadow_color,
+          backgroundColor: ColorConstants.white,
+          shadowOffset: {width: -2, height: 4},
+          shadowRadius: 2,
+          shadowOpacity: 0,
+        },
+        tabBarLabelStyle:{
+          paddingBottom: 10,
+        }
+      }}
+    >
+      <BottomTab.Screen name="Home" component={Dashboard} options={{tabBarIcon(props) {
+        return (
+          <View>
+            <Image source={require("../assets/images/homeTab.png")}
+              resizeMode="contain"
+              style={{ width: 25, maxHeight: 25 }}/>
+          </View>
+        )
+      },}} />
+      <BottomTab.Screen name="Rewards" component={Rewards} options={{tabBarIcon(props) {
+        return (
+          <View>
+            <Image source={require("../assets/images/rewardTab.png")}
+              resizeMode="contain"
+              style={{ width: 25, maxHeight: 25 }}/>
+          </View>
+        )
+      },}} />
+      <BottomTab.Screen name="Support" component={Support} options={{tabBarIcon(props) {
+        return (
+          <View>
+            <Image source={require("../assets/images/supportTab.png")}
+              resizeMode="contain"
+              style={{ width: 25, maxHeight: 25 }}/>
+          </View>
+        )
+      },}} />
+    </BottomTab.Navigator>
+  );
+}

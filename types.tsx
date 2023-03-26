@@ -14,8 +14,9 @@ declare global {
 }
 
 export type RootStackParamList = {
-  Root:  undefined;
-  Dashboard: undefined;
+  Root:  BottomTabScreenProps<RootTabParamList> | undefined;
+  Home: undefined;
+  StockStatus: undefined;
 };
 
 export type RootStackScreenProps<Screen extends keyof RootStackParamList> = NativeStackScreenProps<
@@ -24,8 +25,9 @@ export type RootStackScreenProps<Screen extends keyof RootStackParamList> = Nati
 >;
 
 export type RootTabParamList = {
-  TabOne: undefined;
-  TabTwo: undefined;
+  Home: undefined;
+  Rewards: undefined;
+  Support: undefined
 };
 
 export type RootTabScreenProps<Screen extends keyof RootTabParamList> = CompositeScreenProps<

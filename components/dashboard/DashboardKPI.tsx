@@ -42,6 +42,26 @@ const DashboardKPI = observer(() => {
         }
       });
       setKPIList(scrollArr);
+      let grossArr: GraphData[] = [];
+    data?.responseBody.map((item) => {
+      item.filter((item) => item.kpiType === "Gross Add").forEach((item) => {
+        let graphObj: GraphData = { date: item.addDate, value: item.mtd };
+            grossArr.push(graphObj);
+      })
+     setGrossList(grossArr);
+      // let primaryArr: GraphData[] = [];
+      // item.filter((item) => item.kpiType === scrollArr[1].type).forEach((item) => {
+      //   let graphObj: GraphData = { date: item.addDate, value: item.mtd };
+      //   primaryArr.push(graphObj);
+      // })
+      // setPrimaryList(primaryArr);
+      // let secondaryArr: GraphData[] = [];
+      // item.filter((item) => item.kpiType === scrollArr[2].type).forEach((item) => {
+      //   let graphObj: GraphData = { date: item.addDate, value: item.mtd };
+      //   secondaryArr.push(graphObj);
+      // })
+      // setSecondaryList(secondaryArr);
+    });
     }
   }, [data]);
   const cellSelected = (cell: kpiScroll) => {
@@ -78,28 +98,17 @@ const DashboardKPI = observer(() => {
       </TouchableOpacity>
     );
   };
-  const rendergraph = () => {
-    let grossArr: GraphData[] = [];
-    data?.responseBody.map((item) => {
-      item.filter((item) => item.kpiType === "Gross Add").forEach((item) => {
-        let graphObj: GraphData = { date: item.addDate, value: item.mtd };
-            grossArr.push(graphObj);
-      })
-      // setGrossList(grossArr);
-      // let primaryArr: GraphData[] = [];
-      // item.filter((item) => item.kpiType === scrollArr[1].type).forEach((item) => {
-      //   let graphObj: GraphData = { date: item.addDate, value: item.mtd };
-      //   primaryArr.push(graphObj);
-      // })
-      // setPrimaryList(primaryArr);
-      // let secondaryArr: GraphData[] = [];
-      // item.filter((item) => item.kpiType === scrollArr[2].type).forEach((item) => {
-      //   let graphObj: GraphData = { date: item.addDate, value: item.mtd };
-      //   secondaryArr.push(graphObj);
-      // })
-      // setSecondaryList(secondaryArr);
-    });
-    return (
+  return (
+    <View style={styles.container}>
+      <View style={styles.scrollView}>
+        <FlatList
+          data={kpiList}
+          horizontal={true}
+          keyExtractor={(key) => key.type}
+          renderItem={(item) => renderCollectionCell(item)}
+        />
+      </View>
+      <View style={styles.graphview}>
       <LineChart
           width={Dimensions.get("window").width - 16}
           height={200}
@@ -121,31 +130,17 @@ const DashboardKPI = observer(() => {
             }
           }}
           data={{
-            labels: ["!","2"],
+            labels: ["1","2"],
             legend: ['Gross'],
             datasets:[
               {
-                data: [1,2,3],
+                data: [1,2,3,4],
                 strokeWidth: 2,
               },
             ],
           }}
           style={{borderRadius: 16}}
         />
-    )
-  }
-  return (
-    <View style={styles.container}>
-      <View style={styles.scrollView}>
-        <FlatList
-          data={kpiList}
-          horizontal={true}
-          keyExtractor={(key) => key.type}
-          renderItem={(item) => renderCollectionCell(item)}
-        />
-      </View>
-      <View style={styles.graphview}>
-        {isSuccess ? rendergraph() : null }
       </View>
     </View>
   );
@@ -158,7 +153,10 @@ const styles = StyleSheet.create({
   scrollView: {
     height: 40,
   },
-  graphview: {},
+  graphview: {
+    marginTop: 10,
+    padding:2,
+  },
   cell: {
     width: 150,
     height: 35,

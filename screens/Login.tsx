@@ -41,7 +41,7 @@ const Login = (props: LoginScreenProps) => {
         duration: 1000,
         animationType: "slide-in",
       });
-       props.navigation.navigate('Dashboard')
+       props.navigation.navigate('Home', {screen:'Dashboard'})
     },
     onError(error, _variables, _context) {
       if (error instanceof UnauthorizedError) {

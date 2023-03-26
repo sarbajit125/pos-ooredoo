@@ -10,6 +10,7 @@ import {
   UnauthorizedError,
 } from "../responseModels/responseModels";
 import { SelfUserDetails } from "../responseModels/SelfUserDetailsResponse";
+import { StockStatusResponse } from "../responseModels/StockStatusResponse";
 import { POSWalletDAO } from "./POSAppManager";
 
 export class APIManager {
@@ -132,6 +133,22 @@ export class APIManager {
       throw this.errorhandling(error);
     }
   };
+  fetchStockStatus = async (poscode:string) => {
+    try {
+        const response = await axios.get<StockStatusResponse>(`app/master/stockStatus/getStockByUserId/${poscode}`)
+        if (response.status != 200) {
+          throw new APIError(
+            "recived response status code invalid",
+            response.status
+          );
+        } else {
+          this.printJSON(response.data);
+          return response.data
+        }
+    } catch (error) {
+      throw this.errorhandling(error)
+    }
+  }
   errorhandling = (error: unknown): APIError | UnauthorizedError => {
     console.log(error);
     if (error instanceof AxiosError) {

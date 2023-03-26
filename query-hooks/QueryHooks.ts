@@ -45,3 +45,8 @@ export const dashboardGraphHook = (posCode: string) =>
       return APIManager.sharedInstance().fetchDashboardGraph(formatDate, posCode)
     },
   })
+  export const StockDetailsHook = (posCode: string) => useQuery({
+    queryKey:['stockStatus', posCode],
+    queryFn:() => APIManager.sharedInstance().fetchStockStatus(posCode),
+    staleTime: 3600000,
+  })

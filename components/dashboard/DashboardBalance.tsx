@@ -13,6 +13,8 @@ const DashboardBalance = observer((props: DashboardBalanceProps) => {
   const balanceMutation = walletBalanceHook();
   const [switchState, setSwitch] = useState(false);
   const [showModal, setModal] = useState(false);
+  const [rastasbalance, setRastasBalance] = useState('0.00')
+  const [faisaBalance, setFaisaBalance] = useState('0.00')
   const fetchBalance = (isFaisa: boolean) => {
     if (isFaisa) {
       setModal(true);
@@ -21,6 +23,12 @@ const DashboardBalance = observer((props: DashboardBalanceProps) => {
         wallet: userStore.selectedRastasWallet,
         salesChannelId: userStore.salesChannelList[0],
         mpin: undefined,
+      },{
+        onSuccess(data, variables, context) {
+          data.type === "Faisa"
+            ? setFaisaBalance(data.balance)
+            : setFaisaBalance("0.00")
+        },
       });
     }
   };
@@ -30,7 +38,11 @@ const DashboardBalance = observer((props: DashboardBalanceProps) => {
       wallet: userStore.selectedFaisaWallet,
       salesChannelId: userStore.salesChannelList[0],
       mpin: pin,
-    });
+    }, {onSuccess(data, variables, context) {
+      data.type === "Rastas"
+      ? setRastasBalance(data.balance)
+      : setRastasBalance("0.00")
+    },});
   };
   return (
     <View style={styles.container}>
@@ -58,11 +70,7 @@ const DashboardBalance = observer((props: DashboardBalanceProps) => {
         </Header14RubikLbl>
       </TouchableOpacity>
       <NotoRegular12>
-        {switchState && balanceMutation.isSuccess
-          ? balanceMutation.data.type === "Rastas"
-            ? balanceMutation.data.balance
-            : "0.00"
-          : null}
+        {switchState && rastasbalance}
       </NotoRegular12>
       <TouchableOpacity style={styles.btn} onPress={() => fetchBalance(true)}>
         <Header14RubikLbl>
@@ -70,11 +78,7 @@ const DashboardBalance = observer((props: DashboardBalanceProps) => {
         </Header14RubikLbl>
       </TouchableOpacity>
       <NotoRegular12>
-        {switchState && balanceMutation.isSuccess
-          ? balanceMutation.data.type === "Faisa"
-            ? balanceMutation.data.balance
-            : "0.00"
-          : null}
+        {switchState && faisaBalance}
       </NotoRegular12>
       {showModal && (
         <OoredooPinModal
