@@ -12,6 +12,7 @@ import Rewards from "../screens/Rewards";
 import Support from "../screens/Support";
 import ViewStock from "../screens/ViewStock";
 import { RootStackParamList, RootTabParamList } from "../types";
+import Profile from "../screens/Profile";
 
 export default function Navigation() {
   return (
@@ -46,6 +47,7 @@ function RootNavigator() {
         options={{ headerShown: false }}
       />
       <Stack.Screen name= "StockStatus" component={ViewStock}  />
+      <Stack.Screen name="Profile" component={Profile}  options={{ headerShown: false }} />
     </Stack.Navigator>
   );
 }

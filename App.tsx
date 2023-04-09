@@ -7,6 +7,7 @@ import { NotoSans_400Regular,NotoSans_300Light } from '@expo-google-fonts/noto-s
 import { ToastProvider } from 'react-native-toast-notifications'
 import { defaultStore, StoresContext } from './store/RootStore';
 import { QueryClient, QueryClientProvider } from 'react-query';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 export default function App() {
   const isLoadingComplete = useCachedResources();
   const queryClient = new QueryClient()
@@ -23,6 +24,7 @@ export default function App() {
     return null;
   } else {
     return (
+      <GestureHandlerRootView style={{ flex: 1 }}>
       <StoresContext.Provider value={defaultStore}>
         <QueryClientProvider client={queryClient}>
         <SafeAreaProvider>
@@ -32,6 +34,7 @@ export default function App() {
       </SafeAreaProvider>
         </QueryClientProvider>
       </StoresContext.Provider>  
+      </GestureHandlerRootView>
     );
   }
 }

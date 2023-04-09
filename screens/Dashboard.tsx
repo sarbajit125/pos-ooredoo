@@ -33,7 +33,7 @@ const Dashboard = observer((props: LoginScreenProps) => {
           <View style={styles.topBar}>
             <DashbordNav
               profileTapped={function (): void {
-                // Laucnh Profile section
+                props.navigation.navigate('Profile')
               }}
               notificationTapped={function (): void {
                 // Launch notification
