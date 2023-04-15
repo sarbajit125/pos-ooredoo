@@ -12,6 +12,7 @@ import {
 import { SelfUserDetails } from "../responseModels/SelfUserDetailsResponse";
 import { StockStatusResponse } from "../responseModels/StockStatusResponse";
 import { POSWalletDAO } from "./POSAppManager";
+import { HistoryListResponse } from "../responseModels/HistoryListResponse";
 
 export class APIManager {
   private static instance: APIManager;
@@ -90,7 +91,7 @@ export class APIManager {
       );
       if (response.status != 200) {
         throw new APIError(
-          "recived response status code invalid",
+          "received response status code invalid",
           response.status
         );
       } else {
@@ -145,6 +146,21 @@ export class APIManager {
           this.printJSON(response.data);
           return response.data
         }
+    } catch (error) {
+      throw this.errorhandling(error)
+    }
+  }
+  fetchTransactionHistory = async (orderType: string, startDate: string, endDate: string) => {
+    try {
+      const response = await axios.get<HistoryListResponse[]>(`api/v1/customer/orders`,{
+        params:{
+          orderType: orderType,
+          "orderDate%3E":  startDate,
+          "orderDate%3C": endDate
+        }
+      })
+      this.printJSON(response.data);
+      return response.data
     } catch (error) {
       throw this.errorhandling(error)
     }

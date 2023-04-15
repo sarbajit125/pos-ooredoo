@@ -13,6 +13,7 @@ import Support from "../screens/Support";
 import ViewStock from "../screens/ViewStock";
 import { RootStackParamList, RootTabParamList } from "../types";
 import Profile from "../screens/Profile";
+import HistoryTable from "../screens/HistoryTable";
 
 export default function Navigation() {
   return (
@@ -30,12 +31,14 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 
 function RootNavigator() {
   return (
-    <Stack.Navigator   screenOptions={{
-      headerBackVisible:false,
-      header(props) {
-        return (<NavigationBar {...props}  />)
-      },
-    }}>
+    <Stack.Navigator
+      screenOptions={{
+        headerBackVisible: false,
+        header(props) {
+          return <NavigationBar {...props} />;
+        },
+      }}
+    >
       <Stack.Screen
         name="Root"
         component={Login}
@@ -46,8 +49,16 @@ function RootNavigator() {
         component={Home}
         options={{ headerShown: false }}
       />
-      <Stack.Screen name= "StockStatus" component={ViewStock}  />
-      <Stack.Screen name="Profile" component={Profile}  options={{ headerShown: false }} />
+      <Stack.Screen name="StockStatus" component={ViewStock} />
+      <Stack.Screen
+        name="Profile"
+        component={Profile}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="TransactionHistory"
+        component={HistoryTable}
+      />
     </Stack.Navigator>
   );
 }
@@ -66,49 +77,73 @@ function Home() {
         headerShown: false,
         tabBarActiveTintColor: ColorConstants.red_ED1,
         tabBarInactiveTintColor: ColorConstants.grey_898,
-        tabBarStyle:{
+        tabBarStyle: {
           marginBottom: 20,
           height: 80,
           borderRadius: 8,
           borderWidth: 1,
           shadowColor: ColorConstants.shadow_color,
           backgroundColor: ColorConstants.white,
-          shadowOffset: {width: -2, height: 4},
+          shadowOffset: { width: -2, height: 4 },
           shadowRadius: 2,
           shadowOpacity: 0,
         },
-        tabBarLabelStyle:{
+        tabBarLabelStyle: {
           paddingBottom: 10,
-        }
+        },
       }}
     >
-      <BottomTab.Screen name="Home" component={Dashboard} options={{tabBarIcon(props) {
-        return (
-          <View>
-            <Image source={require("../assets/images/homeTab.png")}
-              resizeMode="contain"
-              style={{ width: 25, maxHeight: 25 }}/>
-          </View>
-        )
-      },}} />
-      <BottomTab.Screen name="Rewards" component={Rewards} options={{tabBarIcon(props) {
-        return (
-          <View>
-            <Image source={require("../assets/images/rewardTab.png")}
-              resizeMode="contain"
-              style={{ width: 25, maxHeight: 25 }}/>
-          </View>
-        )
-      },}} />
-      <BottomTab.Screen name="Support" component={Support} options={{tabBarIcon(props) {
-        return (
-          <View>
-            <Image source={require("../assets/images/supportTab.png")}
-              resizeMode="contain"
-              style={{ width: 25, maxHeight: 25 }}/>
-          </View>
-        )
-      },}} />
+      <BottomTab.Screen
+        name="Home"
+        component={Dashboard}
+        options={{
+          tabBarIcon(props) {
+            return (
+              <View>
+                <Image
+                  source={require("../assets/images/homeTab.png")}
+                  resizeMode="contain"
+                  style={{ width: 25, maxHeight: 25 }}
+                />
+              </View>
+            );
+          },
+        }}
+      />
+      <BottomTab.Screen
+        name="Rewards"
+        component={Rewards}
+        options={{
+          tabBarIcon(props) {
+            return (
+              <View>
+                <Image
+                  source={require("../assets/images/rewardTab.png")}
+                  resizeMode="contain"
+                  style={{ width: 25, maxHeight: 25 }}
+                />
+              </View>
+            );
+          },
+        }}
+      />
+      <BottomTab.Screen
+        name="Support"
+        component={Support}
+        options={{
+          tabBarIcon(props) {
+            return (
+              <View>
+                <Image
+                  source={require("../assets/images/supportTab.png")}
+                  resizeMode="contain"
+                  style={{ width: 25, maxHeight: 25 }}
+                />
+              </View>
+            );
+          },
+        }}
+      />
     </BottomTab.Navigator>
   );
 }

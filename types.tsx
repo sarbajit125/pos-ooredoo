@@ -18,7 +18,11 @@ export type RootStackParamList = {
   Home: undefined;
   StockStatus: undefined;
   Profile: undefined;
+  TransactionHistory: HistoryType;
 };
+export type HistoryType = {
+  id: 'transactionHistory' | 'walletHistory'
+}
 
 export type RootStackScreenProps<Screen extends keyof RootStackParamList> = NativeStackScreenProps<
   RootStackParamList,

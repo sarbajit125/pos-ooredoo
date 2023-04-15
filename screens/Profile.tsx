@@ -54,7 +54,9 @@ const Profile = (props: ProfileNavProps) => {
   const routerServices = (keyStr: string) => {
     switch (keyStr) {
       case "logout":
-       bottomSheetRef.current?.present()
+        bottomSheetRef.current?.present();
+      case 'transactionHistory':
+        props.navigation.navigate('TransactionHistory',{id:'transactionHistory'})
       default:
         console.log(keyStr);
     }
@@ -166,6 +168,12 @@ const ProfileServiceData: ExpandableListProps[] = [
     isExpanded: false,
     category_name: "Profile details",
     key: "profileDetails",
+    subcategory: [],
+  },
+  {
+    category_name: "Transaction History",
+    key: "transactionHistory",
+    isExpanded: false,
     subcategory: [],
   },
   {

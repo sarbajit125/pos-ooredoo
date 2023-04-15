@@ -50,3 +50,13 @@ export const dashboardGraphHook = (posCode: string) =>
     queryFn:() => APIManager.sharedInstance().fetchStockStatus(posCode),
     staleTime: 3600000,
   })
+  export const TransactionHistoryHook = (orderType?: string, startDate?: string, endDate?: string) => useQuery({
+    queryKey:['posHistory', orderType, startDate, endDate],
+    queryFn: () => {
+      let requestType = orderType || ""
+      let fromDate = startDate || dayjs(new Date().getDate() - 7).format("YYYY-MM_DD").toString();
+      let toDate =  endDate || dayjs(new Date().getDate()).format("YYYY-MM_DD").toString();
+      return APIManager.sharedInstance().fetchTransactionHistory(requestType, fromDate, toDate)
+    },
+    staleTime: 3600000,
+  })
