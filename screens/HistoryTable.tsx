@@ -15,6 +15,7 @@ import OoredooActivityView from "../components/OoredooActivityView";
 import OoredooBadReqView from "../components/errors/OoredooBadReqView";
 import TransactionHistoryCell from "../components/History/TransactionHistoryCell";
 import { HistoryListResponse } from "../responseModels/HistoryListResponse";
+import { ColorConstants } from "../constants/Colors";
 
 const HistoryTable = (props: HistoryNavProps) => {
   useEffect(() => {
@@ -70,6 +71,7 @@ const HistoryTable = (props: HistoryNavProps) => {
     );
   }
   const renderCell = (item: ListRenderItemInfo<HistoryListResponse>) => {
+    let btnTitle = item.item.orderStatus == 7 ?  "Receipt Download" : "SAF Download"
     return (
       <TransactionHistoryCell
         orderType={`OrderType: ${item.item.orderType}`}
@@ -77,16 +79,16 @@ const HistoryTable = (props: HistoryNavProps) => {
         orderIdValue={item.item.orderId}
         orderDate={"OrderDate: "}
         orderDateValue={item.item.orderDate.toUTCString()}
-        payment={""}
-        paymentValue={""}
-        tax={""}
-        taxValue={""}
-        closedby={""}
-        closedByValue={""}
-        status={""}
-        statusColor={""}
-        btnTitle={""}
-        ribbonColor={""}
+        payment={"Payment Amount: "}
+        paymentValue={item.item.totalAmount.toString()}
+        tax={"Tax Amount:"}
+        taxValue={item.item.taxAmount.toString()}
+        closedby={"Closed by: "}
+        closedByValue={item.item.closedBy}
+        status={item.item.status ||""}
+        statusColor={ColorConstants.green_20}
+        btnTitle={btnTitle}
+        ribbonColor={ColorConstants.green_20}
       />
     );
   };

@@ -60,7 +60,6 @@ export class APIManager {
   userDetails = async (): Promise<SelfUserDetails> => {
     try {
       const response = await axios.get(`/userDetail/self`);
-      console.log(axios.defaults.headers.common["x-auth-token"]);
       if (response.status != 200) {
         throw new APIError("API error", response.status);
       } else {
@@ -134,37 +133,40 @@ export class APIManager {
       throw this.errorhandling(error);
     }
   };
-  fetchStockStatus = async (poscode:string) => {
+  fetchStockStatus = async (poscode: string) => {
     try {
-        const response = await axios.get<StockStatusResponse>(`app/master/stockStatus/getStockByUserId/${poscode}`)
-        if (response.status != 200) {
-          throw new APIError(
-            "recived response status code invalid",
-            response.status
-          );
-        } else {
-          this.printJSON(response.data);
-          return response.data
-        }
+      const response = await axios.get<StockStatusResponse>(
+        `app/master/stockStatus/getStockByUserId/${poscode}`
+      );
+      if (response.status != 200) {
+        throw new APIError(
+          "recived response status code invalid",
+          response.status
+        );
+      } else {
+        this.printJSON(response.data);
+        return response.data;
+      }
     } catch (error) {
-      throw this.errorhandling(error)
+      throw this.errorhandling(error);
     }
-  }
-  fetchTransactionHistory = async (orderType: string, startDate: string, endDate: string) => {
+  };
+  fetchTransactionHistory = async (
+    orderType: string,
+    startDate: string,
+    endDate: string
+  ) => {
     try {
-      const response = await axios.get<HistoryListResponse[]>(`api/v1/customer/orders`,{
-        params:{
-          orderType: orderType,
-          "orderDate%3E":  startDate,
-          "orderDate%3C": endDate
-        }
-      })
+      const response = await axios.get<HistoryListResponse[]>(
+        `/api/v1/customer/orders?orderType=${orderType}&orderDate%3E=${startDate}&orderDate%3C=${endDate}`,
+        {}
+      );
       this.printJSON(response.data);
-      return response.data
+      return response.data;
     } catch (error) {
-      throw this.errorhandling(error)
+      throw this.errorhandling(error);
     }
-  }
+  };
   errorhandling = (error: unknown): APIError | UnauthorizedError => {
     console.log(error);
     if (error instanceof AxiosError) {
@@ -179,6 +181,9 @@ export class APIManager {
   printJSON = (response: any) => {
     console.log(`Response recvied: \n ${JSON.stringify(response, null, 2)}`);
   };
+  removeAuthToken = () => {
+    axios.defaults.headers.common["x-auth-token"] = undefined
+  }
 }
 
 export interface POSAPIHeaders extends AxiosHeaders {

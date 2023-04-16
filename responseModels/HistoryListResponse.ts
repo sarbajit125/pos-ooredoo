@@ -11,12 +11,12 @@ export interface HistoryListResponse {
     customerId?:           string;
     customerName?:         string;
     customerContactNumber: string;
-    posUserId:             ClosedBy;
+    posUserId:             string;
     retailerId:            number;
     distributorId:         number;
-    closedBy:              ClosedBy;
+    closedBy:              string;
     closedDate:            Date;
-    status?:               Status;
+    status?:               string;
     receiptNumber:         string;
     orderType:             string;
     ifApp:                 boolean;
@@ -29,17 +29,7 @@ export interface HistoryListResponse {
     referenceOrderId?:     string;
     mfaisaWallet?:         string;
     cafPath?:              string;
-    initiatedBy?:          ClosedBy;
+    initiatedBy?:          string;
     inState?:              string;
     customerEmail?:        string;
-}
-
-export enum ClosedBy {
-    ClosedByKhadheejaNajiya = "Khadheeja.najiya",
-    KhadheejaNajiya = "khadheeja.najiya",
-    Khadheejanajiya = "khadheejanajiya",
-}
-
-export enum Status {
-    Closed = "Closed",
 }

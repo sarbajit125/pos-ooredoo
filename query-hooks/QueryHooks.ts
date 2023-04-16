@@ -41,7 +41,7 @@ export const dashboardGraphHook = (posCode: string) =>
     queryKey: ['dashbordKPI'],
     queryFn: () => {
       let yesterDay = new Date().getDate() - 1;
-      const formatDate = dayjs(yesterDay).format("YYYY-MM_DD").toString();
+      const formatDate = dayjs(yesterDay).format("YYYY-MM-DD").toString();
       return APIManager.sharedInstance().fetchDashboardGraph(formatDate, posCode)
     },
   })
@@ -54,9 +54,9 @@ export const dashboardGraphHook = (posCode: string) =>
     queryKey:['posHistory', orderType, startDate, endDate],
     queryFn: () => {
       let requestType = orderType || ""
-      let fromDate = startDate || dayjs(new Date().getDate() - 7).format("YYYY-MM_DD").toString();
-      let toDate =  endDate || dayjs(new Date().getDate()).format("YYYY-MM_DD").toString();
-      return APIManager.sharedInstance().fetchTransactionHistory(requestType, fromDate, toDate)
+      let fromDate = startDate || dayjs(new Date().getDate() - 7).format("YYYY-MM-DD").toString();
+      let toDate =  endDate || dayjs(new Date().getDate()).format("YYYY-MM-DD").toString();
+      return APIManager.sharedInstance().fetchTransactionHistory(requestType, "2023-03-29", "2023-04-05")
     },
     staleTime: 3600000,
   })
