@@ -6,7 +6,7 @@ import { ColorConstants } from "../../constants/Colors";
 const TransactionHistoryCell = (props: HistoryCellData) => {
   return (
     <View style={styles.cell}>
-      <View style={[styles.heading, { backgroundColor: props.ribbonColor }]} />
+      <View style={[styles.ribbon, { backgroundColor: props.ribbonColor }]} />
       <View style={styles.details}>
         <Text style={styles.heading}>{props.orderType}</Text>
         <Text style={styles.rows}>{props.orderId}:</Text>
@@ -22,7 +22,7 @@ const TransactionHistoryCell = (props: HistoryCellData) => {
         <Text style={[styles.heading, { color: props.statusColor }]}>
           {props.status}
         </Text>
-        <TouchableOpacity style={styles.button}>
+        <TouchableOpacity style={styles.button} onPress={()=> props.btnPress()}>
           <Text style={styles.buttonText}>{props.btnTitle}</Text>
         </TouchableOpacity>
       </View>
@@ -46,6 +46,7 @@ export interface HistoryCellData {
   statusColor: string;
   btnTitle: string;
   ribbonColor: string;
+  btnPress: () => void;
 }
 
 export default TransactionHistoryCell;
@@ -57,11 +58,12 @@ const styles = StyleSheet.create({
     width: "90%",
   },
   ribbon: {
-    width: 3,
+    width: 5,
     borderTopLeftRadius: 10,
     borderBottomLeftRadius: 10,
   },
   details: {
+    marginHorizontal: 6,
     flex: 1,
     flexWrap: "wrap",
     flexDirection: "row",
@@ -73,16 +75,20 @@ const styles = StyleSheet.create({
     color: ColorConstants.black,
   },
   heading: {
-    flexBasis: "50%",
+    flexBasis: "100%",
     fontFamily: Fontcache.notoRegular,
     fontSize: 18,
+    color: ColorConstants.black,
   },
   button: {
-    width: 60,
+    flexBasis: "50%",
     height: 35,
     borderWidth: 2,
     borderColor: ColorConstants.red_ED1,
     borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+    alignSelf:'flex-end',
   },
   buttonText: {
     fontFamily: Fontcache.notoRegular,

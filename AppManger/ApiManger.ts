@@ -13,7 +13,8 @@ import { SelfUserDetails } from "../responseModels/SelfUserDetailsResponse";
 import { StockStatusResponse } from "../responseModels/StockStatusResponse";
 import { POSWalletDAO } from "./POSAppManager";
 import { HistoryListResponse } from "../responseModels/HistoryListResponse";
-
+import * as FileSystem from "expo-file-system";
+import { AppConstants } from "../constants/AppConstants";
 export class APIManager {
   private static instance: APIManager;
   private constructor() {
@@ -44,7 +45,7 @@ export class APIManager {
       if (response.status != 200) {
         throw new UnauthorizedError("Unable to login");
       } else if (apiHeaders.get("X-AUTH-TOKEN") == undefined) {
-        throw new UnauthorizedError("Unable to retrive auth token");
+        throw new UnauthorizedError("Unable to retrieve auth token");
       } else {
         axios.defaults.headers.common["x-auth-token"] =
           apiHeaders.get("X-AUTH-TOKEN");
@@ -167,6 +168,33 @@ export class APIManager {
       throw this.errorhandling(error);
     }
   };
+  downloadReceipt = async (url: string, name: string): Promise<Blob> => {
+    try {
+      const response = await axios.get(`/api/v1/customer/orders/${url}`, {
+        responseType: "blob",
+      });
+    return response.data
+    } catch (error) {
+      throw this.errorhandling(error);
+    }
+    // const downloadURL = AppConstants.uatURl + `/api/v1/customer/orders/${url}`
+    // console.log(downloadURL)
+    // let filePath = FileSystem.documentDirectory + name
+    // const downloadResumable = FileSystem.createDownloadResumable(
+    //   downloadURL,
+    //   filePath,
+    //   {headers:{
+    //     'x-auth-token' :   axios.defaults.headers.common["x-auth-token"]?.toString() || ""
+    //   },
+    // },
+    // );
+    // try {
+    //   const response = await downloadResumable.downloadAsync()
+    //   return (response)
+    // } catch (error) {
+    //   throw this.errorhandling(error);
+    // }
+  };
   errorhandling = (error: unknown): APIError | UnauthorizedError => {
     console.log(error);
     if (error instanceof AxiosError) {
@@ -182,8 +210,8 @@ export class APIManager {
     console.log(`Response recvied: \n ${JSON.stringify(response, null, 2)}`);
   };
   removeAuthToken = () => {
-    axios.defaults.headers.common["x-auth-token"] = undefined
-  }
+    axios.defaults.headers.common["x-auth-token"] = undefined;
+  };
 }
 
 export interface POSAPIHeaders extends AxiosHeaders {
