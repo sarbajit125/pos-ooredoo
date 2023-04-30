@@ -2,6 +2,7 @@ import { ActivityIndicator, Dimensions, Modal, StyleSheet, Text, View } from 're
 import React from 'react'
 import { ColorConstants } from '../constants/Colors'
 import Header14Noto from './OoredooFonts/Noto/Header14Noto'
+import { Fontcache } from '../constants/FontCache'
 
 const OoredooActivityView = () => {
   return (
@@ -29,7 +30,7 @@ const styles = StyleSheet.create({
     text: {
       padding: 10,
       color: ColorConstants.black,
-      fontFamily: ''
+      fontFamily: Fontcache.notoRegular
     },
     centeredView: {
       flex: 1,

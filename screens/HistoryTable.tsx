@@ -20,6 +20,7 @@ import { ColorConstants } from "../constants/Colors";
 import dayjs from "dayjs";
 import { APIManager } from "../AppManger/ApiManger";
 import { shareAsync } from "expo-sharing";
+import { POSDownloadType } from "../constants/AppConstants";
 import * as FileSystem from "expo-file-system";
 const HistoryTable = (props: HistoryNavProps) => {
   useEffect(() => {
@@ -34,10 +35,9 @@ const HistoryTable = (props: HistoryNavProps) => {
   const [orderType, setOrderType] = useState("");
   const [fromDate, setFromDate] = useState("");
   const [toDate, setEndDate] = useState("");
-  const downloadFile = (receiptNumber: string, orderStatus: number) => {
+  const downloadFile = (receiptNumber: string, orderStatus: POSDownloadType) => {
     const truncatedString = parseInt(receiptNumber).toFixed(0)
-    const url =
-      orderStatus == 7 ? `${truncatedString}/narrow` : `${truncatedString}/caf`;
+    const url = truncatedString + "/" + orderStatus
     const filename = `${receiptNumber}.pdf`;
     APIManager.sharedInstance()
       .downloadReceipt(url, filename)
@@ -73,8 +73,28 @@ const HistoryTable = (props: HistoryNavProps) => {
     }
   };
   const renderCell = (item: ListRenderItemInfo<HistoryListResponse>) => {
-    let btnTitle =
-      item.item.orderStatus == 7 ? "Receipt Download" : "SAF Download";
+    let btnTitle = ""
+    let receiptNumber = ""
+    let downloadType = POSDownloadType.Narrow
+    switch (item.item.orderType) {
+      case "Physical Voucher":
+      case "outstanding-bill-payment":
+      case "accessories":
+      case "InventorySale":
+      case "add-on":
+      case "E-Recharge":
+      case "digital-sales":
+      case "device":
+        btnTitle = "Receipt Download"
+        receiptNumber = item.item.receiptNumber
+        downloadType = POSDownloadType.Narrow
+        break
+      default:
+        btnTitle = "SAF Download"
+        receiptNumber = item.item.orderId
+        downloadType = POSDownloadType.Caf
+        break
+    }
     const reciptDate = dayjs(item.item.orderDate)
       .format("YYYY-MM-DD")
       .toString();
@@ -95,9 +115,9 @@ const HistoryTable = (props: HistoryNavProps) => {
           status={item.item.status || ""}
           statusColor={ColorConstants.green_20}
           btnTitle={btnTitle}
-          ribbonColor={ColorConstants.red_ED1}
+          ribbonColor={ColorConstants.green_20}
           btnPress={() =>
-            downloadFile(item.item.receiptNumber, item.item.orderStatus)
+            downloadFile(receiptNumber, downloadType)
           }
         />
       </View>
@@ -155,5 +175,6 @@ type HistoryNavProps = NativeStackScreenProps<
 const styles = StyleSheet.create({
   cell: {
     marginVertical: 10,
+    marginHorizontal: 10,
   },
 });

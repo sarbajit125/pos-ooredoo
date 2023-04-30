@@ -9,20 +9,24 @@ import React from "react";
 import { NativeStackHeaderProps } from "@react-navigation/native-stack";
 import { ColorConstants } from "../../constants/Colors";
 import { Fontcache } from "../../constants/FontCache";
+import { TouchableOpacity } from "react-native-gesture-handler";
 
 const NavigationBar = (props: POSNaivgationProps) => {
   return (
     <View style={styles.container}>
       <View style={styles.titleContainer}>
         <Text style={styles.title}>{props.route.name}</Text>
-        <TouchableHighlight
+        <Text style={styles.desc}> Write one line of description here</Text>
+      </View>
+      <View style={styles.imageView}> 
+      <TouchableOpacity
           style={styles.image}
+          activeOpacity={0.5}
           onPress={() => props.navigation.goBack()}
         >
-          <Image  source={require("../../assets/images/backIcon.png")} />
-        </TouchableHighlight>
+          <Image style={{width:20, height:20}}  source={require("../../assets/images/backIcon.png")} />
+        </TouchableOpacity>
       </View>
-      <Text style={styles.desc}> Write one line of description here</Text>
     </View>
   );
 };
@@ -36,6 +40,7 @@ const styles = StyleSheet.create({
     height: 100,
     borderTopLeftRadius: 8,
     borderTopRightRadius: 8,
+    flexDirection: 'row',
   },
   title: {
     marginTop: 17,
@@ -50,21 +55,25 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: ColorConstants.black,
   },
+  imageView:{
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems :'center',
+  },
   image: {
     marginHorizontal: 15,
-    width: 11,
-    height: 11, 
+    width: 30,
+    height: 30, 
+    justifyContent: 'center',
+    alignItems :'center',
   },
   titleContainer:{
-    flexDirection: 'row',
-    justifyContent:'space-between',
     alignContent: 'center',
-    alignItems:'center',
+    flex:1,
   },
   grabber:{
     alignContent: 'center',
     backgroundColor: ColorConstants.grey_E0E,
-    
   }
 });
 

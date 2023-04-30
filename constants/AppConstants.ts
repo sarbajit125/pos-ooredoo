@@ -4,3 +4,8 @@ export const AppConstants = {
     aesKey: "1Hbfh667adfDEJ78",
     uatURl: 'http://10.10.9.113:9080'
 }
+export enum POSDownloadType {
+    Narrow = "narrow",
+    Wide = "wide",
+    Caf = "caf"
+}
