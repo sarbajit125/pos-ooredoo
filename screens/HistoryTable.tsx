@@ -14,7 +14,9 @@ import { RootStackParamList } from "../types";
 import { TransactionHistoryHook } from "../query-hooks/QueryHooks";
 import OoredooActivityView from "../components/OoredooActivityView";
 import OoredooBadReqView from "../components/errors/OoredooBadReqView";
-import TransactionHistoryCell from "../components/History/TransactionHistoryCell";
+import TransactionHistoryCell, {
+  POSCellRowData,
+} from "../components/History/TransactionHistoryCell";
 import { HistoryListResponse } from "../responseModels/HistoryListResponse";
 import { ColorConstants } from "../constants/Colors";
 import dayjs from "dayjs";
@@ -35,25 +37,22 @@ const HistoryTable = (props: HistoryNavProps) => {
   const [orderType, setOrderType] = useState("");
   const [fromDate, setFromDate] = useState("");
   const [toDate, setEndDate] = useState("");
-  const downloadFile = (receiptNumber: string, orderStatus: POSDownloadType) => {
-    const truncatedString = parseInt(receiptNumber).toFixed(0)
-    const url = truncatedString + "/" + orderStatus
+  const downloadFile = (
+    receiptNumber: string,
+    orderStatus: POSDownloadType
+  ) => {
+    const truncatedString = parseInt(receiptNumber).toFixed(0);
+    const url = truncatedString + "/" + orderStatus;
     const filename = `${receiptNumber}.pdf`;
     APIManager.sharedInstance()
       .downloadReceipt(url, filename)
-      .then((result) =>
-        saveFile(
-          result,
-          filename,
-          "application/pdf"
-        )
-      );
+      .then((result) => saveFile(result, filename, "application/pdf"));
   };
   const saveFile = async (data: Blob, filename: string, mimetype: string) => {
     const fileReaderInstance = new FileReader();
     fileReaderInstance.readAsDataURL(data);
-    fileReaderInstance.onload =async () => {
-      const base64data = fileReaderInstance.result.split(',');
+    fileReaderInstance.onload = async () => {
+      const base64data = fileReaderInstance.result.split(",");
       const pdfBuffer = base64data[1];
       const path = `${FileSystem.documentDirectory}/${filename}.pdf`;
       await FileSystem.writeAsStringAsync(path, pdfBuffer, {
@@ -63,19 +62,19 @@ const HistoryTable = (props: HistoryNavProps) => {
         const permission =
           await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync();
         if (permission.granted) {
-              shareAsync(path, { mimeType: mimetype });
+          shareAsync(path, { mimeType: mimetype });
         } else {
-          console.log("Permission not granted")
+          console.log("Permission not granted");
         }
       } else {
         shareAsync(path, { mimeType: mimetype });
       }
-    }
+    };
   };
   const renderCell = (item: ListRenderItemInfo<HistoryListResponse>) => {
-    let btnTitle = ""
-    let receiptNumber = ""
-    let downloadType = POSDownloadType.Narrow
+    let btnTitle = "";
+    let receiptNumber = "";
+    let downloadType = POSDownloadType.Narrow;
     switch (item.item.orderType) {
       case "Physical Voucher":
       case "outstanding-bill-payment":
@@ -85,40 +84,36 @@ const HistoryTable = (props: HistoryNavProps) => {
       case "E-Recharge":
       case "digital-sales":
       case "device":
-        btnTitle = "Receipt Download"
-        receiptNumber = item.item.receiptNumber
-        downloadType = POSDownloadType.Narrow
-        break
+        btnTitle = "Receipt Download";
+        receiptNumber = item.item.receiptNumber;
+        downloadType = POSDownloadType.Narrow;
+        break;
       default:
-        btnTitle = "SAF Download"
-        receiptNumber = item.item.orderId
-        downloadType = POSDownloadType.Caf
-        break
+        btnTitle = "SAF Download";
+        receiptNumber = item.item.orderId;
+        downloadType = POSDownloadType.Caf;
+        break;
     }
-    const reciptDate = dayjs(item.item.orderDate)
+    const receiptDate = dayjs(item.item.orderDate)
       .format("YYYY-MM-DD")
       .toString();
+    const dataTobeDisplayed: POSCellRowData[] = [
+      { title: "OrderId", value: item.item.orderId },
+      { title: "OrderDate", value: receiptDate },
+      { title: "Payment Amount", value: item.item.totalAmount.toString()},
+      {title:'Tax Amount',value:item.item.taxAmount.toString()},
+      {title:'Closed by',value: item.item.closedBy}
+    ];
     return (
       <View style={styles.cell}>
         <TransactionHistoryCell
-          orderType={`OrderType: ${item.item.orderType}`}
-          orderId={"OrderId: "}
-          orderIdValue={item.item.orderId}
-          orderDate={"OrderDate: "}
-          orderDateValue={reciptDate}
-          payment={"Payment Amount: "}
-          paymentValue={item.item.totalAmount.toString()}
-          tax={"Tax Amount:"}
-          taxValue={item.item.taxAmount.toString()}
-          closedby={"Closed by: "}
-          closedByValue={item.item.closedBy}
+          rows={dataTobeDisplayed}
+          heading={`OrderType: ${item.item.orderType}`}
           status={item.item.status || ""}
           statusColor={ColorConstants.green_20}
           btnTitle={btnTitle}
           ribbonColor={ColorConstants.green_20}
-          btnPress={() =>
-            downloadFile(receiptNumber, downloadType)
-          }
+          btnPress={() => downloadFile(receiptNumber, downloadType)}
         />
       </View>
     );

@@ -8,17 +8,13 @@ const TransactionHistoryCell = (props: HistoryCellData) => {
     <View style={styles.cell}>
       <View style={[styles.ribbon, { backgroundColor: props.ribbonColor }]} />
       <View style={styles.details}>
-        <Text style={styles.heading}>{props.orderType}</Text>
-        <Text style={styles.rows}>{props.orderId}:</Text>
-        <Text style={styles.rows}>{props.orderIdValue}</Text>
-        <Text style={styles.rows}>{props.orderDate}:</Text>
-        <Text style={styles.rows}>{props.orderDateValue}</Text>
-        <Text style={styles.rows}>{props.payment}:</Text>
-        <Text style={styles.rows}>{props.paymentValue}</Text>
-        <Text style={styles.rows}>{props.tax}:</Text>
-        <Text style={styles.rows}>{props.taxValue}</Text>
-        <Text style={styles.rows}>{props.closedby}:</Text>
-        <Text style={styles.rows}>{props.closedByValue}</Text>
+      <Text style={styles.heading}>{props.heading}</Text>
+        {props.rows.map((item) =>(
+          <View>
+            <Text style={styles.rows}>{item.title}:</Text>
+            <Text style={styles.rows}>{item.value}</Text>
+          </View>
+        ))}
         <Text style={[styles.heading, { color: props.statusColor }]}>
           {props.status}
         </Text>
@@ -31,22 +27,17 @@ const TransactionHistoryCell = (props: HistoryCellData) => {
 };
 
 export interface HistoryCellData {
-  orderType: string;
-  orderId: string;
-  orderIdValue: string;
-  orderDate: string;
-  orderDateValue: string;
-  payment: string;
-  paymentValue: string;
-  tax: string;
-  taxValue: string;
-  closedby: string;
-  closedByValue: string;
+  rows: POSCellRowData[]
+  heading: string;
   status: string;
   statusColor: string;
   btnTitle: string;
   ribbonColor: string;
   btnPress: () => void;
+}
+export interface POSCellRowData{
+  title: string;
+  value: string,
 }
 
 export default TransactionHistoryCell;
