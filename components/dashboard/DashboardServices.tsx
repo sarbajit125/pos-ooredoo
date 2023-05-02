@@ -10,25 +10,25 @@ const HomeServiceList: HomeServiceProps[] = [
         link: "newCustReg",
         name: "New customer registration",
         description: "Register for pos service",
-        imagePath: require("../../assets/images/newCustomerReg.png") ,
+        imagePath: require("../../assets/images/HomeNewReg.png") ,
       },
       {
         link:"recharge",
         name: "Recharge bill Payment",
         description:"Rechrage services",
-        imagePath: require("../../assets/images/rechargebill.png")
+        imagePath: require("../../assets/images/HomeRecharge.png")
       },
       {
         link:"kpi",
         name:"KPI",
         description:"KPI menu here",
-        imagePath: require("../../assets/images/newCustomerReg.png"),
+        imagePath: require("../../assets/images/HomeKpi.png"),
       },
       {
         link:"services",
         name:"Services",
         description:"Services list for user",
-        imagePath: require("../../assets/images/Groupcomission.png"),
+        imagePath: require("../../assets/images/homeService.png"),
       },
       {
         link:"productAwareness",
@@ -40,7 +40,7 @@ const HomeServiceList: HomeServiceProps[] = [
         link:"comission",
         name:"Comission",
         description:"Get to know you monthly dividends",
-        imagePath:require("../../assets/images/Homeperformance.png"),
+        imagePath:require("../../assets/images/HomeComission.png"),
       }
 ]
   const [servicelist, setServiceList] = useState<HomeServiceProps[]>(HomeServiceList);

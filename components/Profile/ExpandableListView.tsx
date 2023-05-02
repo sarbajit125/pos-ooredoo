@@ -81,20 +81,13 @@ const styles = StyleSheet.create({
   },
   headerText: {
     color: ColorConstants.black,
-    fontFamily: Fontcache.notoRegular,
+    fontFamily: Fontcache.notoLight,
     fontSize: 18,
     padding: 10,
   },
-  separator: {
-    height: 0.5,
-    backgroundColor: ColorConstants.grey_898,
-    opacity: 0.2,
-    marginVertical: 20,
-    width: "100%",
-  },
   text: {
     color: ColorConstants.black,
-    fontFamily: Fontcache.notoRegular,
+    fontFamily: Fontcache.notoLight,
     fontSize: 18,
     padding: 15,
     marginLeft: 20,

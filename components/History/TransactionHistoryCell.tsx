@@ -7,20 +7,22 @@ const TransactionHistoryCell = (props: HistoryCellData) => {
   return (
     <View style={styles.cell}>
       <View style={[styles.ribbon, { backgroundColor: props.ribbonColor }]} />
-      <View style={styles.details}>
+      <View style={styles.rowContainer}>
       <Text style={styles.heading}>{props.heading}</Text>
-        {props.rows.map((item) =>(
-          <View>
+        {props.rows.map((item, index) =>(
+          <View key={index} style={styles.details}>
             <Text style={styles.rows}>{item.title}:</Text>
             <Text style={styles.rows}>{item.value}</Text>
           </View>
         ))}
-        <Text style={[styles.heading, { color: props.statusColor }]}>
+        <View style={styles.details}>
+        <Text style={[styles.statusLbl, { color: props.statusColor }]}>
           {props.status}
         </Text>
         <TouchableOpacity style={styles.button} onPress={()=> props.btnPress()}>
           <Text style={styles.buttonText}>{props.btnTitle}</Text>
         </TouchableOpacity>
+        </View>
       </View>
     </View>
   );
@@ -46,7 +48,7 @@ const styles = StyleSheet.create({
   cell: {
     flexDirection: "row",
     borderRadius: 10,
-    width: "90%",
+    backgroundColor: ColorConstants.white
   },
   ribbon: {
     width: 5,
@@ -54,7 +56,6 @@ const styles = StyleSheet.create({
     borderBottomLeftRadius: 10,
   },
   details: {
-    marginHorizontal: 6,
     flex: 1,
     flexWrap: "wrap",
     flexDirection: "row",
@@ -79,11 +80,19 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     justifyContent: 'center',
     alignItems: 'center',
-    alignSelf:'flex-end',
+    marginVertical: 5,
   },
   buttonText: {
     fontFamily: Fontcache.notoRegular,
     fontSize: 14,
     color: ColorConstants.red_ED1,
   },
+  rowContainer: {
+    marginHorizontal: 6,
+  },
+  statusLbl:{
+    flexBasis: "50%",
+    fontFamily: Fontcache.notoRegular,
+    fontSize: 18,
+  }
 });

@@ -145,7 +145,7 @@ const HistoryTable = (props: HistoryNavProps) => {
     // Show loading overlay
     return (
       <SafeAreaView>
-        <OoredooActivityView />
+        {/* <OoredooActivityView /> */}
       </SafeAreaView>
     );
   } else {

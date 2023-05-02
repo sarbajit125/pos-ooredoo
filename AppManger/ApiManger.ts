@@ -21,6 +21,7 @@ export class APIManager {
     //axios.defaults.baseURL = "http://192.168.29.217:8000/pos";
     axios.defaults.baseURL = "http://10.10.9.113:9080";
     axios.defaults.headers.common["x-auth-token"] = "";
+    axios.defaults.timeout = 30000
     axios.interceptors.request.use((request) => {
       console.log("Starting Request", JSON.stringify(request, null, 2));
       return request;
@@ -136,8 +137,8 @@ export class APIManager {
   };
   fetchStockStatus = async (poscode: string) => {
     try {
-      const response = await axios.get<StockStatusResponse>(
-        `app/master/stockStatus/getStockByUserId/${poscode}`
+      const response = await axios.get<StockStatusResponse[]>(
+        `api/inventory/status`
       );
       if (response.status != 200) {
         throw new APIError(
@@ -177,33 +178,17 @@ export class APIManager {
     } catch (error) {
       throw this.errorhandling(error);
     }
-    // const downloadURL = AppConstants.uatURl + `/api/v1/customer/orders/${url}`
-    // console.log(downloadURL)
-    // let filePath = FileSystem.documentDirectory + name
-    // const downloadResumable = FileSystem.createDownloadResumable(
-    //   downloadURL,
-    //   filePath,
-    //   {headers:{
-    //     'x-auth-token' :   axios.defaults.headers.common["x-auth-token"]?.toString() || ""
-    //   },
-    // },
-    // );
-    // try {
-    //   const response = await downloadResumable.downloadAsync()
-    //   return (response)
-    // } catch (error) {
-    //   throw this.errorhandling(error);
-    // }
   };
   errorhandling = (error: unknown): APIError | UnauthorizedError => {
     console.log(error);
     if (error instanceof AxiosError) {
+      console.log('coming here')
       throw new APIError(
         error.response?.data.message,
         error.response?.status ?? 400
       );
     } else {
-      throw new APIError("APi process falied", 400);
+      throw new APIError("API process falied", 400);
     }
   };
   printJSON = (response: any) => {

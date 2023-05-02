@@ -162,22 +162,23 @@ const styles = StyleSheet.create({
   },
   navView: {
     marginTop: 20,
-    marginHorizontal: 8,
     padding: 5,
     flexDirection: "row",
     justifyContent: "space-between",
     height: 95,
     alignContent: "center",
     alignItems: "center",
+    backgroundColor: ColorConstants.white,
   },
   imageButton: {
+    marginHorizontal:10,
     padding: 10,
     width: 25,
     height: 25,
   },
   nameView: {
     height: 170,
-    backgroundColor: ColorConstants.grey_898,
+    backgroundColor: ColorConstants.grey_F4F4,
     opacity: 0.3,
   },
   username: {
