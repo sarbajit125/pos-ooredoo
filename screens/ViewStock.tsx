@@ -76,7 +76,6 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: ColorConstants.grey_E0E,
     borderRadius: 5,
-    height: 80,
     marginHorizontal: 21,
     marginVertical: 12,
     flexDirection: 'row',
@@ -91,11 +90,12 @@ const styles = StyleSheet.create({
   textView:{
     marginLeft:10,
     flexDirection: 'column',
-    justifyContent: 'space-evenly'
+    flexWrap:'wrap',
+    justifyContent: 'space-evenly',
   },
   heading:{
     fontFamily: Fontcache.rubikRegular,
-    fontSize: 24,
+    fontSize: 18,
     paddingTop: 16,
     paddingLeft: 8,
   },

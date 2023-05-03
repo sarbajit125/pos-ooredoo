@@ -17,7 +17,7 @@ const OoredooBadReqView = (props: OoredooBadReqProps) => {
             <Image style={styles.image} source={require('../../assets/images/warning.png')} />
             <Text style={styles.modalText}>Something went wrong</Text>
             <Text style={styles.modalText}>{props.title}</Text>
-            <OoredooPayBtn onPress={ () => props.action()}  title={'Retry'} />
+            <OoredooPayBtn style={styles.button} onPress={ () => props.action()}  title={'Retry'} />
           </View>
         </View>
       </Modal>
@@ -54,6 +54,7 @@ const styles = StyleSheet.create({
       shadowOpacity: 0.25,
       shadowRadius: 4,
       elevation: 5,
+      flexWrap: 'wrap',
     },
     image:{
 
@@ -67,4 +68,7 @@ const styles = StyleSheet.create({
       marginBottom: 15,
       textAlign: 'center',
     },
+    button: {
+      width: 140,
+    }
   });

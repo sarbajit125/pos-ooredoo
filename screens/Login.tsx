@@ -18,8 +18,9 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../types";
 import { useToast } from "react-native-toast-notifications";
 import { useMutation } from "react-query";
-import { UnauthorizedError } from "../responseModels/responseModels";
+import { APIError, UnauthorizedError } from "../responseModels/responseModels";
 import OoredooActivityView from "../components/OoredooActivityView";
+import OoredooBadReqView from "../components/errors/OoredooBadReqView";
 const loginValidationSchema = yup.object().shape({
   username: yup.string().required("Username is Required"),
   password: yup.string().required("Password is required"),
@@ -27,6 +28,8 @@ const loginValidationSchema = yup.object().shape({
 
 const Login = (props: LoginScreenProps) => {
   const [passwordVisibility, setPasswordVisibility] = useState(true);
+  const [showErrorView, setErrorView] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string>('')
   const toast = useToast();
   const handleForgetPassword = () => {
     console.log("Forget password");
@@ -35,6 +38,7 @@ const Login = (props: LoginScreenProps) => {
     mutationFn: ({ username, password }: LoginReq) =>
       APIManager.sharedInstance().loginAPI(username, password),
     onSuccess(data, _variables, _context) {
+      setErrorView(false)
       toast.show(data.message, {
         type: "success",
         placement: "bottom",
@@ -44,13 +48,9 @@ const Login = (props: LoginScreenProps) => {
        props.navigation.navigate('Home', {screen:'Dashboard'})
     },
     onError(error, _variables, _context) {
-      if (error instanceof UnauthorizedError) {
-        toast.show(error.message, {
-          type: "error",
-          placement: "bottom",
-          duration: 1000,
-          animationType: "slide-in",
-        });
+      if (error instanceof APIError) {
+        setErrorView(true)
+        setErrorMsg(error.message)
       } else {
         toast.show("something went wrong", {
           type: "error",
@@ -145,6 +145,9 @@ const Login = (props: LoginScreenProps) => {
           )}
         </Formik>
         {loginmutation.isLoading ? <OoredooActivityView /> : null}
+        {loginmutation.isError ? <OoredooBadReqView modalVisible={showErrorView} action={function (): void {
+          setErrorView(false)
+        } } title={errorMsg} /> : null}
       </View>
     </SafeAreaView>
   );

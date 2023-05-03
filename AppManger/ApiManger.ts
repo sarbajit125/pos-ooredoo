@@ -124,7 +124,7 @@ export class APIManager {
       });
       if (response.status != 200) {
         throw new APIError(
-          "recived response status code invalid",
+          "received response status code invalid",
           response.status
         );
       } else {
@@ -142,7 +142,7 @@ export class APIManager {
       );
       if (response.status != 200) {
         throw new APIError(
-          "recived response status code invalid",
+          "received response status code invalid",
           response.status
         );
       } else {
@@ -180,19 +180,18 @@ export class APIManager {
     }
   };
   errorhandling = (error: unknown): APIError | UnauthorizedError => {
-    console.log(error);
     if (error instanceof AxiosError) {
-      console.log('coming here')
+      console.log(error.response?.data)
       throw new APIError(
-        error.response?.data.message,
+        error.response?.data,
         error.response?.status ?? 400
       );
     } else {
-      throw new APIError("API process falied", 400);
+      throw new APIError("API process failed", 400);
     }
   };
   printJSON = (response: any) => {
-    console.log(`Response recvied: \n ${JSON.stringify(response, null, 2)}`);
+    console.log(`Response received: \n ${JSON.stringify(response, null, 2)}`);
   };
   removeAuthToken = () => {
     axios.defaults.headers.common["x-auth-token"] = undefined;
