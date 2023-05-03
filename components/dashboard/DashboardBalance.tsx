@@ -111,7 +111,6 @@ const styles = StyleSheet.create({
   },
   switch: {
     padding: 5,
-    width: 70,
   },
   btn: {
     padding: 2,

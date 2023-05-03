@@ -14,14 +14,26 @@ declare global {
 }
 
 export type RootStackParamList = {
-  Root:  BottomTabScreenProps<RootTabParamList> | undefined;
-  Home: undefined;
+  Root:   undefined;
+  Home: BottomTabScreenProps<RootTabParamList> | undefined;
   StockStatus: undefined;
   Profile: undefined;
   TransactionHistory: HistoryType;
+  InventorySale: InventoryScreenList;
 };
 export type HistoryType = {
   id: 'transactionHistory' | 'walletHistory'
+}
+export type InventoryScreenList = {
+  screeName: InventorySaleScreen
+}
+export enum InventorySaleScreen {
+   Entry = 1,
+   Type,
+   Source,
+   Target,
+   Product,
+   Validate
 }
 
 export type RootStackScreenProps<Screen extends keyof RootStackParamList> = NativeStackScreenProps<

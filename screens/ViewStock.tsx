@@ -4,9 +4,9 @@ import {
   StyleSheet,
   View,
   Image,
-  Text
+  Text,
 } from "react-native";
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import { StockDetailsHook } from "../query-hooks/QueryHooks";
 import { StoresContext } from "../store/RootStore";
 import { observer } from "mobx-react";
@@ -52,7 +52,7 @@ const ViewStock = observer((props: ViewStockNavProps) => {
   } else if (isLoading) {
     return (
       <View>
-        <OoredooActivityView />
+        {/* <OoredooActivityView /> */}
       </View>
     );
   } else {
@@ -91,13 +91,13 @@ const styles = StyleSheet.create({
     marginLeft:10,
     flexDirection: 'column',
     flexWrap:'wrap',
-    justifyContent: 'space-evenly',
   },
   heading:{
     fontFamily: Fontcache.rubikRegular,
     fontSize: 18,
     paddingTop: 16,
     paddingLeft: 8,
+    width: "80%"
   },
   desc :{
     fontFamily: Fontcache.notoRegular,

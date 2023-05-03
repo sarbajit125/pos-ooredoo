@@ -29,8 +29,10 @@ const HistoryTable = (props: HistoryNavProps) => {
     switch (props.route.params.id) {
       case "transactionHistory":
         props.navigation.setOptions({ title: "Transaction History" });
+        break
       case "walletHistory":
         props.navigation.setOptions({ title: "Wallet History" });
+        break
     }
   }, []);
   const { data, isSuccess, error, isLoading } = TransactionHistoryHook();
@@ -145,7 +147,7 @@ const HistoryTable = (props: HistoryNavProps) => {
     // Show loading overlay
     return (
       <SafeAreaView>
-        {/* <OoredooActivityView /> */}
+        {/* <OoredooActivityView visible={isLoading} /> */}
       </SafeAreaView>
     );
   } else {

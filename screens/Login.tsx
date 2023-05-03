@@ -18,7 +18,7 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../types";
 import { useToast } from "react-native-toast-notifications";
 import { useMutation } from "react-query";
-import { APIError, UnauthorizedError } from "../responseModels/responseModels";
+import { APIError } from "../responseModels/responseModels";
 import OoredooActivityView from "../components/OoredooActivityView";
 import OoredooBadReqView from "../components/errors/OoredooBadReqView";
 const loginValidationSchema = yup.object().shape({
@@ -144,7 +144,7 @@ const Login = (props: LoginScreenProps) => {
             </View>
           )}
         </Formik>
-        {loginmutation.isLoading ? <OoredooActivityView /> : null}
+        {loginmutation.isLoading ? <OoredooActivityView visible={loginmutation.isLoading} /> : null}
         {loginmutation.isError ? <OoredooBadReqView modalVisible={showErrorView} action={function (): void {
           setErrorView(false)
         } } title={errorMsg} /> : null}

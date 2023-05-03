@@ -23,7 +23,7 @@ import {
   ExpandableListProps,
 } from "../components/Profile/ExpandableListView";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../types";
+import { InventorySaleScreen, RootStackParamList } from "../types";
 import {
   BottomSheetModal,
   BottomSheetModalProvider,
@@ -63,6 +63,8 @@ const Profile = (props: ProfileNavProps) => {
           id: "transactionHistory",
         });
         break;
+      case "inventorySale":
+        props.navigation.navigate('InventorySale', {screeName:InventorySaleScreen.Entry})
       default:
         console.log(keyStr);
         break;

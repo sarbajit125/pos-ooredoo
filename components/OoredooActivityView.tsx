@@ -4,13 +4,13 @@ import { ColorConstants } from '../constants/Colors'
 import Header14Noto from './OoredooFonts/Noto/Header14Noto'
 import { Fontcache } from '../constants/FontCache'
 
-const OoredooActivityView = () => {
+const OoredooActivityView = (props: ActivityViewProps) => {
   return (
     <View  style={styles.centeredView}>
        <Modal
         animationType="slide"
         transparent={true}
-        visible={true}
+        visible={props.visible || true}
         onRequestClose={() => {
         }}>
         <View style={styles.centeredView}>
@@ -55,3 +55,6 @@ const styles = StyleSheet.create({
       elevation: 5,
     },
 })
+export interface  ActivityViewProps {
+  visible?: boolean
+}
