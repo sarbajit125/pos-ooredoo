@@ -51,3 +51,8 @@ export type RootTabScreenProps<Screen extends keyof RootTabParamList> = Composit
   BottomTabScreenProps<RootTabParamList, Screen>,
   NativeStackScreenProps<RootStackParamList>
 >;
+export interface POSSelectData {
+  id: string,
+  name: string,
+  isSelected: boolean
+}
