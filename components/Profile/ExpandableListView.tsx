@@ -47,6 +47,7 @@ export const ExpandableComponent = ({ item, onClick }: ExpandableCellProps) => {
       {item.subcategory.length > 0 &&
         item.subcategory.map((item, key) => (
           <View
+          key={key}
             style={{
               height: layoutHeight,
               overflow: "hidden",

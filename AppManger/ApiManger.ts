@@ -15,6 +15,7 @@ import { POSWalletDAO } from "./POSAppManager";
 import { HistoryListResponse } from "../responseModels/HistoryListResponse";
 import * as FileSystem from "expo-file-system";
 import { AppConstants } from "../constants/AppConstants";
+import { InventoryRulesResponse } from "../responseModels/InventoryRulesResponse";
 export class APIManager {
   private static instance: APIManager;
   private constructor() {
@@ -179,6 +180,15 @@ export class APIManager {
       throw this.errorhandling(error);
     }
   };
+  fetchInventoryRules =async (transferType:string) => {
+    try {
+      const response = await axios.get<InventoryRulesResponse[]>(`api/inventory/transfer/rules/${transferType}`)
+      this.printJSON(response.data);
+      return response.data;
+    } catch (error) {
+      throw this.errorhandling(error);
+    }
+  }
   errorhandling = (error: unknown): APIError | UnauthorizedError => {
     if (error instanceof AxiosError) {
       console.log(error.response?.data)

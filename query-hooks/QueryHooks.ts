@@ -4,6 +4,7 @@ import { POSWalletDAO } from "../AppManger/POSAppManager";
 import CryptoES from "crypto-es";
 import { AppConstants } from "../constants/AppConstants";
 import dayjs from "dayjs";
+import { InventorySaleScreen } from "../types";
 export const walletBalanceHook = () =>
   useMutation({
     mutationKey: ["walletbalance"],
@@ -59,4 +60,30 @@ export const dashboardGraphHook = (posCode: string) =>
       return APIManager.sharedInstance().fetchTransactionHistory(requestType, "2023-03-29", "2023-04-05")
     },
     staleTime: 3600000,
+  })
+
+  export const FetchInventoryRules = (screen: InventorySaleScreen, id: string) => useQuery({
+    queryKey: ['inventoryRules', id],
+    enabled: false,
+    queryFn: () => {
+      let type = "/transferTypes"
+      switch (screen){
+        case InventorySaleScreen.Type:
+          type ="/transferTypes"
+          break
+        case InventorySaleScreen.Source:
+          type ="/sources"
+          break
+        case InventorySaleScreen.Target:
+          type ="/targets"
+          break
+        case InventorySaleScreen.Product:
+          type ="/product"
+          break
+        case InventorySaleScreen.Entry:
+          type = "/transferTypes"
+          break
+      }
+      let query = id + type
+     return  APIManager.sharedInstance().fetchInventoryRules(query)}
   })

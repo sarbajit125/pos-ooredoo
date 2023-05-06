@@ -6,6 +6,7 @@
 import { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import { CompositeScreenProps, NavigatorScreenParams } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { isError } from 'react-query';
 
 declare global {
   namespace ReactNavigation {
@@ -28,12 +29,12 @@ export type InventoryScreenList = {
   screeName: InventorySaleScreen
 }
 export enum InventorySaleScreen {
-   Entry = 1,
-   Type,
-   Source,
-   Target,
-   Product,
-   Validate
+   Entry = "entry",
+   Type  = "type",
+   Source  = "source",
+   Target  = "target",
+   Product  = "product",
+   Validate  = "validate"
 }
 
 export type RootStackScreenProps<Screen extends keyof RootStackParamList> = NativeStackScreenProps<
@@ -55,4 +56,9 @@ export interface POSSelectData {
   id: string,
   name: string,
   isSelected: boolean
+}
+export enum POSAPIHelper {
+  isLoading = 0,
+  isError = 1,
+  None = 2
 }

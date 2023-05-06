@@ -11,7 +11,11 @@ import Login from "../screens/Login";
 import Rewards from "../screens/Rewards";
 import Support from "../screens/Support";
 import ViewStock from "../screens/ViewStock";
-import { InventorySaleScreen, RootStackParamList, RootTabParamList } from "../types";
+import {
+  InventorySaleScreen,
+  RootStackParamList,
+  RootTabParamList,
+} from "../types";
 import Profile from "../screens/Profile";
 import HistoryTable from "../screens/HistoryTable";
 import InventorySale from "../screens/InventorySale";
@@ -40,7 +44,6 @@ function RootNavigator() {
         },
       }}
     >
-      <Stack.Screen name="InventorySale" component={InventorySale} initialParams={{screeName:InventorySaleScreen.Entry}} />
       <Stack.Screen
         name="Root"
         component={Login}
@@ -57,11 +60,12 @@ function RootNavigator() {
         component={Profile}
         options={{ headerShown: false }}
       />
+      <Stack.Screen name="TransactionHistory" component={HistoryTable} />
       <Stack.Screen
-        name="TransactionHistory"
-        component={HistoryTable}
+        name="InventorySale"
+        component={InventorySale}
+        initialParams={{ screeName: InventorySaleScreen.Entry }}
       />
-      
     </Stack.Navigator>
   );
 }
@@ -82,7 +86,7 @@ function Home() {
         tabBarInactiveTintColor: ColorConstants.grey_898,
         tabBarStyle: {
           marginBottom: 20,
-          marginHorizontal:5,
+          marginHorizontal: 5,
           height: 80,
           borderRadius: 8,
           borderWidth: 1,
