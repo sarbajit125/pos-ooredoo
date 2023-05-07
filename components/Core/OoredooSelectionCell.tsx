@@ -34,7 +34,7 @@ export default OoredooSelectionCell
 
 const styles = StyleSheet.create({
     cell: {
-        height: 60,
+        height: 40,
         flex: 1,
         flexDirection: "row",
         alignItems: "center",

@@ -1,5 +1,5 @@
-import { ListRenderItemInfo, StyleSheet, View } from "react-native";
-import React, { useEffect, useState } from "react";
+import { ListRenderItemInfo, ScrollView, StyleSheet, View } from "react-native";
+import React, { useEffect, useRef, useState } from "react";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import {
   InventorySaleScreen,
@@ -15,7 +15,6 @@ import { FetchInventoryRules } from "../query-hooks/QueryHooks";
 import OoredooActivityView from "../components/OoredooActivityView";
 import OoredooBadReqView from "../components/errors/OoredooBadReqView";
 import { APIError } from "../responseModels/responseModels";
-
 const InventorySale = (props: InventorySaleProps) => {
   const [pageName, setPage] = useState<InventorySaleScreen>(
     InventorySaleScreen.Entry
@@ -32,23 +31,45 @@ const InventorySale = (props: InventorySaleProps) => {
   const [selectedMode, setSelectedMode] = useState<string | undefined>(
     undefined
   );
-  const [apiRequest, setapiRequest] = useState<string>("");
-  const [selectedType, setSelectedType] = useState<POSSelectData | undefined>(undefined);
-  const [selectedSource, setSelectedSource] = useState<POSSelectData | undefined>(undefined);
+  const [requestParams, setRequestParams] = useState<string>("");
+  const [selectedType, setSelectedType] = useState<POSSelectData | undefined>(
+    undefined
+  );
+  const [selectedSource, setSelectedSource] = useState<
+    POSSelectData | undefined
+  >(undefined);
+  const [selectedTarget, setSelectedTarget] = useState<
+    POSSelectData | undefined
+  >(undefined);
+  const [selectedProduct, setSelectedProduct] = useState<
+    POSSelectData | undefined
+  >(undefined);
   const [errorMSg, setErrmsg] = useState<string>("");
   const [selectionHeadingLbl, setHeadingLbl] = useState<string>("Select mode");
-  const apiResponse = FetchInventoryRules(pageName, apiRequest);
+  let apiResponse = FetchInventoryRules(pageName, requestParams);
   const [showModal, setShowModal] = useState<boolean>(false);
-
+  const requestRef = useRef<string>();
   useEffect(() => {
     props.navigation.setOptions({ title: "Inventory Sale" });
     if (pageName === InventorySaleScreen.Entry) {
-     console.log("Don't fire API ")
+      console.log("Don't fire API ");
     } else {
-      apiResponse.refetch();
-      handleAPIResponse();
+      if (
+        apiResponse.isSuccess ||
+        apiResponse.isError ||
+        apiResponse.isLoading
+      ) {
+        handleAPIResponse();
+      } else {
+        apiResponse.refetch();
+      }
     }
-  }, [pageName, apiResponse.data]);
+  }, [
+    pageName,
+    apiResponse.isSuccess,
+    apiResponse.isLoading,
+    apiResponse.isError,
+  ]);
   const setButtonTitle = (): string => {
     switch (pageName) {
       case InventorySaleScreen.Validate:
@@ -62,30 +83,27 @@ const InventorySale = (props: InventorySaleProps) => {
       if (apiResponse.data.length == 0) {
         setList([]);
         setErrmsg("NO DATA FOUND");
-        setShowModal(true);
         setApiAction(POSAPIHelper.isError);
+        setShowModal(true);
       } else {
         setApiAction(POSAPIHelper.None);
         setShowModal(false);
-        const tableData: POSSelectData[] = apiResponse.data.map((item) => ({
-          id: item.value,
-          name: item.text,
-          isSelected: false,
-        }));
-        setList(tableData);
+        setList(apiResponse.data);
       }
     } else if (apiResponse.isLoading || apiResponse.isFetching) {
       setShowModal(false);
       setApiAction(POSAPIHelper.isLoading);
-    } else {
+    } else if (apiResponse.isError) {
       setList([]);
-      setShowModal(true);
       if (apiResponse.error instanceof APIError) {
         setErrmsg(apiResponse.error.message);
       } else {
         setErrmsg("SOMETHING WENT WRONG");
       }
       setApiAction(POSAPIHelper.isError);
+      setShowModal(true);
+    } else {
+      console.log(apiResponse.status);
     }
   };
   const tickCheckBox = (selectedObj: POSSelectData) => {
@@ -106,8 +124,16 @@ const InventorySale = (props: InventorySaleProps) => {
         break;
       case InventorySaleScreen.Type:
         setSelectedType(selectedObj);
+        break;
       case InventorySaleScreen.Source:
-        setSelectedSource(selectedObj)
+        setSelectedSource(selectedObj);
+        break;
+      case InventorySaleScreen.Target:
+        setSelectedTarget(selectedObj)
+        break
+      case InventorySaleScreen.Product:
+        setSelectedProduct(selectedObj)
+        break
       default:
         break;
     }
@@ -124,70 +150,132 @@ const InventorySale = (props: InventorySaleProps) => {
     let cards: POSSelectData[] = [];
     switch (pageName) {
       case InventorySaleScreen.Entry:
-        cards = [
-          {
-            id: InventorySaleScreen.Type,
-            name: `Selected Mode: ${selectedMode || ""}`,
-            isSelected: false,
-          },
-        ];
-        setCards(cards);
-        setHeadingLbl("Select type");
-        setFromDropDown("Select from dropdown");
-        setapiRequest(selectedMode || "");
-        setPage(InventorySaleScreen.Type);
+        setTypePage();
         break;
       case InventorySaleScreen.Type:
-        cards = [
-          {
-            id: InventorySaleScreen.Type,
-            name: `Selected Mode: ${selectedMode || ""}`,
-            isSelected: false,
-          },
-          {
-            id: InventorySaleScreen.Source,
-            name: `Selected Type: ${selectedType?.name || ""}`,
-            isSelected: false,
-          },
-        ];
-        setCards(cards);
-        setHeadingLbl("Select source");
-        setFromDropDown("Select from dropdown");
-        setapiRequest(`${selectedMode || ""}/${selectedType?.id || ""}`);
-        setPage(InventorySaleScreen.Source);
+        setSourcePage();
         break;
-    case InventorySaleScreen.Source:
-      cards = [
-        {
-          id: InventorySaleScreen.Type,
-          name: `Selected Mode: ${selectedMode || ""}`,
-          isSelected: false,
-        },
-        {
-          id: InventorySaleScreen.Source,
-          name: `Selected Type: ${selectedType?.name || ""}`,
-          isSelected: false,
-        },
-        {
-          id: InventorySaleScreen.Target,
-          name: `Slected Source: ${selectedSource?.name || ""}`,
-          isSelected: false
-        }
-      ];
-      setCards(cards);
-      setHeadingLbl("Select target");
-      setFromDropDown("Select from dropdown");
-      setapiRequest(`${selectedMode || ""}/${selectedType?.id || ""}/${selectedSource?.id || ""}`);
-      setPage(InventorySaleScreen.Target);
-      break;
+      case InventorySaleScreen.Source:
+        setTargetPage();
+        break;
+      case InventorySaleScreen.Product:
+        setProductPage()
+        break
       default:
         break;
     }
   };
+  const setEntryPage = () => {
+    setPage(InventorySaleScreen.Entry);
+    setHeadingLbl("Select mode");
+    setFromDropDown("Select from dropdown");
+    setCards([]);
+    setList([
+      { id: "P", name: "Push", isSelected: false },
+      { id: "R", name: "Request", isSelected: false },
+    ]);
+  };
+  const setTypePage = () => {
+    let cards: POSSelectData[] = [];
+    cards = [
+      {
+        id: InventorySaleScreen.Entry,
+        name: `Selected Mode: ${selectedMode || ""}`,
+        isSelected: false,
+      },
+    ];
+    setRequestParams(selectedMode || "");
+    requestRef.current = selectedMode;
+    setCards(cards);
+    setHeadingLbl("Select type");
+    setFromDropDown("Select from dropdown");
+    setPage(InventorySaleScreen.Type);
+  };
+  const setSourcePage = () => {
+    let cards: POSSelectData[] = [
+      {
+        id: InventorySaleScreen.Entry,
+        name: `Selected Mode: ${selectedMode || ""}`,
+        isSelected: false,
+      },
+      {
+        id: InventorySaleScreen.Type,
+        name: `Selected Type: ${selectedType?.name || ""}`,
+        isSelected: false,
+      },
+    ];
+    setCards(cards);
+    setHeadingLbl("Select source");
+    setFromDropDown("Select from dropdown");
+    setRequestParams(`${selectedMode || ""}/${selectedType?.id || ""}`);
+    setPage(InventorySaleScreen.Source);
+  };
+  const setTargetPage = () => {
+    let cards: POSSelectData[] = [
+      {
+        id: InventorySaleScreen.Entry,
+        name: `Selected Mode: ${selectedMode || ""}`,
+        isSelected: false,
+      },
+      {
+        id: InventorySaleScreen.Type,
+        name: `Selected Type: ${selectedType?.name || ""}`,
+        isSelected: false,
+      },
+      {
+        id: InventorySaleScreen.Source,
+        name: `Selected Source: ${selectedSource?.name || ""}`,
+        isSelected: false,
+      },
+    ];
+    setCards(cards);
+    setHeadingLbl("Select target");
+    setFromDropDown("Select from dropdown");
+    setRequestParams(
+      `${selectedMode || ""}/${selectedType?.id || ""}/${
+        selectedSource?.id || ""
+      }`
+    );
+    setPage(InventorySaleScreen.Target);
+  };
+  const setProductPage = () => {
+    let cards: POSSelectData[] = [
+      {
+        id: InventorySaleScreen.Entry,
+        name: `Selected Mode: ${selectedMode || ""}`,
+        isSelected: false,
+      },
+      {
+        id: InventorySaleScreen.Type,
+        name: `Selected Type: ${selectedType?.name || ""}`,
+        isSelected: false,
+      },
+      {
+        id: InventorySaleScreen.Source,
+        name: `Selected Source: ${selectedSource?.name || ""}`,
+        isSelected: false,
+      },
+      {
+        id: InventorySaleScreen.Target,
+        name: `Selected Target: ${selectedTarget?.name || ""}`,
+        isSelected: false,
+      },
+    ];
+    setCards(cards);
+    setHeadingLbl("Select Product");
+    setFromDropDown("Select from dropdown");
+    setRequestParams(
+      `${selectedMode || ""}/${selectedType?.id || ""}/${
+        selectedSource?.id || ""
+      }/${selectedTarget?.id || ""}`
+    );
+    setPage(InventorySaleScreen.Target);
+  }
   const modifyBtnTapped = (id: string) => {
     let cards: POSSelectData[] = [];
     switch (id) {
       case InventorySaleScreen.Entry:
+        setEntryPage();
         break;
       case InventorySaleScreen.Type:
         setHeadingLbl("Select mode");
@@ -209,22 +297,31 @@ const InventorySale = (props: InventorySaleProps) => {
           },
         ];
         setCards(cards);
-        setapiRequest(selectedMode || "")
+        setRequestParams(selectedMode || "");
         setPage(InventorySaleScreen.Type);
-        break
+        break;
       default:
         break;
     }
-    toggleConfirmBtn()
+    toggleConfirmBtn();
   };
   const toggleConfirmBtn = (): boolean => {
     switch (pageName) {
       case InventorySaleScreen.Entry:
         return selectedMode === undefined ? true : false;
+        break;
       case InventorySaleScreen.Type:
         return selectedType === undefined ? true : false;
+        break;
       case InventorySaleScreen.Source:
         return selectedSource === undefined ? true : false;
+        break;
+      case InventorySaleScreen.Target:
+        return selectedTarget === undefined ? true : false;
+        break;
+      case InventorySaleScreen.Product:
+        return selectedProduct === undefined ? true : false;
+        break;
       default:
         return true;
     }
@@ -236,64 +333,63 @@ const InventorySale = (props: InventorySaleProps) => {
         text={cell.item.name}
         id={cell.item.id}
         modifyCallback={(id) => modifyBtnTapped(id)}
-        heading={""}
       />
     );
   };
   return (
-    <View style={styles.containerView}>
-      <View style={styles.mainView}>
-        <View style={styles.cardViews}>
-          {cards.length == 0 ? null : (
-            <View style={styles.cardList}>
-              <FlatList
-                data={cards}
-                keyExtractor={(item) => item.id}
-                renderItem={(item) => renderSelectedRows(item)}
+      <View style={styles.containerView}>
+        <View style={styles.mainView}>
+          <View style={styles.cardViews}>
+            {cards.length == 0 ? null : (
+              <View style={styles.cardList}>
+                <FlatList
+                  data={cards}
+                  keyExtractor={(item) => item.id}
+                  renderItem={(item) => renderSelectedRows(item)}
+                />
+              </View>
+            )}
+            <View style={styles.textfieldView}>
+              <SelectedModCell
+                rightViewType={"none"}
+                text={selectedFromDropdown}
+                id={"tf"}
+                modifyCallback={(id) => console.log(id)}
+                heading={selectionHeadingLbl}
               />
             </View>
-          )}
-          <View style={styles.textfieldView}>
-            <SelectedModCell
-              rightViewType={"none"}
-              text={selectedFromDropdown}
-              id={"tf"}
-              modifyCallback={(id) => console.log(id)}
-              heading={selectionHeadingLbl}
+          </View>
+          <View style={styles.dropDownView}>
+            <FlatList
+              data={dropdownList}
+              keyExtractor={(item) => item.id}
+              renderItem={(item) => renderCell(item)}
             />
           </View>
         </View>
-        <View style={styles.dropDownView}>
-          <FlatList
-            data={dropdownList}
-            keyExtractor={(item) => item.id}
-            renderItem={(item) => renderCell(item)}
+        <View style={styles.buttonView}>
+          <OoredooPayBtn
+            isDisabled={toggleConfirmBtn()}
+            onPress={() => nextBtnClicked()}
+            title={setButtonTitle()}
           />
         </View>
+        {apiAction === POSAPIHelper.isLoading ? (
+          <View>
+            <OoredooActivityView />
+          </View>
+        ) : apiAction === POSAPIHelper.isError ? (
+          <View>
+            <OoredooBadReqView
+              modalVisible={showModal}
+              action={function (): void {
+                setShowModal(false);
+              }}
+              title={errorMSg}
+            />
+          </View>
+        ) : null}
       </View>
-      <View style={styles.buttonView}>
-        <OoredooPayBtn
-          isDisabled={toggleConfirmBtn()}
-          onPress={() => nextBtnClicked()}
-          title={setButtonTitle()}
-        />
-      </View>
-      {apiAction === POSAPIHelper.isLoading ? (
-        <View>
-          <OoredooActivityView />
-        </View>
-      ) : apiAction === POSAPIHelper.isError ? (
-        <View>
-          <OoredooBadReqView
-            modalVisible={showModal}
-            action={function (): void {
-              setShowModal(false);
-            }}
-            title={errorMSg}
-          />
-        </View>
-      ) : null}
-    </View>
   );
 };
 
@@ -306,24 +402,22 @@ const styles = StyleSheet.create({
   },
   buttonView: {
     bottom: 5,
-    marginHorizontal: 10,
-    marginTop: 10,
+    marginVertical: 10,
+    marginHorizontal: 6,
   },
   dropDownView: {
+    marginTop: 15,
     height: 300,
   },
   cardViews: {
     flex: 1,
-    flexDirection: "column",
     flexGrow: 1,
   },
   mainView: {
     flex: 1,
     flexGrow: 1,
   },
-  cardList: {
-   
-  },
+  cardList: {},
   textfieldView: {
     height: 70,
   },

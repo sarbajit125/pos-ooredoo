@@ -1,6 +1,5 @@
 import { StyleSheet, Text, View, Image } from "react-native";
 import React from "react";
-import { TouchableOpacity } from "react-native-gesture-handler";
 import NotoRegular18 from "../OoredooFonts/Noto/NotoRegular18";
 import OoredooModBtn from "../OoredooModBtn";
 import { ColorConstants } from "../../constants/Colors";
@@ -10,8 +9,18 @@ const SelectedModCell = (props: SelectedModCellProps) => {
   switch (props.rightViewType) {
     case "button":
       return (
-        <View key={props.id} style={[{height: props.heading.length == 0 ? 70: 90},styles.mainView]}>
-          <Header13RubikLbl style={styles.heading}>{props.heading}</Header13RubikLbl>
+        <View
+          key={props.id}
+          style={[
+            { height: props.heading === undefined ? 70 : 94 },
+            styles.mainView,
+          ]}
+        >
+          {props.heading === undefined ? null : (
+            <Header13RubikLbl style={styles.heading}>
+              {props.heading}
+            </Header13RubikLbl>
+          )}
           <View style={styles.cell}>
             <NotoRegular18 style={styles.text}>{props.text}</NotoRegular18>
             <OoredooModBtn
@@ -37,7 +46,9 @@ const SelectedModCell = (props: SelectedModCellProps) => {
     case "none":
       return (
         <View key={props.id} style={styles.mainView}>
-          <Header13RubikLbl style={styles.heading}>{props.heading}</Header13RubikLbl>
+          <Header13RubikLbl style={styles.heading}>
+            {props.heading}
+          </Header13RubikLbl>
           <View style={styles.cell}>
             <NotoRegular18 style={styles.text}>{props.text}</NotoRegular18>
           </View>
@@ -82,9 +93,9 @@ const styles = StyleSheet.create({
     marginTop: 5,
     height: 90,
   },
-  heading:{
+  heading: {
     marginHorizontal: 16,
-  }
+  },
 });
 
 export interface SelectedModCellProps {
@@ -93,5 +104,5 @@ export interface SelectedModCellProps {
   id: string;
   buttonTitle?: string;
   modifyCallback: (id: string) => void;
-  heading: string;
+  heading?: string;
 }
