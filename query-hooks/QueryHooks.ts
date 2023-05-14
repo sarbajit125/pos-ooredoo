@@ -6,6 +6,7 @@ import { AppConstants } from "../constants/AppConstants";
 import dayjs from "dayjs";
 import { POSSelectData } from "../types";
 import {
+  AvailableSerialsRequest,
   InventoryProductResponse,
   InventoryRulesResponse,
 } from "../responseModels/InventoryRulesResponse";
@@ -109,8 +110,19 @@ export const FetchInventoryRules1 = (id: string) =>
       }
     }
   });
-const checkResponseIfProduct = (
+export const checkResponseIfProduct = (
   response: InventoryRulesResponse[] | InventoryProductResponse[]
 ): response is InventoryRulesResponse[] => {
   return (response as InventoryRulesResponse[])[0].value != undefined;
 };
+
+export const FetchInventoryProduct = (url: string) => useQuery({
+  queryKey: ["inventoryDetails", url],
+  queryFn: () => {
+    return APIManager.sharedInstance().fetchInventoryRules(url);
+  }
+})
+export const FireSerialsForUser = (request: AvailableSerialsRequest) => useMutation({
+  mutationKey:["SerialsList"],
+  mutationFn: () => APIManager.sharedInstance().fetchSerialsForUser(request),
+})

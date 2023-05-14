@@ -6,6 +6,8 @@
 import { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import { CompositeScreenProps, NavigatorScreenParams } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { POSWalletDAO } from './AppManger/POSAppManager';
+import { SelfUserDetails } from './responseModels/SelfUserDetailsResponse';
 declare global {
   namespace ReactNavigation {
     interface RootParamList extends RootStackParamList {}
@@ -59,4 +61,19 @@ export enum POSAPIHelper {
   isLoading = 0,
   isError = 1,
   None = 2
+}
+
+export interface POSUserStore {
+  fname: string
+  lname?: string 
+  username: string
+  userDesc: string 
+  contact: string 
+  email: string 
+  salesChannelList: string[]
+  rastasWallets: POSWalletDAO[]
+  faisaWallets: POSWalletDAO[]
+  currentRole: string
+  userId: string
+  setUserDetails: (response: SelfUserDetails) => void
 }

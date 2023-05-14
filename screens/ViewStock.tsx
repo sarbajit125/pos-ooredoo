@@ -51,9 +51,7 @@ const ViewStock = observer((props: ViewStockNavProps) => {
     );
   } else if (isLoading) {
     return (
-      <View>
-        {/* <OoredooActivityView /> */}
-      </View>
+      <OoredooActivityView />
     );
   } else {
     return (

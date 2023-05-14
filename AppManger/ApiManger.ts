@@ -13,9 +13,9 @@ import { SelfUserDetails } from "../responseModels/SelfUserDetailsResponse";
 import { StockStatusResponse } from "../responseModels/StockStatusResponse";
 import { POSWalletDAO } from "./POSAppManager";
 import { HistoryListResponse } from "../responseModels/HistoryListResponse";
-import * as FileSystem from "expo-file-system";
-import { AppConstants } from "../constants/AppConstants";
 import {
+  AvailableSerialsRequest,
+  AvailableSerialsResponse,
   InventoryProductResponse,
   InventoryRulesResponse,
 } from "../responseModels/InventoryRulesResponse";
@@ -194,6 +194,15 @@ export class APIManager {
       throw this.errorhandling(error);
     }
   };
+  fetchSerialsForUser = async (request:AvailableSerialsRequest) => {
+    try {
+      const response = await axios.post<AvailableSerialsResponse[]>('master/searchInventory',request)
+      this.printJSON(response.data);
+      return response.data;
+    } catch (error) {
+      throw this.errorhandling(error);
+    }
+  }
   errorhandling = (error: unknown): APIError | UnauthorizedError => {
     if (error instanceof AxiosError) {
       console.log(error.response?.data);
