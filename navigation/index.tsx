@@ -2,7 +2,7 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import * as React from "react";
-import { View, Image, TouchableHighlight } from "react-native";
+import { View, Image } from "react-native";
 import NavigationBar from "../components/Core/NavigationBar";
 import { ColorConstants } from "../constants/Colors";
 import Dashboard from "../screens/Dashboard";
@@ -18,7 +18,8 @@ import {
 } from "../types";
 import Profile from "../screens/Profile";
 import HistoryTable from "../screens/HistoryTable";
-import InventorySale from "../screens/InventorySale";
+import InventorySaleRepacked from "../screens/InventorySaleRepacked";
+import SearchScreen from "../screens/SearchScreen";
 
 export default function Navigation() {
   return (
@@ -61,9 +62,10 @@ function RootNavigator() {
         options={{ headerShown: false }}
       />
       <Stack.Screen name="TransactionHistory" component={HistoryTable} />
+      <Stack.Screen name="SearchScreen" component={SearchScreen} />
       <Stack.Screen
         name="InventorySale"
-        component={InventorySale}
+        component={InventorySaleRepacked}
         initialParams={{ screeName: InventorySaleScreen.Entry }}
       />
     </Stack.Navigator>

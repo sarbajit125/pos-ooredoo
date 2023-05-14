@@ -10,7 +10,6 @@ import { StoresContext } from "../store/RootStore";
 import DashboardKPI from "../components/dashboard/DashboardKPI";
 import { useQuery } from "react-query";
 import { APIManager } from "../AppManger/ApiManger";
-import OoredooActivityView from "../components/OoredooActivityView";
 import OoredooBadReqView from "../components/errors/OoredooBadReqView";
 import DashboardServices from "../components/dashboard/DashboardServices";
 import { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
@@ -62,7 +61,7 @@ const Dashboard = observer((props: LoginScreenProps) => {
   } else if (isLoading) {
     return (
       <View style={styles.container}>
-        <OoredooActivityView />
+        {/* <OoredooActivityView /> */}
       </View>
     );
   } else {

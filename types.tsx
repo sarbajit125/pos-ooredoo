@@ -6,8 +6,6 @@
 import { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import { CompositeScreenProps, NavigatorScreenParams } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { isError } from 'react-query';
-
 declare global {
   namespace ReactNavigation {
     interface RootParamList extends RootStackParamList {}
@@ -21,6 +19,7 @@ export type RootStackParamList = {
   Profile: undefined;
   TransactionHistory: HistoryType;
   InventorySale: InventoryScreenList;
+  SearchScreen: undefined;
 };
 export type HistoryType = {
   id: 'transactionHistory' | 'walletHistory'
@@ -34,7 +33,6 @@ export enum InventorySaleScreen {
    Source  = "source",
    Target  = "target",
    Product  = "product",
-   Validate  = "validate"
 }
 
 export type RootStackScreenProps<Screen extends keyof RootStackParamList> = NativeStackScreenProps<

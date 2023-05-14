@@ -4,14 +4,18 @@ import { POSWalletDAO } from "../AppManger/POSAppManager";
 import CryptoES from "crypto-es";
 import { AppConstants } from "../constants/AppConstants";
 import dayjs from "dayjs";
-import { InventorySaleScreen, POSSelectData } from "../types";
+import { POSSelectData } from "../types";
+import {
+  InventoryProductResponse,
+  InventoryRulesResponse,
+} from "../responseModels/InventoryRulesResponse";
 export const walletBalanceHook = () =>
   useMutation({
     mutationKey: ["walletbalance"],
     mutationFn: (reqObj: FetchbalanceReq) => {
       if (reqObj.wallet.type === "Faisa") {
-        let encodedPin = CryptoES.enc.Utf8.parse(reqObj.mpin)
-        let encodedKey = CryptoES.enc.Utf8.parse(AppConstants.aesKey)
+        let encodedPin = CryptoES.enc.Utf8.parse(reqObj.mpin);
+        let encodedKey = CryptoES.enc.Utf8.parse(AppConstants.aesKey);
         const encoded = CryptoES.AES.encrypt(encodedPin, encodedKey, {
           padding: CryptoES.pad.Pkcs7,
           mode: CryptoES.mode.ECB,
@@ -39,56 +43,74 @@ export interface DashboardKPIReq {
 
 export const dashboardGraphHook = (posCode: string) =>
   useQuery({
-    queryKey: ['dashbordKPI'],
+    queryKey: ["dashbordKPI"],
     queryFn: () => {
       let yesterDay = new Date().getDate() - 1;
       const formatDate = dayjs(yesterDay).format("YYYY-MM-DD").toString();
-      return APIManager.sharedInstance().fetchDashboardGraph(formatDate, posCode)
+      return APIManager.sharedInstance().fetchDashboardGraph(
+        formatDate,
+        posCode
+      );
     },
-  })
-  export const StockDetailsHook = (posCode: string) => useQuery({
-    queryKey:['stockStatus', posCode],
-    queryFn:() => APIManager.sharedInstance().fetchStockStatus(posCode),
+  });
+export const StockDetailsHook = (posCode: string) =>
+  useQuery({
+    queryKey: ["stockStatus", posCode],
+    queryFn: () => APIManager.sharedInstance().fetchStockStatus(posCode),
     staleTime: 3600000,
-  })
-  export const TransactionHistoryHook = (orderType?: string, startDate?: string, endDate?: string) => useQuery({
-    queryKey:['posHistory', orderType, startDate, endDate],
+  });
+export const TransactionHistoryHook = (
+  orderType?: string,
+  startDate?: string,
+  endDate?: string
+) =>
+  useQuery({
+    queryKey: ["posHistory", orderType, startDate, endDate],
     queryFn: () => {
-      let requestType = orderType || ""
-      let fromDate = startDate || dayjs(new Date().getDate() - 7).format("YYYY-MM-DD").toString();
-      let toDate =  endDate || dayjs(new Date().getDate()).format("YYYY-MM-DD").toString();
-      return APIManager.sharedInstance().fetchTransactionHistory(requestType, "2023-03-29", "2023-04-05")
-    },
-    staleTime: 3600000,
-  })
-
-  export const FetchInventoryRules = (screen: InventorySaleScreen, id: string) => useQuery({
-    queryKey: ['inventoryRules',screen, id],
+      let requestType = orderType || "";
+      let fromDate =
+        startDate ||
+        dayjs(new Date().getDate() - 7)
+          .format("YYYY-MM-DD")
+          .toString();
+      let toDate =
+        endDate || dayjs(new Date().getDate()).format("YYYY-MM-DD").toString();
+      return APIManager.sharedInstance().fetchTransactionHistory(
+        requestType,
+        "2023-03-29",
+        "2023-04-05"
+      );
+    }
+  });
+export const FetchInventoryRules1 = (id: string) =>
+  useQuery({
+    queryKey: ["inventoryRules", id],
     enabled: false,
     queryFn: () => {
-      let type = "/transferTypes"
-      switch (screen){
-        case InventorySaleScreen.Type:
-          type ="/transferTypes"
-          break
-        case InventorySaleScreen.Source:
-          type ="/sources"
-          break
-        case InventorySaleScreen.Target:
-          type ="/targets"
-          break
-        case InventorySaleScreen.Product:
-          type ="/product"
-          break
-        case InventorySaleScreen.Entry:
-          type = "/transferTypes"
-          break
+      return APIManager.sharedInstance().fetchInventoryRules(id);
+    },
+    select: (data): POSSelectData[] => {
+      if (checkResponseIfProduct(data)) {
+       return (
+        data.map((item) => ({
+          id: item.value,
+          name: item.text,
+          isSelected: false,
+        }))
+       ) 
+      } else {
+        return (
+          data.map((item) => ({
+            id: item.inventoryTypeid.toString(),
+            name: item.inventoryTypeDescription,
+            isSelected: false,
+          }))
+        )
       }
-      let query = id + type
-     return  APIManager.sharedInstance().fetchInventoryRules(query)},
-     select: (data) : POSSelectData[] => data.map((item) => ({
-      id: item.value,
-      name: item.text,
-      isSelected: false,
-    }))
-  })
+    }
+  });
+const checkResponseIfProduct = (
+  response: InventoryRulesResponse[] | InventoryProductResponse[]
+): response is InventoryRulesResponse[] => {
+  return (response as InventoryRulesResponse[])[0].value != undefined;
+};

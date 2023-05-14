@@ -15,14 +15,17 @@ import { POSWalletDAO } from "./POSAppManager";
 import { HistoryListResponse } from "../responseModels/HistoryListResponse";
 import * as FileSystem from "expo-file-system";
 import { AppConstants } from "../constants/AppConstants";
-import { InventoryRulesResponse } from "../responseModels/InventoryRulesResponse";
+import {
+  InventoryProductResponse,
+  InventoryRulesResponse,
+} from "../responseModels/InventoryRulesResponse";
 export class APIManager {
   private static instance: APIManager;
   private constructor() {
     //axios.defaults.baseURL = "http://192.168.29.217:8000/pos";
     axios.defaults.baseURL = "http://10.10.9.113:9080";
     axios.defaults.headers.common["x-auth-token"] = "";
-    axios.defaults.timeout = 30000
+    axios.defaults.timeout = 30000;
     axios.interceptors.request.use((request) => {
       console.log("Starting Request", JSON.stringify(request, null, 2));
       return request;
@@ -175,27 +178,26 @@ export class APIManager {
       const response = await axios.get(`/api/v1/customer/orders/${url}`, {
         responseType: "blob",
       });
-    return response.data
+      return response.data;
     } catch (error) {
       throw this.errorhandling(error);
     }
   };
-  fetchInventoryRules =async (transferType:string) => {
+  fetchInventoryRules = async (transferType: string) => {
     try {
-      const response = await axios.get<InventoryRulesResponse[]>(`api/inventory/transfer/rules/${transferType}`)
+      const response = await axios.get<InventoryRulesResponse[] |InventoryProductResponse[] >(
+        `api/inventory/transfer/rules/${transferType}`
+      );
       this.printJSON(response.data);
       return response.data;
     } catch (error) {
       throw this.errorhandling(error);
     }
-  }
+  };
   errorhandling = (error: unknown): APIError | UnauthorizedError => {
     if (error instanceof AxiosError) {
-      console.log(error.response?.data)
-      throw new APIError(
-        error.response?.data,
-        error.response?.status ?? 400
-      );
+      console.log(error.response?.data);
+      throw new APIError(error.response?.data, error.response?.status ?? 400);
     } else {
       throw new APIError("API process failed", 400);
     }
