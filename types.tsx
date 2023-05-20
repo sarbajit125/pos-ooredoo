@@ -22,6 +22,8 @@ export type RootStackParamList = {
   TransactionHistory: HistoryType;
   InventorySale: InventoryScreenList;
   SearchScreen: undefined;
+  InventoryConfirmation: undefined;
+  POSSuccess: POSSuccessProps
 };
 export type HistoryType = {
   id: 'transactionHistory' | 'walletHistory'
@@ -76,4 +78,11 @@ export interface POSUserStore {
   currentRole: string
   userId: string
   setUserDetails: (response: SelfUserDetails) => void
+}
+
+export interface POSSuccessProps {
+  btnTitle?: string;
+  heading: string;
+  desc?: string;
+  resetTo: 'Dashboard' | 'Profile'
 }

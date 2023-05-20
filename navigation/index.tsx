@@ -20,6 +20,8 @@ import Profile from "../screens/Profile";
 import HistoryTable from "../screens/HistoryTable";
 import InventorySaleRepacked from "../screens/InventorySaleRepacked";
 import SearchScreen from "../screens/SearchScreen";
+import InventoryConfirmation from "../screens/InventoryConfirmation";
+import POSSuccessSheet from "../screens/POSSuccessScreen";
 
 export default function Navigation() {
   return (
@@ -41,10 +43,11 @@ function RootNavigator() {
       screenOptions={{
         headerBackVisible: false,
         header(props) {
-          return <NavigationBar {...props} />;
+          return <NavigationBar {...props}  />;
         },
       }}
     >
+      <Stack.Screen name="InventoryConfirmation" component={InventoryConfirmation}  />
       <Stack.Screen
         name="Root"
         component={Login}
@@ -68,6 +71,7 @@ function RootNavigator() {
         component={InventorySaleRepacked}
         initialParams={{ screeName: InventorySaleScreen.Entry }}
       />
+     <Stack.Screen name="POSSuccess" component={POSSuccessSheet} options={{ headerShown: false }} />
     </Stack.Navigator>
   );
 }

@@ -27,7 +27,7 @@ const Dashboard = observer((props: LoginScreenProps) => {
   });
   if (isSuccess) {
     userStore.fetchSelfDetails(data);
-    setUserDetails(data)
+    //setUserDetails(data)
     return (
       <ScrollView>
         <View style={styles.container}>

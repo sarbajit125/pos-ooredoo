@@ -7,7 +7,7 @@ import {
   RootStackParamList,
 } from "../types";
 import SelectedModCell from "../components/Core/SelectedModCell";
-import { SearchScreenContext } from "../store/RootStore";
+import { InventoryAllocateContext, SearchScreenContext } from "../store/RootStore";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { FetchInventoryRules1 } from "../query-hooks/QueryHooks";
 import { APIError } from "../responseModels/responseModels";
@@ -49,6 +49,7 @@ const InventorySaleRepacked = (props: InventorySaleProps) => {
     serviceCode,
     setSelectedData,
   } = SearchScreenContext();
+  const {setType, setProductId, setProductURL} = InventoryAllocateContext()
   let apiResponse = FetchInventoryRules1(requestParams);
   useEffect(() => {
     setSelectedData(undefined);
@@ -149,7 +150,17 @@ const InventorySaleRepacked = (props: InventorySaleProps) => {
       return true;
     }
   };
-  const selectBtnClicked = () => {};
+  const selectBtnClicked = () => {
+    const type = rows[0].selectedData?.id  === 'P' ? 'P' : 'R'
+    setType(type)
+    setProductId(parseInt(rows[4].selectedData?.id ?? '0'))
+    let query = `${rows[0].selectedData?.id || ""}/${
+      rows[1].selectedData?.id || ""
+    }/${rows[2].selectedData?.id || ""}/${rows[3].selectedData?.id || ""}`;
+    query = query + "/products";
+    setProductURL(query)
+    props.navigation.navigate('InventoryConfirmation')
+  };
 
   const renderCell = (cell: ListRenderItemInfo<InventoryList>) => {
     let btnText = cell.item.selectedData === undefined ? "Select" : "Modify";

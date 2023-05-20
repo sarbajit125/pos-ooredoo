@@ -109,6 +109,7 @@ const Login = (props: LoginScreenProps) => {
                   placeholder="UserName"
                   showError={errors.username && touched.username}
                   errorMsg={errors.username}
+                  keyboardType="ascii-capable"
                 />
                 <OoredooTextInput
                   onChangeText={handleChange("password")}
@@ -144,11 +145,11 @@ const Login = (props: LoginScreenProps) => {
             </View>
           )}
         </Formik>
-        {loginmutation.isLoading ? <OoredooActivityView visible={loginmutation.isLoading} /> : null}
         {loginmutation.isError ? <OoredooBadReqView modalVisible={showErrorView} action={function (): void {
           setErrorView(false)
         } } title={errorMsg} /> : null}
       </View>
+      {loginmutation.isLoading ? <OoredooActivityView  /> : null}
     </SafeAreaView>
   );
 };

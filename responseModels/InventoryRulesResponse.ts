@@ -22,3 +22,26 @@ export interface AvailableSerialsRequest {
     poDateFrom:    string;
     poDateTo:      string;
 }
+
+export interface InventoryOrderReq {
+  orderMode: string;
+  sourceChannelId: number;
+  lineItems: InventoryLineItem[];
+  targetChannelId: number;
+  transferTypeId: number;
+}
+export interface InventoryLineItem {
+  lineNo: number;
+  startSerial: string;
+  unitTypeId: number;
+  inventoryTypeId: number;
+  inventoryTypeDescription: string;
+  requestedQuantity: number;
+  poNo: string;
+  serialType: string;
+  endSerial: string;
+}
+
+export interface InventoryOrderResponse {
+  orderId: number
+}
