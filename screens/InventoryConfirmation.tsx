@@ -10,6 +10,7 @@ import { InventoryAllocateContext } from "../store/RootStore";
 import {
   FetchInventoryProduct,
   FireSerialsForUser,
+  InitateInventoryOrder,
   checkResponseIfProduct,
 } from "../query-hooks/QueryHooks";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -18,7 +19,10 @@ import OoredooPayBtn from "../components/OoredooPayBtn";
 import OoredooActivityView from "../components/OoredooActivityView";
 import OoredooBadReqView from "../components/errors/OoredooBadReqView";
 import Header14RubikLbl from "../components/OoredooFonts/Rubik/Header14RubikLbl";
-import { InventoryProductResponse } from "../responseModels/InventoryRulesResponse";
+import {
+  InventoryOrderReq,
+  InventoryProductResponse,
+} from "../responseModels/InventoryRulesResponse";
 import { POSSelectData, RootStackParamList } from "../types";
 import OoredooSelectionCell from "../components/Core/OoredooSelectionCell";
 import { APIError } from "../responseModels/responseModels";
@@ -26,6 +30,7 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { ColorConstants } from "../constants/Colors";
 import { Fontcache } from "../constants/FontCache";
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
+import { InventoryLineItem } from "../responseModels/InventoryRulesResponse";
 
 const InventoryConfirmation = (props: InventoryConfirmNavProps) => {
   const { type, productURL, selectedProductId } = InventoryAllocateContext();
@@ -56,6 +61,14 @@ const InventoryConfirmation = (props: InventoryConfirmNavProps) => {
     poDateFrom: "2023-04-01",
     poDateTo: "2023-05-03",
   });
+  const {
+    mutate: fireInventoryOrder,
+    data: OrderSuccess,
+    isSuccess: OrderIsSuccess,
+    isLoading: OrderIsLoading,
+    isError: OrderIsError,
+    error: OrderDateError,
+  } = InitateInventoryOrder();
   useEffect(() => {
     props.navigation.setOptions({ title: "Inventory Confirmation" });
   }, []);
@@ -66,6 +79,28 @@ const InventoryConfirmation = (props: InventoryConfirmNavProps) => {
   useEffect(() => {
     handleProductlistResponse();
   }, [isSuccess, isLoading, isError]);
+
+  useEffect(() => {
+    handleOrderAPIResponse()
+  },[OrderIsSuccess, OrderIsError, OrderIsLoading])
+
+  const handleOrderAPIResponse = () => {
+    if(OrderIsSuccess) {
+      props.navigation.navigate("POSSuccess", {
+        heading: `INVENTORY TRANSFER SUCCESSFULL ORDER ID: ${OrderSuccess.orderId}`,
+        resetTo: "Profile",
+      });
+    } else if (OrderIsError) {
+      if (OrderDateError instanceof APIError) {
+        setErrMsg(OrderDateError.message);
+      } else {
+        setErrMsg("SOMETHING WENT WRONG");
+      }
+      setShowModal(true);
+    } else if (OrderIsLoading) {
+
+    }
+  } 
   const handleProductlistResponse = () => {
     if (isSuccess) {
       if (!checkResponseIfProduct(data)) {
@@ -133,6 +168,27 @@ const InventoryConfirmation = (props: InventoryConfirmNavProps) => {
       />
     );
   };
+  const prepareInventoryRequest = () => {
+    const splitArr = productURL.split('/')
+    const reqLineItems: InventoryLineItem[] = selectedSerials.filter((item) => item.isSelected).map((item) => ({lineNo : 1,
+      startSerial : item.name,
+      unitTypeId : 1,
+      inventoryTypeId : selectedProduct.inventoryTypeid,
+      inventoryTypeDescription : selectedProduct.inventoryTypeDescription,
+      requestedQuantity : 1,
+      poNo : "0",
+      serialType : "serial",
+      endSerial : item.name}))
+    let request: InventoryOrderReq = {
+      orderMode: type,
+      sourceChannelId: parseInt(splitArr[2]),
+      targetChannelId: parseInt(splitArr[3]),
+      transferTypeId: parseInt(splitArr[1]),
+      lineItems: reqLineItems
+    }
+    console.log(request)
+    fireInventoryOrder(request)
+  }
   return (
     <BottomSheetModalProvider>
       <SafeAreaView style={styles.mainContainer}>
@@ -208,16 +264,11 @@ const InventoryConfirmation = (props: InventoryConfirmNavProps) => {
         </View>
         <View style={styles.btnView}>
           <OoredooPayBtn
-            onPress={function (): void {
-              props.navigation.navigate("POSSuccess", {
-                heading: "Order id for payment is 1234",
-                resetTo: "Profile",
-              });
-            }}
+            onPress={() => prepareInventoryRequest()}
             title={"Confirm"}
           />
         </View>
-        {isError || serialError ? (
+        {isError || serialError || OrderIsError ? (
           <OoredooBadReqView
             modalVisible={showModal}
             action={() => setShowModal(false)}
@@ -256,6 +307,7 @@ const styles = StyleSheet.create({
   btnView: {
     marginVertical: 16,
     marginHorizontal: 8,
+    padding:5,
   },
   serialTable: {
     marginHorizontal: 8,

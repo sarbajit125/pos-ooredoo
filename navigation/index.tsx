@@ -43,11 +43,10 @@ function RootNavigator() {
       screenOptions={{
         headerBackVisible: false,
         header(props) {
-          return <NavigationBar {...props}  />;
+          return <NavigationBar {...props} />;
         },
       }}
     >
-      <Stack.Screen name="InventoryConfirmation" component={InventoryConfirmation}  />
       <Stack.Screen
         name="Root"
         component={Login}
@@ -71,7 +70,15 @@ function RootNavigator() {
         component={InventorySaleRepacked}
         initialParams={{ screeName: InventorySaleScreen.Entry }}
       />
-     <Stack.Screen name="POSSuccess" component={POSSuccessSheet} options={{ headerShown: false }} />
+      <Stack.Screen
+        name="InventoryConfirmation"
+        component={InventoryConfirmation}
+      />
+      <Stack.Screen
+        name="POSSuccess"
+        component={POSSuccessSheet}
+        options={{ headerShown: false }}
+      />
     </Stack.Navigator>
   );
 }

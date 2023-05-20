@@ -128,6 +128,7 @@ const styles = StyleSheet.create({
   btnView: {
     marginVertical: 16,
     marginHorizontal: 6,
+    padding:5,
   },
   textfield:{
     marginVertical:8,

@@ -23,28 +23,28 @@ export const SearchScreenContext = create<SearchScreenProps>((set) => ({
   serviceCode: "",
   setServiceCode: (code) => set(() => ({serviceCode: code}))
   }))
-  // export const InventoryAllocateContext = create<InventoryConfirmationProps>(
-  //   (set) => ({
-  //     type: "P",
-  //     productURL: "",
-  //     selectedProductId: 0,
-  //     setType: (type) => set(() => ({ type: type })),
-  //     setProductURL: (str) => set(() => ({ productURL: str })),
-  //     setProductId: (id) => set(() => ({selectedProductId: id})),
-  //     reset: () => set(() => ({ type: "P", productURL: "", selectedProductId: 0 })),
-  //   })
-  // );
   export const InventoryAllocateContext = create<InventoryConfirmationProps>(
     (set) => ({
       type: "P",
-      productURL: "P/13/4853/1029/products",
-      selectedProductId: 26,
+      productURL: "",
+      selectedProductId: 0,
       setType: (type) => set(() => ({ type: type })),
       setProductURL: (str) => set(() => ({ productURL: str })),
       setProductId: (id) => set(() => ({selectedProductId: id})),
       reset: () => set(() => ({ type: "P", productURL: "", selectedProductId: 0 })),
     })
   );
+  // export const InventoryAllocateContext = create<InventoryConfirmationProps>(
+  //   (set) => ({
+  //     type: "P",
+  //     productURL: "P/13/4853/1029/products",
+  //     selectedProductId: 26,
+  //     setType: (type) => set(() => ({ type: type })),
+  //     setProductURL: (str) => set(() => ({ productURL: str })),
+  //     setProductId: (id) => set(() => ({selectedProductId: id})),
+  //     reset: () => set(() => ({ type: "P", productURL: "", selectedProductId: 0 })),
+  //   })
+  // );
   
   
   export const UserDetailContext = create<POSUserStore>((set) => ({

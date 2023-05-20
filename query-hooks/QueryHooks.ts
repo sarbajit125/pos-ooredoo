@@ -7,6 +7,7 @@ import dayjs from "dayjs";
 import { POSSelectData } from "../types";
 import {
   AvailableSerialsRequest,
+  InventoryOrderReq,
   InventoryProductResponse,
   InventoryRulesResponse,
 } from "../responseModels/InventoryRulesResponse";
@@ -125,4 +126,8 @@ export const FetchInventoryProduct = (url: string) => useQuery({
 export const FireSerialsForUser = (request: AvailableSerialsRequest) => useMutation({
   mutationKey:["SerialsList"],
   mutationFn: () => APIManager.sharedInstance().fetchSerialsForUser(request),
+})
+export const InitateInventoryOrder = () => useMutation({
+  mutationKey:['InventoryOrder'],
+  mutationFn:(request:InventoryOrderReq) => APIManager.sharedInstance().fireIntiateInventoryOrder(request)
 })

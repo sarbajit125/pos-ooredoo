@@ -23,7 +23,8 @@ export type RootStackParamList = {
   InventorySale: InventoryScreenList;
   SearchScreen: undefined;
   InventoryConfirmation: undefined;
-  POSSuccess: POSSuccessProps
+  POSSuccess: POSSuccessProps;
+  InventoryOrderHistory: undefined;
 };
 export type HistoryType = {
   id: 'transactionHistory' | 'walletHistory'

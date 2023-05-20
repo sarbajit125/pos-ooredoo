@@ -121,7 +121,7 @@ const InventorySaleRepacked = (props: InventorySaleProps) => {
       if (apiResponse.data.length == 0) {
         setErrmsg("NO DATA FOUND");
         setApiAction(POSAPIHelper.isError);
-          setShowModal(true);
+        setShowModal(true);
       } else {
          setApiAction(POSAPIHelper.None);
         setShowModal(false);

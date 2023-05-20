@@ -26,7 +26,7 @@ export interface AvailableSerialsRequest {
 export interface InventoryOrderReq {
   orderMode: string;
   sourceChannelId: number;
-  lineItems: InventoryLineItem[];
+  lineItems?: InventoryLineItem[];
   targetChannelId: number;
   transferTypeId: number;
 }
