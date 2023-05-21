@@ -12,7 +12,7 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { InventoryAllocateContext } from "../store/RootStore";
+import { InventoryAllocateContext, SearchScreenContext } from "../store/RootStore";
 import {
   FetchInventoryProduct,
   FireSerialsForUser,
@@ -293,6 +293,7 @@ const InventoryConfirmation = (props: InventoryConfirmNavProps) => {
                 onChangeText={(str) => setEnteredQuantity(str)}
                 keyboardType="number-pad"
                 showError={undefined}
+                style={styles.textfield}
               />
             </View>
           ) : (
@@ -311,7 +312,8 @@ const InventoryConfirmation = (props: InventoryConfirmNavProps) => {
         </View>
         <View style={styles.btnView}>
           <OoredooPayBtn
-            onPress={() => prepareInventoryRequest()}
+            // onPress={() => prepareInventoryRequest()}
+            onPress={() =>  bottomSheetRef.current?.present()}
             title={"Confirm"}
           />
         </View>
@@ -397,6 +399,9 @@ const styles = StyleSheet.create({
     flexGrow: 1,
   },
   tableView: {},
+  textfield:{
+    marginHorizontal:5,
+  }
 });
 export interface InventoryConfirmationProps {
   type: "P" | "R";

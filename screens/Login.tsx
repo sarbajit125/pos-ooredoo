@@ -109,7 +109,7 @@ const Login = (props: LoginScreenProps) => {
                   placeholder="UserName"
                   showError={errors.username && touched.username}
                   errorMsg={errors.username}
-                  keyboardType="ascii-capable"
+                  keyboardType="email-address"
                 />
                 <OoredooTextInput
                   onChangeText={handleChange("password")}

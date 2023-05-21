@@ -7,7 +7,10 @@ import {
   RootStackParamList,
 } from "../types";
 import SelectedModCell from "../components/Core/SelectedModCell";
-import { InventoryAllocateContext, SearchScreenContext } from "../store/RootStore";
+import {
+  InventoryAllocateContext,
+  SearchScreenContext,
+} from "../store/RootStore";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { FetchInventoryRules1 } from "../query-hooks/QueryHooks";
 import { APIError } from "../responseModels/responseModels";
@@ -58,11 +61,12 @@ const InventorySaleRepacked = (props: InventorySaleProps) => {
     if (selectedData === undefined) {
       console.log("Undefined");
     } else {
+      const selectedIdx = rows.findIndex((item) => item.id == serviceCode)
       setRows((prevState) =>
-        prevState.map((item) =>
+        prevState.map((item, index) =>
           item.id == serviceCode
             ? { ...item, selectedData: selectedData.selectedData?.[0] }
-            : item
+            : index > selectedIdx ? {...item, selectedData: undefined} : item
         )
       );
     }
@@ -123,7 +127,7 @@ const InventorySaleRepacked = (props: InventorySaleProps) => {
         setApiAction(POSAPIHelper.isError);
         setShowModal(true);
       } else {
-         setApiAction(POSAPIHelper.None);
+        setApiAction(POSAPIHelper.None);
         setShowModal(false);
         setData(apiResponse.data);
         props.navigation.navigate("SearchScreen");
@@ -151,15 +155,15 @@ const InventorySaleRepacked = (props: InventorySaleProps) => {
     }
   };
   const selectBtnClicked = () => {
-    const type = rows[0].selectedData?.id  === 'P' ? 'P' : 'R'
-    setType(type)
-    setProductId(parseInt(rows[4].selectedData?.id ?? '0'))
+    const type = rows[0].selectedData?.id === "P" ? "P" : "R";
+    setType(type);
+    setProductId(parseInt(rows[4].selectedData?.id ?? "0"));
     let query = `${rows[0].selectedData?.id || ""}/${
       rows[1].selectedData?.id || ""
     }/${rows[2].selectedData?.id || ""}/${rows[3].selectedData?.id || ""}`;
     query = query + "/products";
-    setProductURL(query)
-    props.navigation.navigate('InventoryConfirmation')
+    setProductURL(query);
+    props.navigation.navigate("InventoryConfirmation");
   };
 
   const renderCell = (cell: ListRenderItemInfo<InventoryList>) => {

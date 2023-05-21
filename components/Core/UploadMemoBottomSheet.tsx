@@ -67,9 +67,6 @@ const UploadMemoBottomSheet = ({
       </View>
       <View style={styles.btnView}>
         <OoredooPayBtn
-          isDisabled={
-            (!(checkboxSelected && fileSelected) || !checkboxSelected)
-          }
           onPress={() => confirmBtnCallback(checkboxSelected, selectedDoc, orderId)}
           title={"Confirm"}
         />

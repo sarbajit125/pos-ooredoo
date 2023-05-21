@@ -17,7 +17,7 @@ import React, {
 } from "react";
 import { ColorConstants } from "../constants/Colors";
 import { Fontcache } from "../constants/FontCache";
-import { StoresContext } from "../store/RootStore";
+import { SearchScreenContext, StoresContext } from "../store/RootStore";
 import {
   ExpandableComponent,
   ExpandableListProps,
@@ -31,6 +31,7 @@ import {
 import OoredooPayBtn from "../components/OoredooPayBtn";
 import { APIManager } from "../AppManger/ApiManger";
 const Profile = (props: ProfileNavProps) => {
+  const {setSelectedData} = SearchScreenContext()
   const userStore = useContext(StoresContext).userDetailStore;
   const [serviceList, setServiceList] =
     useState<ExpandableListProps[]>(ProfileServiceData);
@@ -64,6 +65,7 @@ const Profile = (props: ProfileNavProps) => {
         });
         break;
       case "inventorySale":
+        setSelectedData(undefined)
         props.navigation.navigate('InventorySale', {screeName:InventorySaleScreen.Entry})
         break
       case 'inventoryHistory':
