@@ -65,6 +65,10 @@ const Profile = (props: ProfileNavProps) => {
         break;
       case "inventorySale":
         props.navigation.navigate('InventorySale', {screeName:InventorySaleScreen.Entry})
+        break
+      case 'inventoryHistory':
+        props.navigation.navigate('InventoryOrderHistory')
+        break
       default:
         console.log(keyStr);
         break;
@@ -289,7 +293,7 @@ const ProfileServiceData: ExpandableListProps[] = [
       },
       {
         id: "inventoryHistory",
-        val: "Inventory History",
+        val: "Inventory Order History",
       },
     ],
   },

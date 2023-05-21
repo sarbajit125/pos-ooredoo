@@ -163,6 +163,7 @@ const styles = StyleSheet.create({
     marginTop: 30,
     marginLeft: 29,
     marginRight: 16,
+    flex:1,
   },
   logo: {
     marginTop: 60,

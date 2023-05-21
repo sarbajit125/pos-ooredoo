@@ -10,6 +10,7 @@ export const ColorConstants = {
   grey_898:'#898989',
   shadow_color: '#162233',
   green_20 : '#B0E020',
-  grey_F4F4: '#F4F4F4'
+  grey_F4F4: '#F4F4F4',
+  orange_FFA: '#FFA300'
   // your colors
 }

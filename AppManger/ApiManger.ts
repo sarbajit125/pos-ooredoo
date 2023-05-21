@@ -16,11 +16,15 @@ import { HistoryListResponse } from "../responseModels/HistoryListResponse";
 import {
   AvailableSerialsRequest,
   AvailableSerialsResponse,
+  InventoryOrderListResponse,
   InventoryOrderReq,
   InventoryOrderResponse,
   InventoryProductResponse,
   InventoryRulesResponse,
+  UploadMemoReq,
+  UploadMemoResponse,
 } from "../responseModels/InventoryRulesResponse";
+import FormData from 'form-data';
 export class APIManager {
   private static instance: APIManager;
   private constructor() {
@@ -187,8 +191,20 @@ export class APIManager {
   };
   fetchInventoryRules = async (transferType: string) => {
     try {
-      const response = await axios.get<InventoryRulesResponse[] |InventoryProductResponse[] >(
-        `api/inventory/transfer/rules/${transferType}`
+      const response = await axios.get<
+        InventoryRulesResponse[] | InventoryProductResponse[]
+      >(`api/inventory/transfer/rules/${transferType}`);
+      this.printJSON(response.data);
+      return response.data;
+    } catch (error) {
+      throw this.errorhandling(error);
+    }
+  };
+  fetchSerialsForUser = async (request: AvailableSerialsRequest) => {
+    try {
+      const response = await axios.post<AvailableSerialsResponse[]>(
+        "master/searchInventory",
+        request
       );
       this.printJSON(response.data);
       return response.data;
@@ -196,24 +212,62 @@ export class APIManager {
       throw this.errorhandling(error);
     }
   };
-  fetchSerialsForUser = async (request:AvailableSerialsRequest) => {
+  fireIntiateInventoryOrder = async (request: InventoryOrderReq) => {
     try {
-      const response = await axios.post<AvailableSerialsResponse[]>('master/searchInventory',request)
+      const response = await axios.put<InventoryOrderResponse>(
+        "api/inventory/transfer/orders",
+        request
+      );
       this.printJSON(response.data);
       return response.data;
     } catch (error) {
       throw this.errorhandling(error);
     }
-  }
-  fireIntiateInventoryOrder = async (request:InventoryOrderReq) => {
-      try {
-        const response = await axios.put<InventoryOrderResponse>('api/inventory/transfer/orders', request)
-        this.printJSON(response.data);
+  };
+  fireInventoryOrderHistory = async (fromDate: string, toDate: string) => {
+    try {
+      const response = await axios.post<InventoryOrderListResponse[]>(
+        "api/search/inventory/transfer/orders",
+        {
+          fromDate: fromDate,
+          toDate: toDate,
+        }
+      );
+      this.printJSON(response.data);
       return response.data;
-      } catch (error) {
-        throw this.errorhandling(error);
+    } catch (error) {
+      throw this.errorhandling(error);
+    }
+  };
+  fireUploadMemo = async ({selectedDoc, orderId}:UploadMemoReq) => {
+    try {
+      const formData = new FormData();
+      if  (selectedDoc.type === 'success') {
+        formData.append('file', {
+          uri: selectedDoc.uri,
+          type: 'application/pdf',
+          name: selectedDoc.name,
+        });
       }
-  }
+      const response = await axios.post<UploadMemoResponse>(
+        `api/inventory/transfer/upload/file/${orderId}`,
+        formData,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+          onUploadProgress(progressEvent) {
+            if  (progressEvent.total && progressEvent.loaded) {
+              const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total!);
+              console.log(`File upload progress: ${percentCompleted}%`);
+            }
+          },
+        }
+      );
+      this.printJSON(response.data);
+      return response.data;
+    } catch (error) {
+      throw this.errorhandling(error);
+    }
+  };
   errorhandling = (error: unknown): APIError | UnauthorizedError => {
     if (error instanceof AxiosError) {
       console.log(error.response?.data);
@@ -224,7 +278,7 @@ export class APIManager {
   };
   printJSON = (response: any) => {
     console.log(`Response received: \n ${JSON.stringify(response)}`);
-   // console.log(`Response received: \n ${JSON.stringify(response, null, 2)}`);
+    // console.log(`Response received: \n ${JSON.stringify(response, null, 2)}`);
   };
   removeAuthToken = () => {
     axios.defaults.headers.common["x-auth-token"] = undefined;

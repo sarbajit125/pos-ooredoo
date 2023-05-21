@@ -1,3 +1,4 @@
+import * as DocumentPicker from "expo-document-picker";
 export interface InventoryRulesResponse {
   value: string;
   text: string;
@@ -32,16 +33,42 @@ export interface InventoryOrderReq {
 }
 export interface InventoryLineItem {
   lineNo: number;
-  startSerial: string;
+  startSerial?: string;
   unitTypeId: number;
   inventoryTypeId: number;
   inventoryTypeDescription: string;
   requestedQuantity: number;
-  poNo: string;
-  serialType: string;
-  endSerial: string;
+  poNo?: string;
+  serialType?: string;
+  endSerial?: string;
 }
 
 export interface InventoryOrderResponse {
+  orderId: number
+}
+
+export interface InventoryOrderListResponse {
+  orderId: number;
+  orderDate: string;
+  transferTypeId: number;
+  sourceChannelId: number;
+  targetChannelId: number;
+  initiatedBy: string;
+  orderStatusId: number;
+  orderMode: string;
+  nextStatus: number;
+  nextActionBy: string;
+  nextAction: string;
+  workflow: string;
+  isSimulationFlow: boolean;
+  ifApp: boolean;
+}
+
+export interface  UploadMemoResponse {
+  status: string
+}
+
+export interface UploadMemoReq {
+  selectedDoc: DocumentPicker.DocumentResult,
   orderId: number
 }

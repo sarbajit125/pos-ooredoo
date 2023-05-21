@@ -5,13 +5,20 @@ import {
   Text,
   View,
 } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { InventoryAllocateContext } from "../store/RootStore";
 import {
   FetchInventoryProduct,
   FireSerialsForUser,
   InitateInventoryOrder,
   checkResponseIfProduct,
+  uploadMemoToRequest,
 } from "../query-hooks/QueryHooks";
 import { SafeAreaView } from "react-native-safe-area-context";
 import OoredooTextInput from "../components/OoredooTextInput";
@@ -29,16 +36,21 @@ import { APIError } from "../responseModels/responseModels";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { ColorConstants } from "../constants/Colors";
 import { Fontcache } from "../constants/FontCache";
-import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
+import {
+  BottomSheetModal,
+  BottomSheetModalProvider,
+} from "@gorhom/bottom-sheet";
 import { InventoryLineItem } from "../responseModels/InventoryRulesResponse";
-
+import UploadMemoBottomSheet from "../components/Core/UploadMemoBottomSheet";
+import { DocumentResult } from "expo-document-picker";
 const InventoryConfirmation = (props: InventoryConfirmNavProps) => {
   const { type, productURL, selectedProductId } = InventoryAllocateContext();
   const { data, isSuccess, isLoading, isError, error } =
     FetchInventoryProduct(productURL);
   const [showModal, setShowModal] = useState<boolean>(false);
   const [errMsg, setErrMsg] = useState<string>("");
-  const [enteredQuantity, setEnteredQuantity] = useState<number>(0);
+  const [enteredQuantity, setEnteredQuantity] = useState<string>("0");
+  const [successOrderId, setOrderid] = useState<number>(0);
   const [selectedProduct, setSelectedProduct] =
     useState<InventoryProductResponse>({
       currentStock: 0,
@@ -69,6 +81,15 @@ const InventoryConfirmation = (props: InventoryConfirmNavProps) => {
     isError: OrderIsError,
     error: OrderDateError,
   } = InitateInventoryOrder();
+  const uploadMemoVM = uploadMemoToRequest();
+  // ref
+  const bottomSheetRef = useRef<BottomSheetModal>(null);
+  // variables
+  const snapPoints = useMemo(() => ["40%"], []);
+  // callbacks
+  const handleSheetChanges = useCallback((index: number) => {
+    console.log("handleSheetChanges", index);
+  }, []);
   useEffect(() => {
     props.navigation.setOptions({ title: "Inventory Confirmation" });
   }, []);
@@ -81,15 +102,19 @@ const InventoryConfirmation = (props: InventoryConfirmNavProps) => {
   }, [isSuccess, isLoading, isError]);
 
   useEffect(() => {
-    handleOrderAPIResponse()
-  },[OrderIsSuccess, OrderIsError, OrderIsLoading])
+    handleOrderAPIResponse();
+  }, [OrderIsSuccess, OrderIsError, OrderIsLoading]);
+
+  useEffect(() => {
+    if (uploadMemoVM.isSuccess) {
+      navigateToSuccessScreen();
+    }
+  }, [uploadMemoVM.isSuccess, uploadMemoVM.isLoading]);
 
   const handleOrderAPIResponse = () => {
-    if(OrderIsSuccess) {
-      props.navigation.navigate("POSSuccess", {
-        heading: `INVENTORY TRANSFER SUCCESSFULL ORDER ID: ${OrderSuccess.orderId}`,
-        resetTo: "Profile",
-      });
+    if (OrderIsSuccess) {
+      setOrderid(OrderSuccess.orderId);
+      bottomSheetRef.current?.present();
     } else if (OrderIsError) {
       if (OrderDateError instanceof APIError) {
         setErrMsg(OrderDateError.message);
@@ -98,9 +123,14 @@ const InventoryConfirmation = (props: InventoryConfirmNavProps) => {
       }
       setShowModal(true);
     } else if (OrderIsLoading) {
-
     }
-  } 
+  };
+  const navigateToSuccessScreen = () => {
+    props.navigation.navigate("POSSuccess", {
+      heading: `INVENTORY TRANSFER SUCCESSFULL ORDER ID: ${successOrderId}`,
+      resetTo: "Profile",
+    });
+  };
   const handleProductlistResponse = () => {
     if (isSuccess) {
       if (!checkResponseIfProduct(data)) {
@@ -116,6 +146,7 @@ const InventoryConfirmation = (props: InventoryConfirmNavProps) => {
         }
       }
     } else if (isLoading) {
+      return <OoredooActivityView />;
     } else if (isError) {
       if (error instanceof APIError) {
         setErrMsg(error.message);
@@ -169,26 +200,42 @@ const InventoryConfirmation = (props: InventoryConfirmNavProps) => {
     );
   };
   const prepareInventoryRequest = () => {
-    const splitArr = productURL.split('/')
-    const reqLineItems: InventoryLineItem[] = selectedSerials.filter((item) => item.isSelected).map((item) => ({lineNo : 1,
-      startSerial : item.name,
-      unitTypeId : 1,
-      inventoryTypeId : selectedProduct.inventoryTypeid,
-      inventoryTypeDescription : selectedProduct.inventoryTypeDescription,
-      requestedQuantity : 1,
-      poNo : "0",
-      serialType : "serial",
-      endSerial : item.name}))
+    const splitArr = productURL.split("/");
+    const reqLineItems: InventoryLineItem[] = selectedSerials
+      .filter((item) => item.isSelected)
+      .map((item) => ({
+        lineNo: 1,
+        startSerial: item.name,
+        unitTypeId: 1,
+        inventoryTypeId: selectedProduct.inventoryTypeid,
+        inventoryTypeDescription: selectedProduct.inventoryTypeDescription,
+        requestedQuantity: 1,
+        poNo: "0",
+        serialType: "serial",
+        endSerial: item.name,
+      }));
     let request: InventoryOrderReq = {
       orderMode: type,
       sourceChannelId: parseInt(splitArr[2]),
       targetChannelId: parseInt(splitArr[3]),
       transferTypeId: parseInt(splitArr[1]),
-      lineItems: reqLineItems
-    }
-    console.log(request)
-    fireInventoryOrder(request)
-  }
+      lineItems:
+        type === "P"
+          ? reqLineItems
+          : [
+              {
+                lineNo: 1,
+                requestedQuantity: parseInt(enteredQuantity),
+                unitTypeId: 1,
+                inventoryTypeId: selectedProduct.inventoryTypeid,
+                inventoryTypeDescription:
+                  selectedProduct.inventoryTypeDescription,
+              },
+            ],
+    };
+    console.log(request);
+    fireInventoryOrder(request);
+  };
   return (
     <BottomSheetModalProvider>
       <SafeAreaView style={styles.mainContainer}>
@@ -238,13 +285,13 @@ const InventoryConfirmation = (props: InventoryConfirmNavProps) => {
           {type === "R" ? (
             <View>
               <Header14RubikLbl style={styles.serialTableheading}>
-                {" "}
                 Request Quantity
               </Header14RubikLbl>
               <OoredooTextInput
-                value={enteredQuantity.toString()}
+                value={enteredQuantity}
                 placeholder="Enter Quantity"
-                onChangeText={(str) => setEnteredQuantity(parseInt(str))}
+                onChangeText={(str) => setEnteredQuantity(str)}
+                keyboardType="number-pad"
                 showError={undefined}
               />
             </View>
@@ -276,6 +323,32 @@ const InventoryConfirmation = (props: InventoryConfirmNavProps) => {
           />
         ) : null}
       </SafeAreaView>
+      <BottomSheetModal
+        ref={bottomSheetRef}
+        index={0}
+        snapPoints={snapPoints}
+        onChange={handleSheetChanges}
+        handleIndicatorStyle={{ display: "none" }}
+        backgroundStyle={{ backgroundColor: "transparent" }}
+      >
+        <UploadMemoBottomSheet
+          confirmBtnCallback={function (
+            shouldUpload: boolean,
+            selectedFile: DocumentResult | null,
+            orderId
+          ): void {
+            if (shouldUpload && selectedFile != null) {
+              uploadMemoVM.mutate({
+                orderId: orderId,
+                selectedDoc: selectedFile,
+              });
+            } else {
+              navigateToSuccessScreen();
+            }
+          }}
+          orderId={successOrderId}
+        />
+      </BottomSheetModal>
     </BottomSheetModalProvider>
   );
 };
@@ -307,7 +380,7 @@ const styles = StyleSheet.create({
   btnView: {
     marginVertical: 16,
     marginHorizontal: 8,
-    padding:5,
+    padding: 5,
   },
   serialTable: {
     marginHorizontal: 8,

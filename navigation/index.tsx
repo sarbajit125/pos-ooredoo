@@ -22,6 +22,7 @@ import InventorySaleRepacked from "../screens/InventorySaleRepacked";
 import SearchScreen from "../screens/SearchScreen";
 import InventoryConfirmation from "../screens/InventoryConfirmation";
 import POSSuccessSheet from "../screens/POSSuccessScreen";
+import InventoryOrderHistory from "../screens/InventoryOrderHistory";
 
 export default function Navigation() {
   return (
@@ -78,6 +79,10 @@ function RootNavigator() {
         name="POSSuccess"
         component={POSSuccessSheet}
         options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="InventoryOrderHistory"
+        component={InventoryOrderHistory}
       />
     </Stack.Navigator>
   );

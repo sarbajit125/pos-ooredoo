@@ -10,7 +10,9 @@ import {
   InventoryOrderReq,
   InventoryProductResponse,
   InventoryRulesResponse,
+  UploadMemoReq,
 } from "../responseModels/InventoryRulesResponse";
+import { number } from "yup";
 export const walletBalanceHook = () =>
   useMutation({
     mutationKey: ["walletbalance"],
@@ -82,7 +84,7 @@ export const TransactionHistoryHook = (
         "2023-03-29",
         "2023-04-05"
       );
-    }
+    },
   });
 export const FetchInventoryRules1 = (id: string) =>
   useQuery({
@@ -93,23 +95,19 @@ export const FetchInventoryRules1 = (id: string) =>
     },
     select: (data): POSSelectData[] => {
       if (checkResponseIfProduct(data)) {
-       return (
-        data.map((item) => ({
+        return data.map((item) => ({
           id: item.value,
           name: item.text,
           isSelected: false,
-        }))
-       ) 
+        }));
       } else {
-        return (
-          data.map((item) => ({
-            id: item.inventoryTypeid.toString(),
-            name: item.inventoryTypeDescription,
-            isSelected: false,
-          }))
-        )
+        return data.map((item) => ({
+          id: item.inventoryTypeid.toString(),
+          name: item.inventoryTypeDescription,
+          isSelected: false,
+        }));
       }
-    }
+    },
   });
 export const checkResponseIfProduct = (
   response: InventoryRulesResponse[] | InventoryProductResponse[]
@@ -117,17 +115,33 @@ export const checkResponseIfProduct = (
   return (response as InventoryRulesResponse[])[0].value != undefined;
 };
 
-export const FetchInventoryProduct = (url: string) => useQuery({
-  queryKey: ["inventoryDetails", url],
-  queryFn: () => {
-    return APIManager.sharedInstance().fetchInventoryRules(url);
-  }
-})
-export const FireSerialsForUser = (request: AvailableSerialsRequest) => useMutation({
-  mutationKey:["SerialsList"],
-  mutationFn: () => APIManager.sharedInstance().fetchSerialsForUser(request),
-})
-export const InitateInventoryOrder = () => useMutation({
-  mutationKey:['InventoryOrder'],
-  mutationFn:(request:InventoryOrderReq) => APIManager.sharedInstance().fireIntiateInventoryOrder(request)
-})
+export const FetchInventoryProduct = (url: string) =>
+  useQuery({
+    queryKey: ["inventoryDetails", url],
+    queryFn: () => {
+      return APIManager.sharedInstance().fetchInventoryRules(url);
+    },
+  });
+export const FireSerialsForUser = (request: AvailableSerialsRequest) =>
+  useMutation({
+    mutationKey: ["SerialsList"],
+    mutationFn: () => APIManager.sharedInstance().fetchSerialsForUser(request),
+  });
+export const InitateInventoryOrder = () =>
+  useMutation({
+    mutationKey: ["InventoryOrder"],
+    mutationFn: (request: InventoryOrderReq) =>
+      APIManager.sharedInstance().fireIntiateInventoryOrder(request),
+  });
+export const fetchInventoryOrdersList = (fromDate: string, toDate: string) =>
+  useQuery({
+    queryKey: ["InvntoryOrdersList", fromDate],
+    queryFn: () =>
+      APIManager.sharedInstance().fireInventoryOrderHistory(fromDate, toDate),
+  });
+export const uploadMemoToRequest = () =>
+  useMutation({
+    mutationKey: ["UploadMemo"],
+    mutationFn: (request: UploadMemoReq) =>
+      APIManager.sharedInstance().fireUploadMemo(request),
+  });
