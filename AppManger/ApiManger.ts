@@ -242,21 +242,21 @@ export class APIManager {
   fireUploadMemo = async ({selectedDoc, orderId}:UploadMemoReq) => {
     try {
       const formData = new FormData();
-      if  (selectedDoc.type === 'success') {
-        formData.append('file', {
-          uri: selectedDoc.uri,
-          type: 'application/pdf',
-          name: selectedDoc.name,
-        });
-      }
+      formData.append('uploadfile', {
+        uri: selectedDoc,
+        name: 'memo.jpg',
+        type: 'image/jpg',
+      });
       const response = await axios.post<UploadMemoResponse>(
         `api/inventory/transfer/upload/file/${orderId}`,
         formData,
         {
-          headers: { "Content-Type": "multipart/form-data" },
+          headers: { "Content-Type": "multipart/form-data" , 'accept': 'application/json',},
           onUploadProgress(progressEvent) {
-            if  (progressEvent.total && progressEvent.loaded) {
-              const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total!);
+            if (progressEvent.total && progressEvent.loaded) {
+              const percentCompleted = Math.round(
+                (progressEvent.loaded * 100) / progressEvent.total!
+              );
               console.log(`File upload progress: ${percentCompleted}%`);
             }
           },

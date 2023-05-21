@@ -8,25 +8,35 @@ import OoredooPayBtn from "../OoredooPayBtn";
 import { Ionicons } from "@expo/vector-icons";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import * as DocumentPicker from "expo-document-picker";
+import * as ImagePicker from 'expo-image-picker';
 const UploadMemoBottomSheet = ({
   confirmBtnCallback,
   orderId
 }: UploadMemoBottomSheetProps) => {
   const [checkboxSelected, setSelection] = useState<boolean>(false);
   const [fileSelected, setFileSelected] = useState<boolean>(false);
-  const [selectedDoc, setSelectedDoc] =
-    useState<DocumentPicker.DocumentResult | null>(null);
+  const [selectedDoc, setSelectedDoc] = useState<string | null>(null);
   const [fileName, setFileName] = useState<string>("Pick a PDF document");
 
   const pickDocument = async () => {
-    const result = await DocumentPicker.getDocumentAsync({
-      type: "application/pdf",
-    });
-    if (result.type === "success") {
-      setSelectedDoc(result);
-      setFileName(result.name)
-      setFileSelected(true);
-    }
+    let result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.All,
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 0.1,
+      });
+      console.log(result);
+      if (!result.canceled) {
+        setSelectedDoc(result.assets[0].uri)
+      }
+    // const result = await DocumentPicker.getDocumentAsync({
+    //   type: "application/pdf",
+    // });
+    // if (result.type === "success") {
+    //   setSelectedDoc(result);
+    //   setFileName(result.name)
+    //   setFileSelected(true);
+    // }
   };
   return (
     <View style={styles.container}>
@@ -131,7 +141,7 @@ export interface UploadMemoBottomSheetProps {
   orderId: number
   confirmBtnCallback: (
     shouldUpload: boolean,
-    selectedFile: DocumentPicker.DocumentResult | null,
+    selectedFile: string | null,
     orderId: number
   ) => void;
 }

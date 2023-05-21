@@ -312,8 +312,7 @@ const InventoryConfirmation = (props: InventoryConfirmNavProps) => {
         </View>
         <View style={styles.btnView}>
           <OoredooPayBtn
-            // onPress={() => prepareInventoryRequest()}
-            onPress={() =>  bottomSheetRef.current?.present()}
+             onPress={() => prepareInventoryRequest()}
             title={"Confirm"}
           />
         </View>
@@ -336,7 +335,7 @@ const InventoryConfirmation = (props: InventoryConfirmNavProps) => {
         <UploadMemoBottomSheet
           confirmBtnCallback={function (
             shouldUpload: boolean,
-            selectedFile: DocumentResult | null,
+            selectedFile: string | null,
             orderId
           ): void {
             if (shouldUpload && selectedFile != null) {

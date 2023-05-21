@@ -55,7 +55,8 @@
     "react-query": "^3.39.3",
     "yup": "^1.0.0",
     "zustand": "^4.3.8",
-    "expo-document-picker": "~11.0.1"
+    "expo-document-picker": "~11.0.1",
+    "expo-image-picker": "~14.0.2"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",

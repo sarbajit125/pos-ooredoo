@@ -69,6 +69,6 @@ export interface  UploadMemoResponse {
 }
 
 export interface UploadMemoReq {
-  selectedDoc: DocumentPicker.DocumentResult,
+  selectedDoc: string,
   orderId: number
 }
