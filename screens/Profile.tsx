@@ -71,6 +71,9 @@ const Profile = (props: ProfileNavProps) => {
       case 'inventoryHistory':
         props.navigation.navigate('InventoryOrderHistory')
         break
+      case 'profileDetails':
+        props.navigation.navigate('ProfileDetails')
+        break
       default:
         console.log(keyStr);
         break;

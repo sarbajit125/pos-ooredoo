@@ -12,7 +12,6 @@ import {
   InventoryRulesResponse,
   UploadMemoReq,
 } from "../responseModels/InventoryRulesResponse";
-import { number } from "yup";
 export const walletBalanceHook = () =>
   useMutation({
     mutationKey: ["walletbalance"],
@@ -145,3 +144,7 @@ export const uploadMemoToRequest = () =>
     mutationFn: (request: UploadMemoReq) =>
       APIManager.sharedInstance().fireUploadMemo(request),
   });
+export const fetchSelfDetails = () => useQuery({
+  queryKey: ["userdetails"],
+  queryFn: () => APIManager.sharedInstance().userDetails(),
+});

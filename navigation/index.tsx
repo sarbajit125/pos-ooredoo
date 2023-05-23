@@ -23,6 +23,7 @@ import SearchScreen from "../screens/SearchScreen";
 import InventoryConfirmation from "../screens/InventoryConfirmation";
 import POSSuccessSheet from "../screens/POSSuccessScreen";
 import InventoryOrderHistory from "../screens/InventoryOrderHistory";
+import ProfileDetails from "../screens/ProfileDetails";
 
 export default function Navigation() {
   return (
@@ -84,6 +85,7 @@ function RootNavigator() {
         name="InventoryOrderHistory"
         component={InventoryOrderHistory}
       />
+      <Stack.Screen name="ProfileDetails" component={ProfileDetails} />
     </Stack.Navigator>
   );
 }

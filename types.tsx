@@ -25,6 +25,8 @@ export type RootStackParamList = {
   InventoryConfirmation: undefined;
   POSSuccess: POSSuccessProps;
   InventoryOrderHistory: undefined;
+  InventoryOrderDetails: InventoryDetailsTypes
+  ProfileDetails: undefined
 };
 export type HistoryType = {
   id: 'transactionHistory' | 'walletHistory'
@@ -86,4 +88,9 @@ export interface POSSuccessProps {
   heading: string;
   desc?: string;
   resetTo: 'Dashboard' | 'Profile'
+}
+
+export interface InventoryDetailsTypes {
+  orderId: number,
+  type : 'InventoryDetails'|'ReversalDetails'
 }

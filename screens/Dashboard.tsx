@@ -6,7 +6,7 @@ import DashbordNav from "../components/dashboard/DashbordNav";
 import DashboardGreeting from "../components/dashboard/DashboardGreeting";
 import DashboardBalance from "../components/dashboard/DashboardBalance";
 import { observer } from "mobx-react";
-import { StoresContext, UserDetailContext } from "../store/RootStore";
+import { StoresContext } from "../store/RootStore";
 import DashboardKPI from "../components/dashboard/DashboardKPI";
 import { useQuery } from "react-query";
 import { APIManager } from "../AppManger/ApiManger";
@@ -20,14 +20,12 @@ type LoginScreenProps = CompositeScreenProps<
 >;
 const Dashboard = observer((props: LoginScreenProps) => {
   const userStore = useContext(StoresContext).userDetailStore;
-  const {setUserDetails} = UserDetailContext()
   const { data, isSuccess, isError, isLoading } = useQuery({
     queryKey: ["selfDetails"],
     queryFn: () => APIManager.sharedInstance().userDetails(),
   });
   if (isSuccess) {
     userStore.fetchSelfDetails(data);
-    //setUserDetails(data)
     return (
       <ScrollView>
         <View style={styles.container}>
