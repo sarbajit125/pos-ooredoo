@@ -2,9 +2,8 @@ import { StyleSheet, Image, TouchableOpacity, View, ViewProps } from 'react-nati
 import React from 'react'
 import { ColorConstants } from '../../constants/Colors'
 
-const BaseBottomSheetView = (props: BaseBottomSheetProps) => {
+const CrossButtonView = (props: BaseBottomSheetProps) => {
   return (
-    <View style={styles.sheets}>
         <View style={styles.transparentView}>
               <TouchableOpacity
                 style={styles.crossView}
@@ -16,11 +15,10 @@ const BaseBottomSheetView = (props: BaseBottomSheetProps) => {
                 />
               </TouchableOpacity>
             </View>
-    </View>
   )
 }
 
-export default BaseBottomSheetView
+export default CrossButtonView
 export interface BaseBottomSheetProps extends ViewProps {
     crossBtnAction: () => void
 }

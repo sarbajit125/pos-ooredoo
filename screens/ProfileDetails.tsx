@@ -24,9 +24,9 @@ import OoredooPayBtn from "../components/OoredooPayBtn";
 import { FontAwesome } from "@expo/vector-icons";
 import { MaterialIcons } from "@expo/vector-icons";
 import { Ionicons } from "@expo/vector-icons";
+import CrossButtonView from "../components/Core/BaseBottomSheetView";
 const ProfileDetails = (props: ProfileDetailsNavProps) => {
-  const [userRoles, setUserRoles] = useState<POSSelectData[]>([
-  ]);
+  const [userRoles, setUserRoles] = useState<POSSelectData[]>([]);
   // ref
   const bottomSheetRef = useRef<BottomSheetModal>(null);
   // variables
@@ -130,32 +130,24 @@ const ProfileDetails = (props: ProfileDetailsNavProps) => {
             backgroundStyle={{ backgroundColor: "transparent" }}
           >
             <View style={styles.sheets}>
-              <View style={styles.transparentView}>
-                <TouchableOpacity
-                  style={styles.crossView}
-                  onPress={() => bottomSheetRef.current?.close()}
-                >
-                  <Image
-                    source={require("../assets/images/whiteCross.png")}
-                    style={styles.crossImg}
-                  />
-                </TouchableOpacity>
-              </View>
+              <CrossButtonView
+                crossBtnAction={() => bottomSheetRef.current?.close()}
+              />
               <View style={styles.bottomSheetContentView}>
-                  <View style={styles.mainView}>
-                    <FlatList
-                      data={userRoles}
-                      keyExtractor={(item) => item.id}
-                      renderItem={(item) => renderRoleCell(item)}
-                    />
-                  </View>
-                  <View style={styles.btnView}>
-                    <OoredooPayBtn
-                      onPress={() => console.log("")}
-                      title={"Confirm"}
-                    />
-                  </View>
+                <View style={styles.mainView}>
+                  <FlatList
+                    data={userRoles}
+                    keyExtractor={(item) => item.id}
+                    renderItem={(item) => renderRoleCell(item)}
+                  />
                 </View>
+                <View style={styles.btnView}>
+                  <OoredooPayBtn
+                    onPress={() => console.log("")}
+                    title={"Confirm"}
+                  />
+                </View>
+              </View>
             </View>
           </BottomSheetModal>
         </SafeAreaView>
@@ -203,8 +195,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderWidth: 2,
     borderColor: ColorConstants.grey_E0E,
-    marginVertical:8,
-    marginHorizontal:5,
+    marginVertical: 8,
+    marginHorizontal: 5,
   },
   roleText: {
     marginHorizontal: 5,
@@ -218,24 +210,6 @@ const styles = StyleSheet.create({
   sheets: {
     flex: 1,
     backgroundColor: "transparent",
-  },
-  transparentView: {
-    height: 80,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  crossView: {
-    width: 52,
-    height: 52,
-    backgroundColor: ColorConstants.black,
-    opacity: 0.5,
-    borderRadius: 52 / 2,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  crossImg: {
-    width: 20,
-    height: 20,
   },
 });
 type ProfileDetailsNavProps = NativeStackScreenProps<
