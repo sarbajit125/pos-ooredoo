@@ -59,6 +59,8 @@ const ProfileDetails = (props: ProfileDetailsNavProps) => {
         duration: 1000,
         animationType: "slide-in",
         onClose() {
+          const selectedRole = userRoles.filter((item) => item.isSelected)[0].id
+          userStore.setUserRole(selectedRole)
           props.navigation.goBack()
         },
       })

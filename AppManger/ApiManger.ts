@@ -273,6 +273,7 @@ export class APIManager {
       try {
           const response = await axios.post<RoleChangeSuccss>(`app/api/setUsersCurrentRole/${newRole}`)
           this.printJSON(response.data);
+          axios.defaults.headers.common["x-auth-token"] = response.data.responseBody
           return response.data
       } catch (error) {
         throw this.errorhandling(error);
