@@ -148,3 +148,7 @@ export const fetchSelfDetails = () => useQuery({
   queryKey: ["userdetails"],
   queryFn: () => APIManager.sharedInstance().userDetails(),
 });
+export const changeUserRole = () => useMutation({
+  mutationKey:['changeRole'],
+  mutationFn: (newRole: string) => APIManager.sharedInstance().fireChangeRole(newRole)
+})

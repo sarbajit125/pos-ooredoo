@@ -7,6 +7,7 @@ import {
 import {
   APIError,
   LoginSuccessfull,
+  RoleChangeSuccss,
   UnauthorizedError,
 } from "../responseModels/responseModels";
 import { SelfUserDetails } from "../responseModels/SelfUserDetailsResponse";
@@ -268,6 +269,15 @@ export class APIManager {
       throw this.errorhandling(error);
     }
   };
+  fireChangeRole = async (newRole:string) => {
+      try {
+          const response = await axios.post<RoleChangeSuccss>(`app/api/setUsersCurrentRole/${newRole}`)
+          this.printJSON(response.data);
+          return response.data
+      } catch (error) {
+        throw this.errorhandling(error);
+      }
+  }
   errorhandling = (error: unknown): APIError | UnauthorizedError => {
     if (error instanceof AxiosError) {
       console.log(error.response?.data);

@@ -6,7 +6,7 @@ export interface SelfUserDetails {
     currentRole: string,
     userLastName?: string,
     userFirstName: string,
-    walletNumbers: WalletResponse,
+    walletNumbers?: WalletResponse,
     salesChannelIdList: string[]
 }
 export interface UserCredentials {

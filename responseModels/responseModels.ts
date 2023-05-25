@@ -20,3 +20,7 @@ export interface LoginSuccessfull {
     message: string
 }
 
+export interface RoleChangeSuccss {
+    responseBody: string
+}
+

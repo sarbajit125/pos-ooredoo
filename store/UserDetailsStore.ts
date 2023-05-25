@@ -67,16 +67,12 @@ export default class UserDetailsStore {
   };
 
   @action setDefaultRastasWallet = (wallet?: POSWalletDAO) => {
-    if (wallet != null) {
-      this.selectedRastasWallet = wallet;
-    } else {
+    if (this.rastasWallets[0] != undefined) {
       this.selectedRastasWallet = this.rastasWallets[0];
     }
   };
   @action setDefaultFaisaWallet = (wallet?: POSWalletDAO) => {
-    if (wallet != null) {
-      this.selectedFaisaWallet = wallet;
-    } else {
+    if (this.faisaWallets[0] != undefined) {
       this.selectedFaisaWallet = this.faisaWallets[0];
     }
   };
@@ -96,8 +92,12 @@ export default class UserDetailsStore {
             response.userLastName
           );
           this.setSalesChannelList(response.salesChannelIdList);
-          this.setRastasList(response.walletNumbers.Raastas);
-          this.setFaisaList(response.walletNumbers.MFaisa);
+          if (response.walletNumbers?.Raastas != undefined) {
+            this.setRastasList(response.walletNumbers.Raastas);
+          }
+          if (response.walletNumbers?.MFaisa != undefined) {
+            this.setFaisaList(response.walletNumbers.MFaisa);
+          }
           this.setDefaultRastasWallet(undefined);
           this.setDefaultFaisaWallet(undefined);
           this.currentRole = response.currentRole;
