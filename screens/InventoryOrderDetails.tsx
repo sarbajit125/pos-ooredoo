@@ -22,11 +22,14 @@ import { POSDateFormat } from "../constants/AppConstants";
 import { POSUtilityManager } from "../AppManger/POSAppManager";
 import { Fontcache } from "../constants/FontCache";
 import InventoryLogCell from "../components/Inventory/InventoryLogCell";
+import InventoryHistoryModal from "../components/Inventory/InventoryHistoryModal";
 
 const InventoryOrderDetails = (props: InventoryDetailsNavProps) => {
   const detailsVM = fetchInventoryDetails(props.route.params.orderId);
- // const catelogVM = POSInventoryCatelogManger();
+  const catelogVM = POSInventoryCatelogManger();
   const [showError, setShowError] = useState<boolean>(false);
+  const [showHistoryLog, toggleHistoryLog] = useState<boolean>(false);
+  const [showAllocateLog, toggleAllocateLog] = useState<boolean>(false);
   const handleAPIError = (error: unknown) => {
     let errMsg = "";
     if (error instanceof APIError) {
@@ -68,6 +71,10 @@ const InventoryOrderDetails = (props: InventoryDetailsNavProps) => {
         key: "Order History:",
         type: "image",
         imageURL: require("../assets/images/inventory_orderDetails_icon.png"),
+        valueTapped(key) {
+          console.log(key);
+          toggleHistoryLog(true);
+        },
       },
       {
         key: "Memo Download:",
@@ -78,6 +85,9 @@ const InventoryOrderDetails = (props: InventoryDetailsNavProps) => {
         key: "Allocation History:",
         type: "image",
         imageURL: require("../assets/images/inventory_orderDetails_icon.png"),
+        valueTapped(key) {
+          toggleAllocateLog(true)
+        },
       },
     ];
   };
@@ -146,9 +156,44 @@ const InventoryOrderDetails = (props: InventoryDetailsNavProps) => {
       }
     }
   };
+
+  const launchHistoryLogs = (data: InventoryOrderDetailsResponse) => {
+    const requiredRows = data.orderHistory.map((item) => [
+      item.actionBy,
+      dayjs(item.actionDate).format(POSDateFormat).toString(),
+      item.actionValue,
+      item.remarks || "",
+    ]);
+    return (
+      <InventoryHistoryModal
+        heading={`Order Summary (${data.orderId})`}
+        modalVisible={showHistoryLog}
+        closeModalAction={() => toggleHistoryLog(false)}
+        rows={requiredRows}
+      />
+    );
+  };
+
+  const launchAllocationLogs = (data: InventoryOrderDetailsResponse) => {
+    let requiredRows:string[][] = []
+    if (data.grns != undefined && data.grns.length > 0) {
+      requiredRows = data.grns[0].grnDetailList.map((item) => (
+        [item.inventoryType, item.allocatedQuantity.toString(), item.startSeries]
+      ))
+      
+  } 
+    return (
+      <InventoryHistoryModal
+        heading={`Allocation Summary (${data.orderId})`}
+        modalVisible={showAllocateLog}
+        closeModalAction={() => toggleAllocateLog(false)}
+        rows={requiredRows}
+      />
+    );
+  }
   return (
     <SafeAreaView style={styles.container}>
-      {detailsVM.isSuccess ? (
+      {detailsVM.isSuccess && catelogVM.isSuccess ? (
         <ScrollView>
           <View style={styles.topView}>
             <InventoryDetailCard
@@ -166,18 +211,23 @@ const InventoryOrderDetails = (props: InventoryDetailsNavProps) => {
             {detailsVM.data.lineItems.map((item) => (
               <InventoryLogCell
                 rows={[
-                  item.inventoryTypeId.toString(),
+                  POSUtilityManager.sharedInstance().fetchNameFromInventoryCatelog(
+                    item.inventoryTypeId,
+                    catelogVM.data
+                  ),
                   item.requestedQuantity.toString(),
                   item.transferredQuantity.toString(),
-                  item.lineNo.toString(),
+                  item.startSerial || "",
                 ]}
               />
             ))}
           </View>
+          {showHistoryLog ? launchHistoryLogs(detailsVM.data) : null}
+          {showAllocateLog ? launchAllocationLogs(detailsVM.data) : null}
           {prepareActionButtons(detailsVM.data.nextAction)}
         </ScrollView>
       ) : null}
-      {detailsVM.isLoading  ? (
+      {detailsVM.isLoading || catelogVM.isLoading ? (
         <OoredooActivityView />
       ) : null}
       {detailsVM.isError ? handleAPIError(detailsVM.error) : null}
@@ -209,7 +259,7 @@ const styles = StyleSheet.create({
     borderBottomColor: ColorConstants.grey_AAA,
     borderBottomWidth: 1,
     flexDirection: "row",
-    alignItems:'center',
+    alignItems: "center",
   },
   lineItemHeaderText: {
     fontFamily: Fontcache.notoRegular,

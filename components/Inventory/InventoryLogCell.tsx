@@ -12,7 +12,6 @@ const InventoryLogCell = (props: InventoryLogCellProps) => {
           style={{
             flexBasis: `${(100 / props.rows.length).toFixed()}%`,
             flexDirection: "row",
-           
           }}
         >
           <Text style={styles.label}> {item}</Text>
@@ -43,6 +42,8 @@ const styles = StyleSheet.create({
     padding: 5,
     marginHorizontal: 8,
     flex:1,
+    color: ColorConstants.black,
+    alignSelf:'center',
   },
   lineItemSeparator: {
     width: 2,
