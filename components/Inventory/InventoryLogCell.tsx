@@ -6,18 +6,21 @@ import { ColorConstants } from "../../constants/Colors";
 const InventoryLogCell = (props: InventoryLogCellProps) => {
   return (
     <View style={styles.container}>
-      {props.rows.map((item, index) =>
-        index === props.rows.length ? (
-          <View key={index}> 
-            <Text style={styles.label}> {item}</Text>
-          </View>
-        ) : (
-          <View key={index}>
-            <Text style={styles.label}> {item}</Text>
-            <View style={styles.lineItemSeparator}> </View>
-          </View>
-        )
-      )}
+      {props.rows.map((item, index) => (
+        <View
+          key={index}
+          style={{
+            flexBasis: `${(100 / props.rows.length).toFixed()}%`,
+            flexDirection: "row",
+           
+          }}
+        >
+          <Text style={styles.label}> {item}</Text>
+          {(props.rows.length -1) === index ? null : 
+            (<View style={styles.lineItemSeparator}>{}</View>
+          )}
+        </View>
+      ))}
     </View>
   );
 };
@@ -25,7 +28,7 @@ const InventoryLogCell = (props: InventoryLogCellProps) => {
 export default InventoryLogCell;
 
 export interface InventoryLogCellProps {
-    rows: string[]
+  rows: string[];
 }
 
 const styles = StyleSheet.create({
@@ -39,11 +42,10 @@ const styles = StyleSheet.create({
     fontSize: 12,
     padding: 5,
     marginHorizontal: 8,
+    flex:1,
   },
   lineItemSeparator: {
-    width: 4,
-    marginVertical: 10,
+    width: 2,
     backgroundColor: ColorConstants.grey_898,
-    alignSelf: "center",
   },
 });

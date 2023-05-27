@@ -163,22 +163,16 @@ const InventoryOrderDetails = (props: InventoryDetailsNavProps) => {
               <Text style={styles.lineItemHeaderText}> TQuantity </Text>
               <Text style={styles.lineItemHeaderText}> Serials</Text>
             </View>
-            {/* {detailsVM.data.lineItems.map((item) => (
+            {detailsVM.data.lineItems.map((item) => (
               <InventoryLogCell
                 rows={[
-                  catelogVM.isSuccess
-                    ? POSUtilityManager.sharedInstance().fetchNameFromInventoryCatelog(
-                        item.inventoryTypeId,
-                        catelogVM.data
-                      )
-                    : item.inventoryTypeId.toString(),
                   item.inventoryTypeId.toString(),
                   item.requestedQuantity.toString(),
                   item.transferredQuantity.toString(),
                   item.lineNo.toString(),
                 ]}
               />
-            ))} */}
+            ))}
           </View>
           {prepareActionButtons(detailsVM.data.nextAction)}
         </ScrollView>
@@ -208,8 +202,7 @@ const styles = StyleSheet.create({
     borderColor: ColorConstants.grey_898,
     marginVertical: 8,
     marginHorizontal: 8,
-    borderTopLeftRadius: 8,
-    borderTopRightRadius: 8,
+    borderRadius: 8,
   },
   lineItemsHeaderView: {
     height: 40,
