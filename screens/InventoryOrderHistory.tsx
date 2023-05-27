@@ -23,7 +23,7 @@ import { POSUtilityManager } from "../AppManger/POSAppManager";
 const InventoryOrderHistory = (props: InventoryOrdersHistory) => {
   const { data, isSuccess, isError, error, isLoading } =
     fetchInventoryOrdersList(
-      dayjs().subtract(7,'days').format("YYYY-MM-DD"),
+      dayjs().subtract(7, "days").format("YYYY-MM-DD"),
       dayjs(new Date(Date.now())).format("YYYY-MM-DD").toString()
     );
 
@@ -59,7 +59,10 @@ const InventoryOrderHistory = (props: InventoryOrdersHistory) => {
           btnTitle={"View Details"}
           ribbonColor={fetchStatus.color}
           btnPress={function (): void {
-            throw new Error("Function not implemented.");
+            props.navigation.navigate("InventoryOrderDetails", {
+              orderId: cellData.item.orderId,
+              type: "InventoryDetails",
+            });
           }}
         />
       </View>
@@ -73,7 +76,7 @@ const InventoryOrderHistory = (props: InventoryOrdersHistory) => {
           <OoredooBadReqView
             modalVisible={true}
             action={() => props.navigation.goBack()}
-            title={'NO DATA FOUND'}
+            title={"NO DATA FOUND"}
           />
         </SafeAreaView>
       );
@@ -111,11 +114,7 @@ const InventoryOrderHistory = (props: InventoryOrdersHistory) => {
       </SafeAreaView>
     );
   } else {
-    return (
-    <SafeAreaView>
-
-    </SafeAreaView>
-    )
+    return <SafeAreaView></SafeAreaView>;
   }
 };
 

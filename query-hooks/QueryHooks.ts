@@ -151,4 +151,13 @@ export const fetchSelfDetails = () => useQuery({
 export const changeUserRole = () => useMutation({
   mutationKey:['changeRole'],
   mutationFn: (newRole: string) => APIManager.sharedInstance().fireChangeRole(newRole)
+});
+export const fetchInventoryDetails = (orderId: number) => useQuery({
+  queryKey: ['inventoryDetail'],
+  queryFn: () => APIManager.sharedInstance().fireInventoryDetails(orderId.toString()),
+})
+export const POSInventoryCatelogManger = () => useQuery({
+  queryKey: ['inventoryTypes'],
+  queryFn: () => APIManager.sharedInstance().firePOSInventoryCatelog(),
+  staleTime: 300000
 })

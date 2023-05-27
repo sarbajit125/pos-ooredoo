@@ -1,4 +1,5 @@
 import { ColorConstants } from "../constants/Colors"
+import { POSInventoryCatelogResponse } from "../responseModels/InventoryOrderDetailsResponse"
 
 
 export interface POSWalletDAO {
@@ -149,6 +150,14 @@ prepareStatusforInventoryOrdersList = (statusId:number): {text: string, color:st
       return {text: "New serials received by Partner", color:  ColorConstants.red_ED1}
     default:
       return {text: "", color:  ColorConstants.white}
+    }
+  }
+  fetchNameFromInventoryCatelog = (inventoryTypeId: number, catelog: POSInventoryCatelogResponse[]): string => {
+    const detail = catelog.filter((item) => item.value === inventoryTypeId)
+    if (detail.length === 0) {
+      return inventoryTypeId.toString()
+    } else {
+      return detail[0].text
     }
   }
 }

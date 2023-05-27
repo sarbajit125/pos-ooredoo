@@ -63,6 +63,7 @@ const Login = (props: LoginScreenProps) => {
   });
   return (
     <SafeAreaView style={styles.container}>
+      <View style={styles.contentView}>
       <View>
         <Image
           style={styles.logo}
@@ -149,6 +150,7 @@ const Login = (props: LoginScreenProps) => {
           setErrorView(false)
         } } title={errorMsg} /> : null}
       </View>
+      </View>
       {loginmutation.isLoading ? <OoredooActivityView  /> : null}
     </SafeAreaView>
   );
@@ -161,9 +163,10 @@ export default Login;
 const styles = StyleSheet.create({
   container: {
     marginTop: 30,
-    marginLeft: 29,
-    marginRight: 16,
     flex:1,
+  },
+  contentView:{
+    marginHorizontal:16,
   },
   logo: {
     marginTop: 60,

@@ -9,3 +9,5 @@ export enum POSDownloadType {
     Wide = "wide",
     Caf = "caf"
 }
+
+export const POSDateFormat = "YYYY-MM-DD"

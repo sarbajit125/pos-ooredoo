@@ -26,6 +26,7 @@ import {
   UploadMemoResponse,
 } from "../responseModels/InventoryRulesResponse";
 import FormData from 'form-data';
+import { InventoryOrderDetailsResponse, POSInventoryCatelogResponse } from "../responseModels/InventoryOrderDetailsResponse";
 export class APIManager {
   private static instance: APIManager;
   private constructor() {
@@ -278,6 +279,24 @@ export class APIManager {
       } catch (error) {
         throw this.errorhandling(error);
       }
+  }
+  fireInventoryDetails = async (orderId:string) => {
+    try {
+      const response = await axios.get<InventoryOrderDetailsResponse>(`api/inventory/transfer/orders/${orderId}`)
+      this.printJSON(response.data);
+      return response.data
+    } catch (error) {
+      throw this.errorhandling(error);
+    }
+  }
+  firePOSInventoryCatelog = async () => {
+    try {
+      const response  = await axios.get<POSInventoryCatelogResponse[]>(`master/inventoryTypes`)
+      this.printJSON(response.data);
+      return response.data
+    } catch (error) {
+      throw this.errorhandling(error);
+    }
   }
   errorhandling = (error: unknown): APIError | UnauthorizedError => {
     if (error instanceof AxiosError) {
