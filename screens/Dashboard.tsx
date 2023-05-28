@@ -1,34 +1,31 @@
 import { StyleSheet, View, ScrollView } from "react-native";
-import React, { useContext } from "react";
+import React, { useEffect } from "react";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList, RootTabParamList } from "../types";
 import DashbordNav from "../components/dashboard/DashbordNav";
 import DashboardGreeting from "../components/dashboard/DashboardGreeting";
 import DashboardBalance from "../components/dashboard/DashboardBalance";
-import { observer } from "mobx-react";
-import { StoresContext } from "../store/RootStore";
 import DashboardKPI from "../components/dashboard/DashboardKPI";
-import { useQuery } from "react-query";
-import { APIManager } from "../AppManger/ApiManger";
 import OoredooBadReqView from "../components/errors/OoredooBadReqView";
 import DashboardServices from "../components/dashboard/DashboardServices";
 import { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
 import { CompositeScreenProps } from "@react-navigation/native";
+import OoredooActivityView from "../components/OoredooActivityView";
+import { fetchSelfDetails } from "../query-hooks/QueryHooks";
+import { POSUserDataContext } from "../store/RootStore";
 type LoginScreenProps = CompositeScreenProps<
   BottomTabScreenProps<RootTabParamList, "Home">,
   NativeStackScreenProps<RootStackParamList>
 >;
-const Dashboard = observer((props: LoginScreenProps) => {
-  const userStore = useContext(StoresContext).userDetailStore;
-  const { data, isSuccess, isError, isLoading } = useQuery({
-    queryKey: ["selfDetails"],
-    queryFn: () => APIManager.sharedInstance().userDetails(),
-  });
-  if (isSuccess) {
-    userStore.fetchSelfDetails(data);
-    return (
-      <ScrollView>
-        <View style={styles.container}>
+const Dashboard = (props: LoginScreenProps) => {
+  const {setUserDetails} = POSUserDataContext()
+  const { data, isSuccess, isError, isLoading } = fetchSelfDetails()
+  useEffect (() => {
+    isSuccess ? setUserDetails(data) : null
+  },[isSuccess])
+  return (
+    <ScrollView>
+      {isSuccess ? <View style={styles.container}>
           <View style={styles.topBar}>
             <DashbordNav
               profileTapped={function (): void {
@@ -55,27 +52,16 @@ const Dashboard = observer((props: LoginScreenProps) => {
           <View style={styles.servicesView}>
             <DashboardServices />
           </View>
-        </View>
-      </ScrollView>
-    );
-  } else if (isLoading) {
-    return (
-      <View style={styles.container}>
-        {/* <OoredooActivityView /> */}
-      </View>
-    );
-  } else {
-    return (
-      <View style={styles.container}>
-        <OoredooBadReqView
+        </View> : null}
+      {isLoading? <OoredooActivityView /> : null}
+      {isError ?  <OoredooBadReqView
           modalVisible={true}
           action={() => props.navigation.goBack()}
           title={"API error"}
-        />
-      </View>
-    );
-  }
-});
+        /> : null}
+    </ScrollView>
+  )
+};
 
 export default Dashboard;
 

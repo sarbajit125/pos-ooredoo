@@ -79,6 +79,10 @@ export default class UserDetailsStore {
   @action setUserRole(role: string) {
     this.currentRole = role;
   }
+  @action setUserid(id: string) {
+    this.userId = id
+  }
+
  fetchSelfDetails = (response: SelfUserDetails) => {
     this.salesChannelList = [];
     this.faisaWallets = Object.assign([], this.faisaWallets);
@@ -100,8 +104,8 @@ export default class UserDetailsStore {
           }
           this.setDefaultRastasWallet(undefined);
           this.setDefaultFaisaWallet(undefined);
-          this.currentRole = response.currentRole;
-          this.userId = response.userId
+          this.setUserRole(response.currentRole)
+          this.setUserid(response.userId)
   };
 
   fetchBalance(wallet?: POSWalletDAO, pin?: string) {

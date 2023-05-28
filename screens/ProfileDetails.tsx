@@ -33,10 +33,10 @@ import { Ionicons } from "@expo/vector-icons";
 import CrossButtonView from "../components/Core/BaseBottomSheetView";
 import { APIError } from "../responseModels/responseModels";
 import OoredooBadReqView from "../components/errors/OoredooBadReqView";
-import { StoresContext } from "../store/RootStore";
+import { POSUserDataContext, StoresContext } from "../store/RootStore";
 import { useToast } from "react-native-toast-notifications";
 const ProfileDetails = (props: ProfileDetailsNavProps) => {
-  const userStore = useContext(StoresContext).userDetailStore;
+  const {currentRole, setNewRole} = POSUserDataContext()
   const [userRoles, setUserRoles] = useState<POSSelectData[]>([]);
   // ref
   const bottomSheetRef = useRef<BottomSheetModal>(null);
@@ -60,7 +60,7 @@ const ProfileDetails = (props: ProfileDetailsNavProps) => {
         animationType: "slide-in",
         onClose() {
           const selectedRole = userRoles.filter((item) => item.isSelected)[0].id
-          userStore.setUserRole(selectedRole)
+          setNewRole(selectedRole)
           props.navigation.goBack()
         },
       })
@@ -105,7 +105,7 @@ const ProfileDetails = (props: ProfileDetailsNavProps) => {
   const handleBottomsheetConfirm = () => {
     bottomSheetRef.current?.close();
     const filteredArr = userRoles.filter((item) => item.isSelected);
-    if (filteredArr[0].id === userStore.currentRole) {
+    if (filteredArr[0].id === currentRole) {
       setErrMsg("Selected Role Same as current role");
       setShowModal(true);
     } else {

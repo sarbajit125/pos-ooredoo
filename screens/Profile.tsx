@@ -10,14 +10,13 @@ import {
 } from "react-native";
 import React, {
   useCallback,
-  useContext,
   useMemo,
   useRef,
   useState,
 } from "react";
 import { ColorConstants } from "../constants/Colors";
 import { Fontcache } from "../constants/FontCache";
-import { SearchScreenContext, StoresContext } from "../store/RootStore";
+import { POSUserDataContext, SearchScreenContext } from "../store/RootStore";
 import {
   ExpandableComponent,
   ExpandableListProps,
@@ -32,7 +31,7 @@ import OoredooPayBtn from "../components/OoredooPayBtn";
 import { APIManager } from "../AppManger/ApiManger";
 const Profile = (props: ProfileNavProps) => {
   const {setSelectedData} = SearchScreenContext()
-  const userStore = useContext(StoresContext).userDetailStore;
+  const {userDesc} =  POSUserDataContext()
   const [serviceList, setServiceList] =
     useState<ExpandableListProps[]>(ProfileServiceData);
   // ref
@@ -103,7 +102,7 @@ const Profile = (props: ProfileNavProps) => {
         </View>
         <View style={styles.nameView}>
           <Text style={styles.greeting}>Hello,</Text>
-          <Text style={styles.username}>{userStore.userDesc}</Text>
+          <Text style={styles.username}>{userDesc}</Text>
         </View>
         <ScrollView style={styles.scrollView}>
           {serviceList.map((item, key) => {
@@ -152,7 +151,8 @@ const Profile = (props: ProfileNavProps) => {
                 <OoredooPayBtn
                   onPress={function (): void {
                    APIManager.sharedInstance().removeAuthToken()
-                   props.navigation.navigate("Root")
+                   props.navigation.popToTop()
+                   //props.navigation.navigate("Root")
                   }}
                   title={"CONFIRM"}
                 />

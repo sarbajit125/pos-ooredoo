@@ -81,6 +81,7 @@ export interface POSUserStore {
   currentRole: string
   userId: string
   setUserDetails: (response: SelfUserDetails) => void
+  setNewRole: (newRole: string) => void
 }
 
 export interface POSSuccessProps {

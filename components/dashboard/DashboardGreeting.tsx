@@ -2,22 +2,21 @@ import { StyleSheet, View } from 'react-native'
 import React, { useContext } from 'react'
 import Header14RubikLbl from '../OoredooFonts/Rubik/Header14RubikLbl'
 import Title26Noto from '../OoredooFonts/Noto/Title26Noto'
-import { observer } from 'mobx-react'
-import { StoresContext } from '../../store/RootStore'
+import { fetchSelfDetails } from '../../query-hooks/QueryHooks'
 
-const DashboardGreeting = observer(() => {
-    const userStore = useContext(StoresContext).userDetailStore
+const DashboardGreeting = () => {
+    const { data, isSuccess} = fetchSelfDetails()
     return (
       <View style={styles.container}>
           <Header14RubikLbl>
               Hello,
           </Header14RubikLbl>
           <Title26Noto style={styles.name}>
-              {userStore.userDesc}
+              { isSuccess && data.userCredentials.userDesc}
           </Title26Noto>
       </View>
     )
-  }) 
+  }
 
 export default DashboardGreeting
 
