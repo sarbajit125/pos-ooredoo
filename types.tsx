@@ -68,19 +68,8 @@ export enum POSAPIHelper {
   None = 2
 }
 
-export interface POSUserStore {
-  fname: string
-  lname?: string 
-  username: string
-  userDesc: string 
-  contact: string 
-  email: string 
-  salesChannelList: string[]
-  rastasWallets: POSWalletDAO[]
-  faisaWallets: POSWalletDAO[]
-  currentRole: string
-  userId: string
-  setUserDetails: (response: SelfUserDetails) => void
+export interface POSUserStore extends POSUserDetailsV2 {
+  setUserDetails: (response: POSUserDetailsV2) => void
   setNewRole: (newRole: string) => void
 }
 
@@ -94,4 +83,22 @@ export interface POSSuccessProps {
 export interface InventoryDetailsTypes {
   orderId: number,
   type : 'InventoryDetails'|'ReversalDetails'
+}
+
+export interface POSUserDetailsV2 {
+  fname: string
+  lname?: string 
+  fullname: string
+  username: string
+  userDesc: string 
+  contact: string 
+  email: string 
+  salesChannelList: string
+  rastasWallets: POSWalletDAO[]
+  faisaWallets: POSWalletDAO[]
+  currentRole: string
+  userId: string
+  userAuthorities: string[]
+  defaultRastas: POSWalletDAO
+  defaultFaisa: POSWalletDAO
 }

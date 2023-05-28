@@ -29,8 +29,10 @@ import {
 } from "@gorhom/bottom-sheet";
 import OoredooPayBtn from "../components/OoredooPayBtn";
 import { APIManager } from "../AppManger/ApiManger";
+import { useQueryClient } from "react-query";
 const Profile = (props: ProfileNavProps) => {
   const {setSelectedData} = SearchScreenContext()
+  const queryClient = useQueryClient()
   const {userDesc} =  POSUserDataContext()
   const [serviceList, setServiceList] =
     useState<ExpandableListProps[]>(ProfileServiceData);
@@ -152,7 +154,7 @@ const Profile = (props: ProfileNavProps) => {
                   onPress={function (): void {
                    APIManager.sharedInstance().removeAuthToken()
                    props.navigation.popToTop()
-                   //props.navigation.navigate("Root")
+                   queryClient.invalidateQueries()
                   }}
                   title={"CONFIRM"}
                 />

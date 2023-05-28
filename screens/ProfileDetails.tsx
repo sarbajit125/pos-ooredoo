@@ -137,7 +137,7 @@ const ProfileDetails = (props: ProfileDetailsNavProps) => {
             <View style={styles.cell}>
               <SelectedModCell
                 rightViewType={"none"}
-                text={data.userAddress.contactNumber}
+                text={data.contact}
                 id={"MOBILE"}
                 heading="Mobile Number"
                 modifyCallback={() => console.log("MOBILE")}
@@ -146,7 +146,7 @@ const ProfileDetails = (props: ProfileDetailsNavProps) => {
             <View style={styles.cell}>
               <SelectedModCell
                 rightViewType={"none"}
-                text={data.userFirstName + data.userLastName}
+                text={data.fullname}
                 id={"NAME"}
                 heading="Name"
                 modifyCallback={function (id: string): void {
@@ -164,10 +164,10 @@ const ProfileDetails = (props: ProfileDetailsNavProps) => {
                 modifyCallback={() => {
                   setUserRoles(
                     data.userAuthorities.map((item) => ({
-                      id: item.authority,
-                      name: item.authority,
+                      id: item,
+                      name: item,
                       isSelected:
-                        item.authority === data.currentRole ? true : false,
+                        item === data.currentRole ? true : false,
                     }))
                   );
                   bottomSheetRef.current?.present();
@@ -177,7 +177,7 @@ const ProfileDetails = (props: ProfileDetailsNavProps) => {
             <View style={styles.cell}>
               <SelectedModCell
                 rightViewType={"none"}
-                text={data.userAddress.emailId}
+                text={data.email}
                 id={"EMAIL"}
                 heading="Email"
                 modifyCallback={() => console.log("MOBILE")}

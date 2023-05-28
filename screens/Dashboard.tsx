@@ -21,7 +21,7 @@ const Dashboard = (props: LoginScreenProps) => {
   const {setUserDetails} = POSUserDataContext()
   const { data, isSuccess, isError, isLoading } = fetchSelfDetails()
   useEffect (() => {
-    isSuccess ? setUserDetails(data) : null
+  isSuccess ? setUserDetails(data) : null
   },[isSuccess])
   return (
     <ScrollView>

@@ -12,7 +12,7 @@ const DashboardGreeting = () => {
               Hello,
           </Header14RubikLbl>
           <Title26Noto style={styles.name}>
-              { isSuccess && data.userCredentials.userDesc}
+              { isSuccess && data.userDesc}
           </Title26Noto>
       </View>
     )

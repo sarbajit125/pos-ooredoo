@@ -2,7 +2,7 @@ import { createContext, useContext } from "react";
 import UserDetailsStore from "./UserDetailsStore";
 import { create } from "zustand";
 import { SearchScreenProps } from "../screens/SearchScreen";
-import { POSWalletDAO } from "../AppManger/POSAppManager";
+import { FaisaWalletPlaceholder, POSWalletDAO, RastasWalletPlaceholder } from "../AppManger/POSAppManager";
 import { POSUserStore } from "../types";
 import { InventoryConfirmationProps } from "../screens/InventoryConfirmation";
 
@@ -43,23 +43,28 @@ export const POSUserDataContext = create<POSUserStore>((set) => ({
   faisaWallets: [],
   fname: "",
   rastasWallets: [],
-  salesChannelList: [],
+  salesChannelList: "",
   userDesc: "",
   userId: "",
   username: "",
+  defaultFaisa: FaisaWalletPlaceholder,
+  defaultRastas: RastasWalletPlaceholder,
+  fullname: '',
+  userAuthorities: [],
   setUserDetails(response) {
     set(() => ({
-      contact: response.userAddress.contactNumber,
-      email: response.userAddress.emailId,
+      contact: response.contact,
+      email: response.email,
       currentRole: response.currentRole,
-      faisaWallets: [],
-      fname: response.userFirstName,
-      rastasWallets: [],
-      salesChannelList: response.salesChannelIdList,
-      userDesc: response.userCredentials.userDesc,
+      faisaWallets: response.faisaWallets,
+      fname: response.fname,
+      rastasWallets: response.rastasWallets,
+      salesChannelList: response.salesChannelList,
+      userDesc: response.userDesc,
       userId: response.userId,
-      username: response.userCredentials.username,
-      lname: response.userLastName,
+      username: response.username,
+      lname: response.lname,
+      fullname: response.fullname
     }));
   },
   setNewRole: (newRole) => set(() => ({ currentRole: newRole })),

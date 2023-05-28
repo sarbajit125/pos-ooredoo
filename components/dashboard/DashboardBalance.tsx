@@ -9,6 +9,7 @@ import {
   fetchSelfDetails,
   walletBalanceHook,
 } from "../../query-hooks/QueryHooks";
+import { FaisaWalletPlaceholder, RastasWalletPlaceholder } from "../../AppManger/POSAppManager";
 const DashboardBalance = (props: DashboardBalanceProps) => {
   const balanceMutation = walletBalanceHook();
   const [switchState, setSwitch] = useState(false);
@@ -22,16 +23,8 @@ const DashboardBalance = (props: DashboardBalanceProps) => {
     } else {
       balanceMutation.mutate(
         {
-          wallet: {
-            type: "Rastas",
-            walletid:
-              data != undefined && data.walletNumbers?.Raastas != undefined
-                ? data.walletNumbers?.Raastas.length > 0
-                  ? data.walletNumbers?.Raastas[0]
-                  : "" || ""
-                : "",
-          },
-          salesChannelId: data?.salesChannelIdList[0] || "",
+          wallet: data?.defaultRastas ?? RastasWalletPlaceholder,
+          salesChannelId: data?.salesChannelList ?? "",
           mpin: undefined,
         },
         {
@@ -48,16 +41,8 @@ const DashboardBalance = (props: DashboardBalanceProps) => {
     setModal(false);
     balanceMutation.mutate(
       {
-        wallet: {
-          type: "Faisa",
-          walletid:
-            data != undefined && data.walletNumbers?.MFaisa != undefined
-              ? data.walletNumbers?.MFaisa.length > 0
-                ? data.walletNumbers?.MFaisa[0]
-                : "" || ""
-              : "",
-        },
-        salesChannelId: data?.salesChannelIdList[0] || "",
+        wallet: data?.defaultFaisa ?? FaisaWalletPlaceholder,
+        salesChannelId:  data?.salesChannelList ?? "",
         mpin: pin,
       },
       {
@@ -98,11 +83,7 @@ const DashboardBalance = (props: DashboardBalanceProps) => {
         >
           <Header14RubikLbl>
             {`Rastas wallet ${
-              data != undefined && data.walletNumbers?.Raastas != undefined
-                ? data.walletNumbers?.Raastas.length > 0
-                  ? data.walletNumbers?.Raastas[0]
-                  : "" || ""
-                : ""
+               data?.defaultRastas.walletid ?? RastasWalletPlaceholder.walletid
             } balance : `}
           </Header14RubikLbl>
         </TouchableOpacity>
@@ -110,11 +91,7 @@ const DashboardBalance = (props: DashboardBalanceProps) => {
         <TouchableOpacity style={styles.btn} onPress={() => fetchBalance(true)}>
           <Header14RubikLbl>
             {`Faisa wallet ${
-              data != undefined && data.walletNumbers?.MFaisa != undefined
-                ? data.walletNumbers?.MFaisa.length > 0
-                  ? data.walletNumbers?.MFaisa[0]
-                  : "" || ""
-                : ""
+             data?.defaultFaisa.walletid ?? FaisaWalletPlaceholder.walletid
             } balance : `}
           </Header14RubikLbl>
         </TouchableOpacity>
@@ -123,11 +100,7 @@ const DashboardBalance = (props: DashboardBalanceProps) => {
           <OoredooPinModal
             show={showModal}
             walledId={
-              data != undefined && data.walletNumbers?.MFaisa != undefined
-                ? data.walletNumbers?.MFaisa.length > 0
-                  ? data.walletNumbers?.MFaisa[0]
-                  : "" || ""
-                : ""
+              data?.defaultFaisa.walletid ?? FaisaWalletPlaceholder.walletid
             }
             returnPrin={handleFaisaPin}
             onDismiss={function (): void {

@@ -1,10 +1,10 @@
 import { useMutation, useQuery } from "react-query";
 import { APIManager } from "../AppManger/ApiManger";
-import { POSWalletDAO } from "../AppManger/POSAppManager";
+import { POSUtilityManager, POSWalletDAO } from "../AppManger/POSAppManager";
 import CryptoES from "crypto-es";
 import { AppConstants } from "../constants/AppConstants";
 import dayjs from "dayjs";
-import { POSSelectData } from "../types";
+import { POSSelectData, POSUserDetailsV2 } from "../types";
 import {
   AvailableSerialsRequest,
   InventoryOrderReq,
@@ -144,20 +144,56 @@ export const uploadMemoToRequest = () =>
     mutationFn: (request: UploadMemoReq) =>
       APIManager.sharedInstance().fireUploadMemo(request),
   });
-export const fetchSelfDetails = () => useQuery({
-  queryKey: ["userdetails"],
-  queryFn: () => APIManager.sharedInstance().userDetails(),
-});
-export const changeUserRole = () => useMutation({
-  mutationKey:['changeRole'],
-  mutationFn: (newRole: string) => APIManager.sharedInstance().fireChangeRole(newRole)
-});
-export const fetchInventoryDetails = (orderId: number) => useQuery({
-  queryKey: ['inventoryDetail'],
-  queryFn: () => APIManager.sharedInstance().fireInventoryDetails(orderId.toString()),
-})
-export const POSInventoryCatelogManger = () => useQuery({
-  queryKey: ['inventoryTypes'],
-  queryFn: () => APIManager.sharedInstance().firePOSInventoryCatelog(),
-  staleTime: 300000
-})
+export const fetchSelfDetails = () =>
+  useQuery({
+    queryKey: ["userdetails"],
+    queryFn: () => APIManager.sharedInstance().userDetails(),
+    select: (response): POSUserDetailsV2 => {
+      const { defaultWallet: faisaDefault, wallets: faisaWallets } =
+        POSUtilityManager.sharedInstance().prepareFaisaWallets(
+          response.walletNumbers?.MFaisa
+        );
+      const { defaultWallet: rastasDefault, wallets: rastasWallets } =
+        POSUtilityManager.sharedInstance().prepareRastasWallets(
+          response.walletNumbers?.Raastas
+        );
+      return {
+        contact: response.userAddress.contactNumber,
+        email: response.userAddress.emailId,
+        currentRole: response.currentRole,
+        faisaWallets: faisaWallets,
+        defaultFaisa: faisaDefault,
+        fname: response.userFirstName,
+        rastasWallets: rastasWallets,
+        defaultRastas: rastasDefault,
+        salesChannelList:
+          response.salesChannelIdList.length > 0
+            ? response.salesChannelIdList[0]
+            : "",
+        userDesc: response.userCredentials.userDesc,
+        userId: response.userId,
+        username: response.userCredentials.username,
+        lname: response.userLastName,
+        fullname: response.userFirstName + response.userLastName,
+        userAuthorities: response.userAuthorities.map((item) => item.authority),
+      };
+    },
+  });
+export const changeUserRole = () =>
+  useMutation({
+    mutationKey: ["changeRole"],
+    mutationFn: (newRole: string) =>
+      APIManager.sharedInstance().fireChangeRole(newRole),
+  });
+export const fetchInventoryDetails = (orderId: number) =>
+  useQuery({
+    queryKey: ["inventoryDetail"],
+    queryFn: () =>
+      APIManager.sharedInstance().fireInventoryDetails(orderId.toString()),
+  });
+export const POSInventoryCatelogManger = () =>
+  useQuery({
+    queryKey: ["inventoryTypes"],
+    queryFn: () => APIManager.sharedInstance().firePOSInventoryCatelog(),
+    staleTime: 300000,
+  });
