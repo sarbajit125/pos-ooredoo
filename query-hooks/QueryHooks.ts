@@ -4,7 +4,12 @@ import { POSUtilityManager, POSWalletDAO } from "../AppManger/POSAppManager";
 import CryptoES from "crypto-es";
 import { AppConstants } from "../constants/AppConstants";
 import dayjs from "dayjs";
-import { POSSelectData, POSUserDetailsV2 } from "../types";
+import {
+  DashboardGraphUI,
+  GraphData,
+  POSSelectData,
+  POSUserDetailsV2,
+} from "../types";
 import {
   AvailableSerialsRequest,
   InventoryOrderReq,
@@ -46,7 +51,7 @@ export interface DashboardKPIReq {
 
 export const dashboardGraphHook = (posCode: string) =>
   useQuery({
-    queryKey: ["dashbordKPI"],
+    queryKey: ["dashbordKPI", posCode],
     queryFn: () => {
       let yesterDay = new Date().getDate() - 1;
       const formatDate = dayjs(yesterDay).format("YYYY-MM-DD").toString();
@@ -54,6 +59,39 @@ export const dashboardGraphHook = (posCode: string) =>
         formatDate,
         posCode
       );
+    },
+    enabled: false,
+    select: (response): DashboardGraphUI => {
+      const lastObj = response.responseBody.slice(-1).pop() ?? [];
+      let grossArr: GraphData[] = [];
+      let primaryArr: GraphData[] = [];
+      let secondaryArr: GraphData[] = [];
+      response.responseBody.map((item) => {
+        item
+          .filter((item) => item.kpi === "Gross Add")
+          .forEach((item) => {
+            let graphObj: GraphData = { date: item.addDate, value: item.mtd };
+            grossArr.push(graphObj);
+          });
+        item
+          .filter((item) => item.kpi === "Primary")
+          .forEach((item) => {
+            let graphObj: GraphData = { date: item.addDate, value: item.mtd };
+            primaryArr.push(graphObj);
+          });
+        item
+          .filter((item) => item.kpi === "Secondary")
+          .forEach((item) => {
+            let graphObj: GraphData = { date: item.addDate, value: item.mtd };
+            secondaryArr.push(graphObj);
+          });
+      });
+      return {
+        grossList: grossArr,
+        primaryList: primaryArr,
+        secondaryList: secondaryArr,
+        lastObj: lastObj,
+      };
     },
   });
 export const StockDetailsHook = (posCode: string) =>

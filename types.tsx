@@ -8,6 +8,7 @@ import { CompositeScreenProps, NavigatorScreenParams } from '@react-navigation/n
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { POSWalletDAO } from './AppManger/POSAppManager';
 import { SelfUserDetails } from './responseModels/SelfUserDetailsResponse';
+import { DashboardKPIRespArr } from './responseModels/DashboardKPIResponse';
 declare global {
   namespace ReactNavigation {
     interface RootParamList extends RootStackParamList {}
@@ -101,4 +102,16 @@ export interface POSUserDetailsV2 {
   userAuthorities: string[]
   defaultRastas: POSWalletDAO
   defaultFaisa: POSWalletDAO
+}
+
+export interface DashboardGraphUI {
+  grossList: GraphData[],
+  primaryList: GraphData[],
+  secondaryList:   GraphData[],
+  lastObj: DashboardKPIRespArr[]
+}
+
+export interface GraphData {
+  date: string;
+  value: string;
 }
