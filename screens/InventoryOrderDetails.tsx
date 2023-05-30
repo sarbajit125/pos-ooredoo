@@ -1,5 +1,5 @@
 import { SafeAreaView, StyleSheet, Text, View } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { ScrollView } from "react-native-gesture-handler";
 import { ColorConstants } from "../constants/Colors";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
@@ -8,6 +8,7 @@ import OoredooPayBtn from "../components/OoredooPayBtn";
 import OoredooCancelBtn from "../components/Core/OoredooCancelBtn";
 import {
   POSInventoryCatelogManger,
+  callInventoryApproval,
   fetchInventoryDetails,
 } from "../query-hooks/QueryHooks";
 import OoredooActivityView from "../components/OoredooActivityView";
@@ -23,6 +24,7 @@ import { POSUtilityManager } from "../AppManger/POSAppManager";
 import { Fontcache } from "../constants/FontCache";
 import InventoryLogCell from "../components/Inventory/InventoryLogCell";
 import InventoryHistoryModal from "../components/Inventory/InventoryHistoryModal";
+import OoredooDialog from "../components/Core/OoredooDiaglog";
 
 const InventoryOrderDetails = (props: InventoryDetailsNavProps) => {
   const detailsVM = fetchInventoryDetails(props.route.params.orderId);
@@ -30,6 +32,27 @@ const InventoryOrderDetails = (props: InventoryDetailsNavProps) => {
   const [showError, setShowError] = useState<boolean>(false);
   const [showHistoryLog, toggleHistoryLog] = useState<boolean>(false);
   const [showAllocateLog, toggleAllocateLog] = useState<boolean>(false);
+  const [showDialog, toggleDialog] = useState<boolean>(false);
+  const approvalVM = callInventoryApproval(
+    props.route.params.orderId.toString()
+  );
+  useEffect(() => {
+    if (approvalVM.isSuccess) {
+      let heading = `Approved Successfully ${approvalVM.data.orderId}`
+      switch (approvalVM.data.decision) {
+        case 'ACK':
+          heading = `Acknowledged  Successfully ${approvalVM.data.orderId}`
+          break
+        case 'REJECT':
+          heading = `Rejected  Successfully ${approvalVM.data.orderId}`
+          break
+        default:
+          heading = `Approved Successfully ${approvalVM.data.orderId}`
+          break
+      }
+      props.navigation.navigate('POSSuccess',{resetTo:'Profile',heading: heading})
+    }
+  },[approvalVM.isSuccess])
   const handleAPIError = (error: unknown) => {
     let errMsg = "";
     if (error instanceof APIError) {
@@ -86,7 +109,7 @@ const InventoryOrderDetails = (props: InventoryDetailsNavProps) => {
         type: "image",
         imageURL: require("../assets/images/inventory_orderDetails_icon.png"),
         valueTapped(key) {
-          toggleAllocateLog(true)
+          toggleAllocateLog(true);
         },
       },
     ];
@@ -96,67 +119,50 @@ const InventoryOrderDetails = (props: InventoryDetailsNavProps) => {
     if (nextAction === undefined) {
       return null;
     } else {
+      let btnTitle = ""
+      let mutateType: 'ACK' | 'APPROVE' | 'REJECT' = 'ACK'
       switch (nextAction) {
         case "ACK":
         case "ACKF":
         case "ACKNOWLEDGEMENT":
-          return (
-            <View style={styles.btnView}>
-              <OoredooPayBtn
-                onPress={function (): void {
-                  throw new Error("Function not implemented.");
-                }}
-                title={"Accept"}
-              />
-              <OoredooCancelBtn
-                onPress={function (): void {
-                  throw new Error("Function not implemented.");
-                }}
-                title={"Reject"}
-              />
-            </View>
-          );
+          btnTitle = "Accept"
+          mutateType = "ACK"
+          break
         case "APPROVE":
-          return (
-            <View style={styles.btnView}>
-              <OoredooPayBtn
-                onPress={function (): void {
-                  throw new Error("Function not implemented.");
-                }}
-                title={"Approve"}
-              />
-              <OoredooCancelBtn
-                onPress={function (): void {
-                  throw new Error("Function not implemented.");
-                }}
-                title={"Reject"}
-              />
-            </View>
-          );
+          btnTitle = "Approve"
+          mutateType = "APPROVE"
+          break
         case "ALLOCATE":
         case "ALLOCATION":
-          return (
-            <View style={styles.btnView}>
-              <OoredooPayBtn
-                onPress={function (): void {
-                  throw new Error("Function not implemented.");
-                }}
-                title={"Allocate"}
-              />
-              <OoredooCancelBtn
-                onPress={function (): void {
-                  throw new Error("Function not implemented.");
-                }}
-                title={"Reject"}
-              />
-            </View>
-          );
+          btnTitle = "Allocate"
+          break
         default:
           return null;
       }
+      return (
+        <View style={styles.btnView}>
+        <OoredooPayBtn
+        style={styles.buttons}
+          onPress={() => (
+            approvalVM.mutate({
+              type:mutateType,
+            })
+          )}
+          title={btnTitle}
+        />
+        <OoredooCancelBtn
+          style={styles.buttons}
+          onPress={() => (
+            approvalVM.mutate({
+              type:'REJECT'
+            })
+          )}
+          title={"Reject"}
+        />
+      </View>
+      )
     }
   };
-
   const launchHistoryLogs = (data: InventoryOrderDetailsResponse) => {
     const requiredRows = data.orderHistory.map((item) => [
       item.actionBy,
@@ -175,13 +181,14 @@ const InventoryOrderDetails = (props: InventoryDetailsNavProps) => {
   };
 
   const launchAllocationLogs = (data: InventoryOrderDetailsResponse) => {
-    let requiredRows:string[][] = []
+    let requiredRows: string[][] = [];
     if (data.grns != undefined && data.grns.length > 0) {
-      requiredRows = data.grns[0].grnDetailList.map((item) => (
-        [item.inventoryType, item.allocatedQuantity.toString(), item.startSeries]
-      ))
-      
-  } 
+      requiredRows = data.grns[0].grnDetailList.map((item) => [
+        item.inventoryType,
+        item.allocatedQuantity.toString(),
+        item.startSeries,
+      ]);
+    }
     return (
       <InventoryHistoryModal
         heading={`Allocation Summary (${data.orderId})`}
@@ -190,11 +197,12 @@ const InventoryOrderDetails = (props: InventoryDetailsNavProps) => {
         rows={requiredRows}
       />
     );
-  }
+  };
   return (
     <SafeAreaView style={styles.container}>
       {detailsVM.isSuccess && catelogVM.isSuccess ? (
-        <ScrollView>
+        <View style={styles.compositeView}>
+          <ScrollView>
           <View style={styles.topView}>
             <InventoryDetailCard
               orderHeading={`Order Summary: ${detailsVM.data.orderId.toString()}`}
@@ -224,13 +232,15 @@ const InventoryOrderDetails = (props: InventoryDetailsNavProps) => {
           </View>
           {showHistoryLog ? launchHistoryLogs(detailsVM.data) : null}
           {showAllocateLog ? launchAllocationLogs(detailsVM.data) : null}
-          {prepareActionButtons(detailsVM.data.nextAction)}
         </ScrollView>
+        {prepareActionButtons(detailsVM.data.nextAction)}
+        </View>
       ) : null}
-      {detailsVM.isLoading || catelogVM.isLoading ? (
+      {detailsVM.isLoading || catelogVM.isLoading || approvalVM.isLoading ? (
         <OoredooActivityView />
       ) : null}
       {detailsVM.isError ? handleAPIError(detailsVM.error) : null}
+      {approvalVM.isError ? handleAPIError(approvalVM.error) : null}
     </SafeAreaView>
   );
 };
@@ -273,6 +283,14 @@ const styles = StyleSheet.create({
     marginVertical: 16,
     padding: 2,
   },
+  buttons:{
+    flexBasis:'48%',
+    marginHorizontal:2,
+  },
+  compositeView:{
+    flex:1,
+    flexGrow:1,
+  }
 });
 type InventoryDetailsNavProps = NativeStackScreenProps<
   RootStackParamList,

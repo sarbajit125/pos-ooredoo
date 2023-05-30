@@ -17,6 +17,7 @@ import { LineChart } from "react-native-chart-kit";
 import OoredooActivityView from "../OoredooActivityView";
 import dayjs from "dayjs";
 import { GraphData } from "../../types";
+import { Fontcache } from "../../constants/FontCache";
 const DashboardKPI = () => {
   const detailsVM = fetchSelfDetails();
   const [kpiList, setKPIList] = useState<kpiScroll[]>([]);
@@ -151,8 +152,8 @@ const DashboardKPI = () => {
                 style={{ borderRadius: 16 }}
               />
             ) : (
-              <View>
-                <Text> NO DATA</Text>
+              <View style={styles.emptyView}>
+                <Text style={styles.emptyText}> NO DATA</Text>
               </View>
             )}
           </View>
@@ -200,6 +201,19 @@ const styles = StyleSheet.create({
     font: "Rubik_700Bold",
     fontSize: 14,
   },
+  emptyView:{
+    marginTop: 10,
+    padding: 2,
+    height: 100,
+    justifyContent: 'center',
+    alignItems:'center',
+  },
+  emptyText:{
+    fontFamily: Fontcache.notoRegular,
+    fontSize:22,
+    color: ColorConstants.black,
+
+  }
 });
 
 interface kpiScroll {

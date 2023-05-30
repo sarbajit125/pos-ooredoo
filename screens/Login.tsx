@@ -17,7 +17,7 @@ import { APIManager } from "../AppManger/ApiManger";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../types";
 import { useToast } from "react-native-toast-notifications";
-import { useMutation } from "react-query";
+import { useMutation, useQueryClient } from "react-query";
 import { APIError } from "../responseModels/responseModels";
 import OoredooActivityView from "../components/OoredooActivityView";
 import OoredooBadReqView from "../components/errors/OoredooBadReqView";
@@ -30,6 +30,7 @@ const Login = (props: LoginScreenProps) => {
   const [passwordVisibility, setPasswordVisibility] = useState(true);
   const [showErrorView, setErrorView] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string>('')
+  const queryClient = useQueryClient()
   const toast = useToast();
   const handleForgetPassword = () => {
     console.log("Forget password");
@@ -45,6 +46,7 @@ const Login = (props: LoginScreenProps) => {
         duration: 1000,
         animationType: "slide-in",
       });
+      queryClient.invalidateQueries()
        props.navigation.navigate('Home', {screen:'Dashboard'})
     },
     onError(error, _variables, _context) {

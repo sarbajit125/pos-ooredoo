@@ -106,3 +106,14 @@ export enum InventorySubType {
   L = "L",
   P = "P",
 }
+export interface InventoryReqApprovalResp {
+  orderId: number
+}
+export interface InventoryApprovalUIModel extends InventoryReqApprovalResp {
+  decision: string
+}
+
+export interface InventoryApprovalReq {
+  remarks?: string
+  type: 'ACK' | 'APPROVE' | 'REJECT'
+}

@@ -16,8 +16,8 @@ const InventoryDetailCard = (props: InventoryCardDetailsProps) => {
       <View style={styles.headingView}>
         <Text style={styles.headingText}>{props.orderHeading}</Text>
       </View>
-      {props.rows.map((item) => (
-        <View style={styles.rows}>
+      {props.rows.map((item, index) => (
+        <View style={styles.rows} key={index}>
           <Text style={styles.rowsText}>{item.key}</Text>
           {item.type === "image" ? (
             <TouchableOpacity

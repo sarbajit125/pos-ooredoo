@@ -17,6 +17,7 @@ import {
   InventoryRulesResponse,
   UploadMemoReq,
 } from "../responseModels/InventoryRulesResponse";
+import { InventoryApprovalReq } from "../responseModels/InventoryOrderDetailsResponse";
 export const walletBalanceHook = () =>
   useMutation({
     mutationKey: ["walletbalance"],
@@ -235,3 +236,22 @@ export const POSInventoryCatelogManger = () =>
     queryFn: () => APIManager.sharedInstance().firePOSInventoryCatelog(),
     staleTime: 300000,
   });
+export const callInventoryApproval = (orderId: string) => 
+    useMutation({
+      mutationKey:['InventoryApproval', orderId],
+      mutationFn: (request: InventoryApprovalReq) => {
+        let endpointId: string = ""
+        switch (request.type) {
+          case 'APPROVE':
+            endpointId = "api/inventory/transfer/orders/" + orderId + "/approve"
+            break
+          case 'ACK':
+            endpointId = "api/inventory/transfer/" + "accept/" + orderId
+            break
+          case 'REJECT':
+            endpointId = "api/inventory/transfer/orders/" + orderId + "/reject"
+            break
+        }
+        return APIManager.sharedInstance().fireInventoryApproval(endpointId, request.type, request.remarks)
+      },
+    })

@@ -26,7 +26,7 @@ import {
   UploadMemoResponse,
 } from "../responseModels/InventoryRulesResponse";
 import FormData from 'form-data';
-import { InventoryOrderDetailsResponse, POSInventoryCatelogResponse } from "../responseModels/InventoryOrderDetailsResponse";
+import { InventoryApprovalUIModel, InventoryOrderDetailsResponse, InventoryReqApprovalResp, POSInventoryCatelogResponse } from "../responseModels/InventoryOrderDetailsResponse";
 export class APIManager {
   private static instance: APIManager;
   private constructor() {
@@ -294,6 +294,21 @@ export class APIManager {
       const response  = await axios.get<POSInventoryCatelogResponse[]>(`master/inventoryTypes`)
       this.printJSON(response.data);
       return response.data
+    } catch (error) {
+      throw this.errorhandling(error);
+    }
+  }
+  fireInventoryApproval = async (endpointId:string, decision: string, remarks?:string) => {
+    try {
+      const response = await axios.post<InventoryReqApprovalResp>(endpointId,{
+        remarks: remarks
+      })
+      this.printJSON(response.data);
+      let uiObj: InventoryApprovalUIModel = {
+        decision: decision,
+        orderId: response.data.orderId
+      }
+      return uiObj
     } catch (error) {
       throw this.errorhandling(error);
     }
