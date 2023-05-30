@@ -25,8 +25,15 @@ import {
   UploadMemoReq,
   UploadMemoResponse,
 } from "../responseModels/InventoryRulesResponse";
-import FormData from 'form-data';
-import { InventoryApprovalUIModel, InventoryOrderDetailsResponse, InventoryReqApprovalResp, POSInventoryCatelogResponse } from "../responseModels/InventoryOrderDetailsResponse";
+import FormData from "form-data";
+import {
+  InventoryAllocateReq,
+  InventoryAllocateResp,
+  InventoryApprovalUIModel,
+  InventoryOrderDetailsResponse,
+  InventoryReqApprovalResp,
+  POSInventoryCatelogResponse,
+} from "../responseModels/InventoryOrderDetailsResponse";
 export class APIManager {
   private static instance: APIManager;
   private constructor() {
@@ -241,19 +248,22 @@ export class APIManager {
       throw this.errorhandling(error);
     }
   };
-  fireUploadMemo = async ({selectedDoc, orderId}:UploadMemoReq) => {
+  fireUploadMemo = async ({ selectedDoc, orderId }: UploadMemoReq) => {
     try {
       const formData = new FormData();
-      formData.append('uploadfile', {
+      formData.append("uploadfile", {
         uri: selectedDoc,
-        name: 'memo.jpg',
-        type: 'image/jpg',
+        name: "memo.jpg",
+        type: "image/jpg",
       });
       const response = await axios.post<UploadMemoResponse>(
         `api/inventory/transfer/upload/file/${orderId}`,
         formData,
         {
-          headers: { "Content-Type": "multipart/form-data" , 'accept': 'application/json',},
+          headers: {
+            "Content-Type": "multipart/form-data",
+            accept: "application/json",
+          },
           onUploadProgress(progressEvent) {
             if (progressEvent.total && progressEvent.loaded) {
               const percentCompleted = Math.round(
@@ -270,49 +280,75 @@ export class APIManager {
       throw this.errorhandling(error);
     }
   };
-  fireChangeRole = async (newRole:string) => {
-      try {
-          const response = await axios.post<RoleChangeSuccss>(`app/api/setUsersCurrentRole/${newRole}`)
-          this.printJSON(response.data);
-          axios.defaults.headers.common["x-auth-token"] = response.data.responseBody
-          return response.data
-      } catch (error) {
-        throw this.errorhandling(error);
-      }
-  }
-  fireInventoryDetails = async (orderId:string) => {
+  fireChangeRole = async (newRole: string) => {
     try {
-      const response = await axios.get<InventoryOrderDetailsResponse>(`api/inventory/transfer/orders/${orderId}`)
+      const response = await axios.post<RoleChangeSuccss>(
+        `app/api/setUsersCurrentRole/${newRole}`
+      );
       this.printJSON(response.data);
-      return response.data
+      axios.defaults.headers.common["x-auth-token"] =
+        response.data.responseBody;
+      return response.data;
     } catch (error) {
       throw this.errorhandling(error);
     }
-  }
+  };
+  fireInventoryDetails = async (orderId: string) => {
+    try {
+      const response = await axios.get<InventoryOrderDetailsResponse>(
+        `api/inventory/transfer/orders/${orderId}`
+      );
+      this.printJSON(response.data);
+      return response.data;
+    } catch (error) {
+      throw this.errorhandling(error);
+    }
+  };
   firePOSInventoryCatelog = async () => {
     try {
-      const response  = await axios.get<POSInventoryCatelogResponse[]>(`master/inventoryTypes`)
+      const response = await axios.get<POSInventoryCatelogResponse[]>(
+        `master/inventoryTypes`
+      );
       this.printJSON(response.data);
-      return response.data
+      return response.data;
     } catch (error) {
       throw this.errorhandling(error);
     }
-  }
-  fireInventoryApproval = async (endpointId:string, decision: string, remarks?:string) => {
+  };
+  fireInventoryApproval = async (
+    endpointId: string,
+    decision: string,
+    remarks?: string
+  ) => {
     try {
-      const response = await axios.post<InventoryReqApprovalResp>(endpointId,{
-        remarks: remarks
-      })
+      const response = await axios.post<InventoryReqApprovalResp>(endpointId, {
+        remarks: remarks,
+      });
       this.printJSON(response.data);
       let uiObj: InventoryApprovalUIModel = {
         decision: decision,
-        orderId: response.data.orderId
-      }
-      return uiObj
+        orderId: response.data.orderId,
+      };
+      return uiObj;
     } catch (error) {
       throw this.errorhandling(error);
     }
-  }
+  };
+  fireInventoryAllocate = async (
+    request: InventoryAllocateReq[],
+    orderId: number
+  ) => {
+    try {
+      const response = await axios.post<InventoryAllocateResp>(
+        `api/inventory/transfer/allocation/${orderId}`,
+        request
+      );
+      this.printJSON(response.data);
+      return response.data;
+    } catch (error) {
+      throw this.errorhandling(error);
+    }
+  };
   errorhandling = (error: unknown): APIError | UnauthorizedError => {
     if (error instanceof AxiosError) {
       console.log(error.response?.data);

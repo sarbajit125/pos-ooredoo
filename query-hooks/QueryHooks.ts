@@ -17,7 +17,7 @@ import {
   InventoryRulesResponse,
   UploadMemoReq,
 } from "../responseModels/InventoryRulesResponse";
-import { InventoryApprovalReq } from "../responseModels/InventoryOrderDetailsResponse";
+import { InventoryAllocateReq, InventoryApprovalReq } from "../responseModels/InventoryOrderDetailsResponse";
 export const walletBalanceHook = () =>
   useMutation({
     mutationKey: ["walletbalance"],
@@ -255,3 +255,7 @@ export const callInventoryApproval = (orderId: string) =>
         return APIManager.sharedInstance().fireInventoryApproval(endpointId, request.type, request.remarks)
       },
     })
+export const allocateInventory = (orderId: number) => useMutation({
+  mutationKey:['InventoryAllocate', orderId],
+  mutationFn: (request: InventoryAllocateReq[]) => APIManager.sharedInstance().fireInventoryAllocate(request, orderId)
+})

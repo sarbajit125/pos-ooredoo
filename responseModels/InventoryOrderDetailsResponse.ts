@@ -117,3 +117,51 @@ export interface InventoryApprovalReq {
   remarks?: string
   type: 'ACK' | 'APPROVE' | 'REJECT'
 }
+export interface InventoryAllocateReq {
+  endSerial: string;
+  endSeries: string;
+  fileData: any[];
+  huDetails: HUReq[];
+  inventoryCount: number;
+  inventoryType: string;
+  inventoryTypeDescription: string;
+  inventoryTypeId: number;
+  lineNo: number;
+  lineNumber: number;
+  parentInventoryId: number;
+  purchaseOrder: string;
+  serial: string;
+  serialType: string;
+  startSerial: string;
+  startSeries: string;
+  unitType: string | number;
+  unitTypeDesc: string;
+  valid: boolean;
+}
+
+export interface HUReq {
+  endSeries: string;
+  fileData: any[];
+  inventoryCount: number;
+  inventoryTypeId: number;
+  lineNumber: number;
+  serial: string;
+  serialType: string;
+  startSeries: string;
+  unitType: number;
+}
+
+export interface InventoryAllocateResp {
+  orderId: number;
+  orderDate: string;
+  transferTypeId: number;
+  sourceChannelId: number;
+  targetChannelId: number;
+  initiatedBy: string;
+  lastUpdatedBy: string;
+  orderStatusId: number;
+  orderMode: string;
+  lastUpdatedByName: string;
+  workflow: string;
+  isSimulationFlow: boolean;
+}
