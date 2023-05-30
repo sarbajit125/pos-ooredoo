@@ -31,10 +31,12 @@ const OoredooDialog = (props: OoredooDialogProps) => {
           </View>
           <View style={styles.btnView}>
             <OoredooPayBtn
+              style={styles.btnView}
               onPress={() => props.actionBtnCallback(true, inputText)}
               title={props.okBtnName ?? "Ok"}
             />
             <OoredooCancelBtn
+              style={styles.btnView}
               onPress={() => props.actionBtnCallback(false, inputText)}
               title={props.okBtnName ?? "Cancel"}
             />
@@ -51,12 +53,14 @@ const styles = StyleSheet.create({
   centeredView: {
     flex: 1,
     marginTop: 22,
+    justifyContent: "center",
+    alignItems: "center",
   },
   modalView: {
-    margin: 20,
+    margin: 10,
     backgroundColor: "white",
     borderRadius: 20,
-    padding: 35,
+    padding: 15,
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
@@ -65,11 +69,13 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 4,
     elevation: 5,
+    height: 200,
   },
   headingView: {
     height: 30,
     borderBottomWidth: 1,
     borderBottomColor: ColorConstants.grey_AAA,
+    alignItems: "center",
   },
   headingText: {
     fontFamily: Fontcache.notoRegular,
@@ -78,25 +84,27 @@ const styles = StyleSheet.create({
   },
   descView: {
     flex: 1,
-    alignItems: "center",
   },
   descText: {
     fontFamily: Fontcache.rubikBold,
     fontSize: 13,
     padding: 3,
+    marginHorizontal: 10,
   },
   RemarkField: {
     padding: 2,
-    marginHorizontal: 6,
     marginVertical: 8,
   },
   btnView: {
-    height: 50,
+    height: 40,
+    flex: 1,
     flexDirection: "row",
+    padding: 3,
+    marginTop:20,
   },
   btns: {
-    flexBasis: 50,
-    marginHorizontal: 5,
+    flexBasis: "50%",
+    padding: 3,
   },
 });
 

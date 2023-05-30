@@ -33,26 +33,32 @@ const InventoryOrderDetails = (props: InventoryDetailsNavProps) => {
   const [showHistoryLog, toggleHistoryLog] = useState<boolean>(false);
   const [showAllocateLog, toggleAllocateLog] = useState<boolean>(false);
   const [showDialog, toggleDialog] = useState<boolean>(false);
+  const [decisionType, setDecisionType] = useState<
+    "ACK" | "APPROVE" | "REJECT"
+  >("ACK");
   const approvalVM = callInventoryApproval(
     props.route.params.orderId.toString()
   );
   useEffect(() => {
     if (approvalVM.isSuccess) {
-      let heading = `Approved Successfully ${approvalVM.data.orderId}`
+      let heading = `Approved Successfully ${approvalVM.data.orderId}`;
       switch (approvalVM.data.decision) {
-        case 'ACK':
-          heading = `Acknowledged  Successfully ${approvalVM.data.orderId}`
-          break
-        case 'REJECT':
-          heading = `Rejected  Successfully ${approvalVM.data.orderId}`
-          break
+        case "ACK":
+          heading = `Acknowledged  Successfully ${approvalVM.data.orderId}`;
+          break;
+        case "REJECT":
+          heading = `Rejected  Successfully ${approvalVM.data.orderId}`;
+          break;
         default:
-          heading = `Approved Successfully ${approvalVM.data.orderId}`
-          break
+          heading = `Approved Successfully ${approvalVM.data.orderId}`;
+          break;
       }
-      props.navigation.navigate('POSSuccess',{resetTo:'Profile',heading: heading})
+      props.navigation.navigate("POSSuccess", {
+        resetTo: "Profile",
+        heading: heading,
+      });
     }
-  },[approvalVM.isSuccess])
+  }, [approvalVM.isSuccess]);
   const handleAPIError = (error: unknown) => {
     let errMsg = "";
     if (error instanceof APIError) {
@@ -119,49 +125,86 @@ const InventoryOrderDetails = (props: InventoryDetailsNavProps) => {
     if (nextAction === undefined) {
       return null;
     } else {
-      let btnTitle = ""
-      let mutateType: 'ACK' | 'APPROVE' | 'REJECT' = 'ACK'
+      let btnTitle = "";
+      let mutateType: "ACK" | "APPROVE" | "REJECT" = "ACK";
       switch (nextAction) {
         case "ACK":
         case "ACKF":
         case "ACKNOWLEDGEMENT":
-          btnTitle = "Accept"
-          mutateType = "ACK"
-          break
+          btnTitle = "Accept";
+          mutateType = "ACK";
+          break;
         case "APPROVE":
-          btnTitle = "Approve"
-          mutateType = "APPROVE"
-          break
+          btnTitle = "Approve";
+          mutateType = "APPROVE";
+          break;
         case "ALLOCATE":
         case "ALLOCATION":
-          btnTitle = "Allocate"
-          break
+          btnTitle = "Allocate";
+          break;
         default:
           return null;
       }
       return (
         <View style={styles.btnView}>
-        <OoredooPayBtn
-        style={styles.buttons}
-          onPress={() => (
-            approvalVM.mutate({
-              type:mutateType,
-            })
-          )}
-          title={btnTitle}
-        />
-        <OoredooCancelBtn
-          style={styles.buttons}
-          onPress={() => (
-            approvalVM.mutate({
-              type:'REJECT'
-            })
-          )}
-          title={"Reject"}
-        />
-      </View>
-      )
+          <OoredooPayBtn
+            style={styles.buttons}
+            onPress={() => {
+              setDecisionType(mutateType);
+              toggleDialog(true);
+            }}
+            title={btnTitle}
+          />
+          <OoredooCancelBtn
+            style={styles.buttons}
+            onPress={() => {
+              setDecisionType("REJECT");
+              toggleDialog(true);
+            }}
+            title={"Reject"}
+          />
+        </View>
+      );
     }
+  };
+  const prepareDialog = () => {
+    let descText = "";
+    switch (decisionType) {
+      case "ACK":
+        descText = "Enter Remark for Inventory Acknowledge";
+        break;
+      case "APPROVE":
+        descText = "Enter Remark for Inventory Approval";
+        break;
+      case "REJECT":
+        descText = "Enter Remark for Inventory Rejection";
+        break;
+    }
+
+    return (
+      <OoredooDialog
+        type={"textfield"}
+        modalVisisble={showDialog}
+        heading={"Please Confirm"}
+        descText={descText}
+        textInputProps={{
+          placeholder: "Enter remark here",
+          value: "",
+        }}
+        actionBtnCallback={function (
+          approve: boolean,
+          remark?: string | undefined
+        ): void {
+          if (approve) {
+            approvalVM.mutate({
+              type: decisionType,
+              remarks: remark,
+            });
+          }
+          toggleDialog(false);
+        }}
+      />
+    );
   };
   const launchHistoryLogs = (data: InventoryOrderDetailsResponse) => {
     const requiredRows = data.orderHistory.map((item) => [
@@ -203,37 +246,38 @@ const InventoryOrderDetails = (props: InventoryDetailsNavProps) => {
       {detailsVM.isSuccess && catelogVM.isSuccess ? (
         <View style={styles.compositeView}>
           <ScrollView>
-          <View style={styles.topView}>
-            <InventoryDetailCard
-              orderHeading={`Order Summary: ${detailsVM.data.orderId.toString()}`}
-              rows={prepareHeaderCell(detailsVM.data)}
-            />
-          </View>
-          <View style={styles.lineItemsView}>
-            <View style={styles.lineItemsHeaderView}>
-              <Text style={styles.lineItemHeaderText}> Name </Text>
-              <Text style={styles.lineItemHeaderText}> RQuantity </Text>
-              <Text style={styles.lineItemHeaderText}> TQuantity </Text>
-              <Text style={styles.lineItemHeaderText}> Serials</Text>
-            </View>
-            {detailsVM.data.lineItems.map((item) => (
-              <InventoryLogCell
-                rows={[
-                  POSUtilityManager.sharedInstance().fetchNameFromInventoryCatelog(
-                    item.inventoryTypeId,
-                    catelogVM.data
-                  ),
-                  item.requestedQuantity.toString(),
-                  item.transferredQuantity.toString(),
-                  item.startSerial || "",
-                ]}
+            <View style={styles.topView}>
+              <InventoryDetailCard
+                orderHeading={`Order Summary: ${detailsVM.data.orderId.toString()}`}
+                rows={prepareHeaderCell(detailsVM.data)}
               />
-            ))}
-          </View>
-          {showHistoryLog ? launchHistoryLogs(detailsVM.data) : null}
-          {showAllocateLog ? launchAllocationLogs(detailsVM.data) : null}
-        </ScrollView>
-        {prepareActionButtons(detailsVM.data.nextAction)}
+            </View>
+            <View style={styles.lineItemsView}>
+              <View style={styles.lineItemsHeaderView}>
+                <Text style={styles.lineItemHeaderText}> Name </Text>
+                <Text style={styles.lineItemHeaderText}> RQuantity </Text>
+                <Text style={styles.lineItemHeaderText}> TQuantity </Text>
+                <Text style={styles.lineItemHeaderText}> Serials</Text>
+              </View>
+              {detailsVM.data.lineItems.map((item, index) => (
+                <InventoryLogCell
+                  rows={[
+                    POSUtilityManager.sharedInstance().fetchNameFromInventoryCatelog(
+                      item.inventoryTypeId,
+                      catelogVM.data
+                    ),
+                    item.requestedQuantity.toString(),
+                    item.transferredQuantity.toString(),
+                    item.startSerial || "",
+                  ]}
+                  key={index}
+                />
+              ))}
+            </View>
+            {showHistoryLog ? launchHistoryLogs(detailsVM.data) : null}
+            {showAllocateLog ? launchAllocationLogs(detailsVM.data) : null}
+          </ScrollView>
+          {prepareActionButtons(detailsVM.data.nextAction)}
         </View>
       ) : null}
       {detailsVM.isLoading || catelogVM.isLoading || approvalVM.isLoading ? (
@@ -241,6 +285,7 @@ const InventoryOrderDetails = (props: InventoryDetailsNavProps) => {
       ) : null}
       {detailsVM.isError ? handleAPIError(detailsVM.error) : null}
       {approvalVM.isError ? handleAPIError(approvalVM.error) : null}
+      {showDialog ? prepareDialog() : null}
     </SafeAreaView>
   );
 };
@@ -283,14 +328,14 @@ const styles = StyleSheet.create({
     marginVertical: 16,
     padding: 2,
   },
-  buttons:{
-    flexBasis:'48%',
-    marginHorizontal:2,
+  buttons: {
+    flexBasis: "48%",
+    marginHorizontal: 2,
   },
-  compositeView:{
-    flex:1,
-    flexGrow:1,
-  }
+  compositeView: {
+    flex: 1,
+    flexGrow: 1,
+  },
 });
 type InventoryDetailsNavProps = NativeStackScreenProps<
   RootStackParamList,

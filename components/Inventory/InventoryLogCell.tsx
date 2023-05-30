@@ -5,7 +5,7 @@ import { ColorConstants } from "../../constants/Colors";
 
 const InventoryLogCell = (props: InventoryLogCellProps) => {
   return (
-    <View style={styles.container}>
+    <View style={styles.container} key={props.key}>
       {props.rows.map((item, index) => (
         <View
           key={index}
@@ -28,6 +28,7 @@ export default InventoryLogCell;
 
 export interface InventoryLogCellProps {
   rows: string[];
+  key: number
 }
 
 const styles = StyleSheet.create({
