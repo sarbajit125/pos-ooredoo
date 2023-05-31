@@ -8,6 +8,7 @@ import OoredooPayBtn from "../components/OoredooPayBtn";
 import OoredooCancelBtn from "../components/Core/OoredooCancelBtn";
 import {
   POSInventoryCatelogManger,
+  allocateInventory,
   callInventoryApproval,
   fetchInventoryDetails,
 } from "../query-hooks/QueryHooks";
@@ -25,9 +26,17 @@ import { Fontcache } from "../constants/FontCache";
 import InventoryLogCell from "../components/Inventory/InventoryLogCell";
 import InventoryHistoryModal from "../components/Inventory/InventoryHistoryModal";
 import OoredooDialog from "../components/Core/OoredooDiaglog";
+import { InventoryAllocateContext } from "../store/RootStore";
 
 const InventoryOrderDetails = (props: InventoryDetailsNavProps) => {
   const detailsVM = fetchInventoryDetails(props.route.params.orderId);
+  const {
+    setProductId,
+    setProductURL,
+    setRequestedQuantity,
+    setTransferredQuantity,
+    setType,
+  } = InventoryAllocateContext();
   const catelogVM = POSInventoryCatelogManger();
   const [showError, setShowError] = useState<boolean>(false);
   const [showHistoryLog, toggleHistoryLog] = useState<boolean>(false);
@@ -39,6 +48,7 @@ const InventoryOrderDetails = (props: InventoryDetailsNavProps) => {
   const approvalVM = callInventoryApproval(
     props.route.params.orderId.toString()
   );
+  const allocateVM = allocateInventory(props.route.params.orderId);
   useEffect(() => {
     if (approvalVM.isSuccess) {
       let heading = `Approved Successfully ${approvalVM.data.orderId}`;
@@ -59,6 +69,15 @@ const InventoryOrderDetails = (props: InventoryDetailsNavProps) => {
       });
     }
   }, [approvalVM.isSuccess]);
+  useEffect(() => {
+    if (allocateVM.isSuccess) {
+      let heading = `Allocated Successfully ${allocateVM.data.orderId}`;
+      props.navigation.navigate("POSSuccess", {
+        resetTo: "Profile",
+        heading: heading,
+      });
+    }
+  }, [allocateVM.isSuccess]);
   const handleAPIError = (error: unknown) => {
     let errMsg = "";
     if (error instanceof APIError) {
@@ -71,7 +90,7 @@ const InventoryOrderDetails = (props: InventoryDetailsNavProps) => {
       <OoredooBadReqView
         modalVisible={showError}
         action={function (): void {
-          setShowError(true);
+          setShowError(false);
         }}
         title={errMsg}
       />
@@ -121,7 +140,10 @@ const InventoryOrderDetails = (props: InventoryDetailsNavProps) => {
     ];
   };
 
-  const prepareActionButtons = (nextAction?: string) => {
+  const prepareActionButtons = (
+    orderDetails: InventoryOrderDetailsResponse,
+    nextAction?: string
+  ) => {
     if (nextAction === undefined) {
       return null;
     } else {
@@ -150,8 +172,24 @@ const InventoryOrderDetails = (props: InventoryDetailsNavProps) => {
           <OoredooPayBtn
             style={styles.buttons}
             onPress={() => {
-              setDecisionType(mutateType);
-              toggleDialog(true);
+              if (btnTitle === "Allocate") {
+                // launch confirmation screen
+                setProductId(orderDetails.lineItems[0].inventoryTypeId);
+                setType("P");
+                setRequestedQuantity(
+                  orderDetails.lineItems[0].requestedQuantity
+                );
+                setTransferredQuantity(
+                  orderDetails.lineItems[0].transferredQuantity
+                );
+                setProductURL(
+                  `${orderDetails.orderMode}/${orderDetails.transferTypeId}/${orderDetails.sourceChannelId}/${orderDetails.targetChannelId}/products`
+                );
+                props.navigation.navigate('InventoryConfirmation',{screen:'Allocation'})
+              } else {
+                setDecisionType(mutateType);
+                toggleDialog(true);
+              }
             }}
             title={btnTitle}
           />
@@ -277,7 +315,7 @@ const InventoryOrderDetails = (props: InventoryDetailsNavProps) => {
             {showHistoryLog ? launchHistoryLogs(detailsVM.data) : null}
             {showAllocateLog ? launchAllocationLogs(detailsVM.data) : null}
           </ScrollView>
-          {prepareActionButtons(detailsVM.data.nextAction)}
+          {prepareActionButtons(detailsVM.data, detailsVM.data.nextAction)}
         </View>
       ) : null}
       {detailsVM.isLoading || catelogVM.isLoading || approvalVM.isLoading ? (

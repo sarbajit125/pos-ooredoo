@@ -12,11 +12,12 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { InventoryAllocateContext, SearchScreenContext } from "../store/RootStore";
+import { InventoryAllocateContext } from "../store/RootStore";
 import {
   FetchInventoryProduct,
   FireSerialsForUser,
   InitateInventoryOrder,
+  allocateInventory,
   checkResponseIfProduct,
   uploadMemoToRequest,
 } from "../query-hooks/QueryHooks";
@@ -42,9 +43,17 @@ import {
 } from "@gorhom/bottom-sheet";
 import { InventoryLineItem } from "../responseModels/InventoryRulesResponse";
 import UploadMemoBottomSheet from "../components/Core/UploadMemoBottomSheet";
-import { DocumentResult } from "expo-document-picker";
+import { POSDateFormat } from "../constants/AppConstants";
+import dayjs from "dayjs";
 const InventoryConfirmation = (props: InventoryConfirmNavProps) => {
-  const { type, productURL, selectedProductId } = InventoryAllocateContext();
+  const {
+    type,
+    productURL,
+    selectedProductId,
+    requestedQuantity,
+    transferredQuantity,
+    orderId,
+  } = InventoryAllocateContext();
   const { data, isSuccess, isLoading, isError, error } =
     FetchInventoryProduct(productURL);
   const [showModal, setShowModal] = useState<boolean>(false);
@@ -70,8 +79,8 @@ const InventoryConfirmation = (props: InventoryConfirmNavProps) => {
   } = FireSerialsForUser({
     invCategory: "Y",
     inventoryType: selectedProductId.toString(),
-    poDateFrom: "2023-04-01",
-    poDateTo: "2023-05-03",
+    poDateFrom: dayjs().subtract(6, "months").format(POSDateFormat),
+    poDateTo: dayjs(new Date(Date.now())).format(POSDateFormat).toString(),
   });
   const {
     mutate: fireInventoryOrder,
@@ -81,6 +90,7 @@ const InventoryConfirmation = (props: InventoryConfirmNavProps) => {
     isError: OrderIsError,
     error: OrderDateError,
   } = InitateInventoryOrder();
+  const allocationVM = allocateInventory(orderId);
   const uploadMemoVM = uploadMemoToRequest();
   // ref
   const bottomSheetRef = useRef<BottomSheetModal>(null);
@@ -89,9 +99,6 @@ const InventoryConfirmation = (props: InventoryConfirmNavProps) => {
   // callbacks
   const handleSheetChanges = useCallback((index: number) => {
     console.log("handleSheetChanges", index);
-  }, []);
-  useEffect(() => {
-    props.navigation.setOptions({ title: "Inventory Confirmation" });
   }, []);
   useEffect(() => {
     handleSerialAPIResponse();
@@ -110,6 +117,9 @@ const InventoryConfirmation = (props: InventoryConfirmNavProps) => {
       navigateToSuccessScreen();
     }
   }, [uploadMemoVM.isSuccess, uploadMemoVM.isLoading]);
+  useEffect(() => {
+    handleAllocationAPIResponse();
+  }, [allocationVM.isSuccess, allocationVM.isError]);
 
   const handleOrderAPIResponse = () => {
     if (OrderIsSuccess) {
@@ -199,6 +209,33 @@ const InventoryConfirmation = (props: InventoryConfirmNavProps) => {
       />
     );
   };
+  const prepareAllocateRequest = () => {
+    allocationVM.mutate({
+      productId: selectedProduct.inventoryTypeid,
+      productName: selectedProduct.inventoryTypeDescription,
+      serials: selectedSerials
+        .filter((item) => item.isSelected)
+        .map((item) => item.id),
+    });
+  };
+  const handleAllocationAPIResponse = () => {
+    if (allocationVM.isSuccess) {
+      const heading = `Allocated Successfully for orderId: ${allocationVM.data.orderId}`;
+      props.navigation.navigate("POSSuccess", {
+        heading: heading,
+        resetTo: "Profile",
+      });
+    } else if (allocationVM.isError) {
+      if (error instanceof APIError) {
+        setErrMsg(error.message);
+      } else {
+        setErrMsg("SOMETHING WENT WRONG");
+      }
+      setShowModal(true);
+    } else {
+      return <OoredooActivityView />;
+    }
+  };
   const prepareInventoryRequest = () => {
     const splitArr = productURL.split("/");
     const reqLineItems: InventoryLineItem[] = selectedSerials
@@ -233,8 +270,70 @@ const InventoryConfirmation = (props: InventoryConfirmNavProps) => {
               },
             ],
     };
-    console.log(request);
     fireInventoryOrder(request);
+  };
+  const prepareDetailsViewForAllocation = () => {
+    return (
+      <View style={[styles.allocationDetails]}>
+        <Header14RubikLbl style={styles.detailsheading}>
+          Product details
+        </Header14RubikLbl>
+        <Text style={styles.detailsText}>
+          Name: {selectedProduct.inventoryTypeDescription}
+        </Text>
+        <Text style={styles.detailsText}>
+          Product Id: {selectedProduct.inventoryTypeid}
+        </Text>
+        <Text style={styles.detailsText}>
+          Requested Quantity: {requestedQuantity}
+        </Text>
+        <Text style={styles.detailsText}>
+          Transfered Quantity: {transferredQuantity}
+        </Text>
+        <Text style={styles.detailsText}>
+          Selected Quantity:{" "}
+          {selectedSerials.filter((item) => item.isSelected === true).length}
+        </Text>
+      </View>
+    );
+  };
+  const prepareDetailsViewForConfirmation = () => {
+    if (type === "R") {
+      return (
+        <View style={styles.detailsView}>
+          <Header14RubikLbl style={styles.detailsheading}>
+            {" "}
+            Product details
+          </Header14RubikLbl>
+          <Text style={styles.detailsText}>
+            Name: {selectedProduct.inventoryTypeDescription}
+          </Text>
+          <Text style={styles.detailsText}>
+            Product Id: {selectedProduct.inventoryTypeid}
+          </Text>
+          <Text style={styles.detailsText}>
+            Current Stock: {selectedProduct.currentStock}
+          </Text>
+        </View>
+      );
+    } else {
+      <View style={styles.detailsView}>
+        <Header14RubikLbl style={styles.detailsheading}>
+          {" "}
+          Product details
+        </Header14RubikLbl>
+        <Text style={styles.detailsText}>
+          Name: {selectedProduct.inventoryTypeDescription}
+        </Text>
+        <Text style={styles.detailsText}>
+          Product Id: {selectedProduct.inventoryTypeid}
+        </Text>
+        <Text style={styles.detailsText}>
+          Selected Quantity:{" "}
+          {selectedSerials.filter((item) => item.isSelected === true).length}
+        </Text>
+      </View>;
+    }
   };
   return (
     <BottomSheetModalProvider>
@@ -245,43 +344,9 @@ const InventoryConfirmation = (props: InventoryConfirmNavProps) => {
             styles.topView,
           ]}
         >
-          {type === "R" ? (
-            <View style={styles.detailsView}>
-              <Header14RubikLbl style={styles.detailsheading}>
-                {" "}
-                Product details
-              </Header14RubikLbl>
-              <Text style={styles.detailsText}>
-                Name: {selectedProduct.inventoryTypeDescription}
-              </Text>
-              <Text style={styles.detailsText}>
-                Product Id: {selectedProduct.inventoryTypeid}
-              </Text>
-              <Text style={styles.detailsText}>
-                Current Stock: {selectedProduct.currentStock}
-              </Text>
-            </View>
-          ) : (
-            <View style={styles.detailsView}>
-              <Header14RubikLbl style={styles.detailsheading}>
-                {" "}
-                Product details
-              </Header14RubikLbl>
-              <Text style={styles.detailsText}>
-                Name: {selectedProduct.inventoryTypeDescription}
-              </Text>
-              <Text style={styles.detailsText}>
-                Product Id: {selectedProduct.inventoryTypeid}
-              </Text>
-              <Text style={styles.detailsText}>
-                Selected Quantity:{" "}
-                {
-                  selectedSerials.filter((item) => item.isSelected === true)
-                    .length
-                }
-              </Text>
-            </View>
-          )}
+          {props.route.params.screen === "Allocation"
+            ? prepareDetailsViewForAllocation()
+            : prepareDetailsViewForConfirmation()}
           {type === "R" ? (
             <View>
               <Header14RubikLbl style={styles.serialTableheading}>
@@ -312,7 +377,11 @@ const InventoryConfirmation = (props: InventoryConfirmNavProps) => {
         </View>
         <View style={styles.btnView}>
           <OoredooPayBtn
-             onPress={() => prepareInventoryRequest()}
+            onPress={() =>
+              props.route.params.screen === "Confirmation"
+                ? prepareInventoryRequest()
+                : prepareAllocateRequest()
+            }
             title={"Confirm"}
           />
         </View>
@@ -367,6 +436,14 @@ const styles = StyleSheet.create({
     marginHorizontal: 8,
     marginVertical: 8,
   },
+  allocationDetails: {
+    height: 150,
+    backgroundColor: ColorConstants.white,
+    borderRadius: 8,
+    borderWidth: 1,
+    marginHorizontal: 8,
+    marginVertical: 8,
+  },
   detailsheading: {
     padding: 3,
     marginHorizontal: 5,
@@ -398,17 +475,23 @@ const styles = StyleSheet.create({
     flexGrow: 1,
   },
   tableView: {},
-  textfield:{
-    marginHorizontal:5,
-  }
+  textfield: {
+    marginHorizontal: 5,
+  },
 });
 export interface InventoryConfirmationProps {
   type: "P" | "R";
   productURL: string;
   selectedProductId: number;
+  requestedQuantity: number;
+  transferredQuantity: number;
+  orderId: number;
   setType: (type: "P" | "R") => void;
   setProductURL: (urlStr: string) => void;
   setProductId: (id: number) => void;
+  setRequestedQuantity: (quantity: number) => void;
+  setTransferredQuantity: (quantity: number) => void;
+  setOrderId: (id: number) => void;
   reset: () => void;
 }
 type InventoryConfirmNavProps = NativeStackScreenProps<

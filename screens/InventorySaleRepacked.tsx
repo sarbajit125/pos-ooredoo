@@ -163,7 +163,7 @@ const InventorySaleRepacked = (props: InventorySaleProps) => {
     }/${rows[2].selectedData?.id || ""}/${rows[3].selectedData?.id || ""}`;
     query = query + "/products";
     setProductURL(query);
-    props.navigation.navigate("InventoryConfirmation");
+    props.navigation.navigate("InventoryConfirmation", {screen:'Confirmation'});
   };
 
   const renderCell = (cell: ListRenderItemInfo<InventoryList>) => {

@@ -165,3 +165,9 @@ export interface InventoryAllocateResp {
   workflow: string;
   isSimulationFlow: boolean;
 }
+export interface InventoryAllocateMutation {
+  serials: string[]
+  productId: number
+  productName: string
+  poNumber?: number
+}

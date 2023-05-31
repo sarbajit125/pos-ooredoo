@@ -2,7 +2,11 @@ import { createContext, useContext } from "react";
 import UserDetailsStore from "./UserDetailsStore";
 import { create } from "zustand";
 import { SearchScreenProps } from "../screens/SearchScreen";
-import { FaisaWalletPlaceholder, POSWalletDAO, RastasWalletPlaceholder } from "../AppManger/POSAppManager";
+import {
+  FaisaWalletPlaceholder,
+  POSWalletDAO,
+  RastasWalletPlaceholder,
+} from "../AppManger/POSAppManager";
 import { POSUserStore } from "../types";
 import { InventoryConfirmationProps } from "../screens/InventoryConfirmation";
 
@@ -28,11 +32,26 @@ export const InventoryAllocateContext = create<InventoryConfirmationProps>(
     type: "P",
     productURL: "",
     selectedProductId: 0,
+    requestedQuantity: 0,
+    transferredQuantity: 0,
+    orderId: 0,
     setType: (type) => set(() => ({ type: type })),
     setProductURL: (str) => set(() => ({ productURL: str })),
     setProductId: (id) => set(() => ({ selectedProductId: id })),
+    setRequestedQuantity: (quantity) =>
+      set(() => ({ requestedQuantity: quantity })),
+    setTransferredQuantity: (quantity) =>
+      set(() => ({ transferredQuantity: quantity })),
+    setOrderId: (id) =>  set(() => ({ orderId: id })),
     reset: () =>
-      set(() => ({ type: "P", productURL: "", selectedProductId: 0 })),
+      set(() => ({
+        type: "P",
+        productURL: "",
+        selectedProductId: 0,
+        requestedQuantity: 0,
+        transferredQuantity: 0,
+        orderId:0,
+      })),
   })
 );
 
@@ -49,7 +68,7 @@ export const POSUserDataContext = create<POSUserStore>((set) => ({
   username: "",
   defaultFaisa: FaisaWalletPlaceholder,
   defaultRastas: RastasWalletPlaceholder,
-  fullname: '',
+  fullname: "",
   userAuthorities: [],
   setUserDetails(response) {
     set(() => ({
@@ -64,7 +83,7 @@ export const POSUserDataContext = create<POSUserStore>((set) => ({
       userId: response.userId,
       username: response.username,
       lname: response.lname,
-      fullname: response.fullname
+      fullname: response.fullname,
     }));
   },
   setNewRole: (newRole) => set(() => ({ currentRole: newRole })),

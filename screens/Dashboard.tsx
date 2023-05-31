@@ -19,10 +19,10 @@ type LoginScreenProps = CompositeScreenProps<
 >;
 const Dashboard = (props: LoginScreenProps) => {
   const {setUserDetails} = POSUserDataContext()
-  const { data, isSuccess, isError, isLoading } = fetchSelfDetails()
+  const { data, isSuccess, isError, isLoading, isStale } = fetchSelfDetails()
   useEffect (() => {
-  isSuccess ? setUserDetails(data) : null
-  },[isSuccess])
+  isSuccess && !isStale ? setUserDetails(data) : null
+  },[isSuccess, isStale])
   return (
     <ScrollView>
       {isSuccess ? <View style={styles.container}>

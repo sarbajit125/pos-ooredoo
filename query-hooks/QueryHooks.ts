@@ -17,7 +17,11 @@ import {
   InventoryRulesResponse,
   UploadMemoReq,
 } from "../responseModels/InventoryRulesResponse";
-import { InventoryAllocateReq, InventoryApprovalReq } from "../responseModels/InventoryOrderDetailsResponse";
+import {
+  InventoryAllocateMutation,
+  InventoryAllocateReq,
+  InventoryApprovalReq,
+} from "../responseModels/InventoryOrderDetailsResponse";
 export const walletBalanceHook = () =>
   useMutation({
     mutationKey: ["walletbalance"],
@@ -226,7 +230,7 @@ export const changeUserRole = () =>
   });
 export const fetchInventoryDetails = (orderId: number) =>
   useQuery({
-    queryKey: ["inventoryDetail"],
+    queryKey: ["inventoryDetail", orderId],
     queryFn: () =>
       APIManager.sharedInstance().fireInventoryDetails(orderId.toString()),
   });
@@ -236,26 +240,70 @@ export const POSInventoryCatelogManger = () =>
     queryFn: () => APIManager.sharedInstance().firePOSInventoryCatelog(),
     staleTime: 300000,
   });
-export const callInventoryApproval = (orderId: string) => 
-    useMutation({
-      mutationKey:['InventoryApproval', orderId],
-      mutationFn: (request: InventoryApprovalReq) => {
-        let endpointId: string = ""
-        switch (request.type) {
-          case 'APPROVE':
-            endpointId = "api/inventory/transfer/orders/" + orderId + "/approve"
-            break
-          case 'ACK':
-            endpointId = "api/inventory/transfer/" + "accept/" + orderId
-            break
-          case 'REJECT':
-            endpointId = "api/inventory/transfer/orders/" + orderId + "/reject"
-            break
-        }
-        return APIManager.sharedInstance().fireInventoryApproval(endpointId, request.type, request.remarks)
-      },
-    })
-export const allocateInventory = (orderId: number) => useMutation({
-  mutationKey:['InventoryAllocate', orderId],
-  mutationFn: (request: InventoryAllocateReq[]) => APIManager.sharedInstance().fireInventoryAllocate(request, orderId)
-})
+export const callInventoryApproval = (orderId: string) =>
+  useMutation({
+    mutationKey: ["InventoryApproval", orderId],
+    mutationFn: (request: InventoryApprovalReq) => {
+      let endpointId: string = "";
+      switch (request.type) {
+        case "APPROVE":
+          endpointId = "api/inventory/transfer/orders/" + orderId + "/approve";
+          break;
+        case "ACK":
+          endpointId = "api/inventory/transfer/" + "accept/" + orderId;
+          break;
+        case "REJECT":
+          endpointId = "api/inventory/transfer/orders/" + orderId + "/reject";
+          break;
+      }
+      return APIManager.sharedInstance().fireInventoryApproval(
+        endpointId,
+        request.type,
+        request.remarks
+      );
+    },
+  });
+export const allocateInventory = (orderId: number) =>
+  useMutation({
+    mutationKey: ["InventoryAllocate", orderId],
+    mutationFn: (request: InventoryAllocateMutation) => {
+
+      const req: InventoryAllocateReq[] = request.serials.map((serial) => ({
+        agentId: 0,
+        distributorId: 0,
+        endSerial: serial,
+        endSeries: serial,
+        fileData: [],
+        huDetails: [
+          {
+            endSeries: serial,
+            fileData: [],
+            inventoryCount: 1,
+            inventoryTypeId: request.productId,
+            lineNumber: 1,
+            serial: "\u0000",
+            serialType: "serial",
+            startSeries: serial,
+            unitType: 1,
+          },
+        ],
+        inventoryCount: 1,
+        inventoryType: request.productName,
+        inventoryTypeDescription: request.productName,
+        inventoryTypeId: request.productId,
+        lineNo: 1,
+        lineNumber: request.poNumber ?? 0,
+        parentInventoryId: 0,
+        purchaseOrder: "",
+        retailerId: 0,
+        serial: "\u0000",
+        serialType: "serial",
+        startSerial: serial,
+        startSeries: serial,
+        unitType: "1",
+        unitTypeDesc: "IP",
+        valid: false,
+      }));
+      return  APIManager.sharedInstance().fireInventoryAllocate(req, orderId)
+    }
+  });
