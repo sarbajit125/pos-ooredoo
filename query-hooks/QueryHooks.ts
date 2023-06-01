@@ -105,25 +105,18 @@ export const StockDetailsHook = (posCode: string) =>
     queryFn: () => APIManager.sharedInstance().fetchStockStatus(posCode),
   });
 export const TransactionHistoryHook = (
+  startDate: string,
+  endDate: string,
   orderType?: string,
-  startDate?: string,
-  endDate?: string
 ) =>
   useQuery({
     queryKey: ["posHistory", orderType, startDate, endDate],
     queryFn: () => {
       let requestType = orderType || "";
-      let fromDate =
-        startDate ||
-        dayjs(new Date().getDate() - 7)
-          .format("YYYY-MM-DD")
-          .toString();
-      let toDate =
-        endDate || dayjs(new Date().getDate()).format("YYYY-MM-DD").toString();
       return APIManager.sharedInstance().fetchTransactionHistory(
         requestType,
-        "2023-03-29",
-        "2023-04-05"
+        startDate,
+        endDate
       );
     },
   });

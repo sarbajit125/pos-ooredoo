@@ -3,7 +3,7 @@ import {
   Text,
   View,
   SafeAreaView,
-  ImageBackground,
+  Image,
   FlatList,
   ListRenderItemInfo,
   Platform,
@@ -22,23 +22,31 @@ import { ColorConstants } from "../constants/Colors";
 import dayjs from "dayjs";
 import { APIManager } from "../AppManger/ApiManger";
 import { shareAsync } from "expo-sharing";
-import { POSDownloadType } from "../constants/AppConstants";
+import { POSDateFormat, POSDownloadType } from "../constants/AppConstants";
 import * as FileSystem from "expo-file-system";
 const HistoryTable = (props: HistoryNavProps) => {
   useEffect(() => {
     switch (props.route.params.id) {
       case "transactionHistory":
         props.navigation.setOptions({ title: "Transaction History" });
-        break
+        break;
       case "walletHistory":
         props.navigation.setOptions({ title: "Wallet History" });
-        break
+        break;
     }
   }, []);
-  const { data, isSuccess, error, isLoading } = TransactionHistoryHook();
   const [orderType, setOrderType] = useState("");
-  const [fromDate, setFromDate] = useState("");
-  const [toDate, setEndDate] = useState("");
+  const [fromDate, setFromDate] = useState(
+    dayjs().subtract(7, "days").format(POSDateFormat)
+  );
+  const [toDate, setEndDate] = useState(
+    dayjs(new Date(Date.now())).format(POSDateFormat).toString()
+  );
+  const { data, isSuccess, error, isLoading } = TransactionHistoryHook(
+    fromDate,
+    toDate,
+    orderType
+  );
   const downloadFile = (
     receiptNumber: string,
     orderStatus: POSDownloadType
@@ -54,7 +62,7 @@ const HistoryTable = (props: HistoryNavProps) => {
     const fileReaderInstance = new FileReader();
     fileReaderInstance.readAsDataURL(data);
     fileReaderInstance.onload = async () => {
-      const base64data = fileReaderInstance.result.split(",");
+      const base64data = fileReaderInstance.result?.split(",");
       const pdfBuffer = base64data[1];
       const path = `${FileSystem.documentDirectory}/${filename}.pdf`;
       await FileSystem.writeAsStringAsync(path, pdfBuffer, {
@@ -102,9 +110,9 @@ const HistoryTable = (props: HistoryNavProps) => {
     const dataTobeDisplayed: POSCellRowData[] = [
       { title: "OrderId", value: item.item.orderId },
       { title: "OrderDate", value: receiptDate },
-      { title: "Payment Amount", value: item.item.totalAmount.toString()},
-      {title:'Tax Amount',value:item.item.taxAmount.toString()},
-      {title:'Closed by',value: item.item.closedBy}
+      { title: "Payment Amount", value: item.item.totalAmount.toString() },
+      { title: "Tax Amount", value: item.item.taxAmount.toString() },
+      { title: "Closed by", value: item.item.closedBy },
     ];
     return (
       <View style={styles.cell}>
@@ -135,19 +143,19 @@ const HistoryTable = (props: HistoryNavProps) => {
     } else {
       // Show no data found
       return (
-        <SafeAreaView>
-          <ImageBackground
+        <SafeAreaView style={styles.noDataView}>
+          <Image
             source={require("../assets/images/NoDataFound.png")}
-            resizeMode="cover"
-          ></ImageBackground>
+            style={styles.noDataImage}
+          />
         </SafeAreaView>
       );
     }
   } else if (isLoading) {
     // Show loading overlay
     return (
-      <SafeAreaView>
-        {/* <OoredooActivityView visible={isLoading} /> */}
+      <SafeAreaView style={styles.container}>
+        <OoredooActivityView />
       </SafeAreaView>
     );
   } else {
@@ -174,4 +182,15 @@ const styles = StyleSheet.create({
     marginVertical: 10,
     marginHorizontal: 10,
   },
+  noDataView: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  noDataImage: {
+    marginHorizontal: 4,
+  },
+  container:{
+    flex:1
+  }
 });
