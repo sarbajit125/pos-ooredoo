@@ -13,7 +13,10 @@ import {
 import { SelfUserDetails } from "../responseModels/SelfUserDetailsResponse";
 import { StockStatusResponse } from "../responseModels/StockStatusResponse";
 import { POSWalletDAO } from "./POSAppManager";
-import { HistoryListResponse } from "../responseModels/HistoryListResponse";
+import {
+  HistoryListResponse,
+  dropdownsOrderedByIdResp,
+} from "../responseModels/HistoryListResponse";
 import {
   AvailableSerialsRequest,
   AvailableSerialsResponse,
@@ -243,7 +246,7 @@ export class APIManager {
         }
       );
       this.printJSON(response.data);
-        return response.data;
+      return response.data;
     } catch (error) {
       throw this.errorhandling(error);
     }
@@ -349,12 +352,23 @@ export class APIManager {
       throw this.errorhandling(error);
     }
   };
+  fireOrderSubTypes = async () => {
+    try {
+      const response = await axios.get<dropdownsOrderedByIdResp[]>(
+        `master/dropdownsOrderedById/orderSubType`
+      );
+      this.printJSON(response.data);
+      return response.data;
+    } catch (error) {
+      throw this.errorhandling(error);
+    }
+  };
   errorhandling = (error: unknown): APIError | UnauthorizedError => {
     if (error instanceof AxiosError) {
       console.log(error.response?.data);
       throw new APIError(error.response?.data, error.response?.status ?? 400);
     } else if (error instanceof APIError) {
-      throw error
+      throw error;
     } else {
       throw new APIError("API process failed", 400);
     }

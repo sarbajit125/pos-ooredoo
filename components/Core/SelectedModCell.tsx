@@ -12,7 +12,7 @@ const SelectedModCell = (props: SelectedModCellProps) => {
         <View
           key={props.id}
           style={[
-            { height: props.heading === undefined ? 70 : 94 },
+            { height: props.heading === undefined ? 60 : 74 },
             styles.mainView,
           ]}
         >

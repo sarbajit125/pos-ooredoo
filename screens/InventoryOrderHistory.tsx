@@ -75,29 +75,32 @@ const InventoryOrderHistory = (props: InventoryOrdersHistory) => {
     if (data.length === 0) {
       return (
         <View style={styles.noDataView}>
-            <Image style={styles.noDataImage} source={require('../assets/images/NoDataFound.png')} />
+          <Image
+            style={styles.noDataImage}
+            source={require("../assets/images/NoDataFound.png")}
+          />
         </View>
-      )
+      );
     } else {
       return (
-        <FlatList
-          data={data}
-          keyExtractor={(item) => item.orderId.toString()}
-          renderItem={(item) => renderCell(item)}
-        />
+          <FlatList
+            data={data}
+            keyExtractor={(item) => item.orderId.toString()}
+            renderItem={(item) => renderCell(item)}
+          />
       );
     }
   };
-  useEffect(()=>{
+  useEffect(() => {
     if (isError) {
       if (error instanceof APIError) {
-        setErrMSg(error.message)
+        setErrMSg(error.message);
       } else {
-        setErrMSg('SOMETHING WENT WRONG')
+        setErrMSg("SOMETHING WENT WRONG");
       }
-      setShowError(true)
+      setShowError(true);
     }
-  },[isError])
+  }, [isError]);
   return (
     <SafeAreaView style={styles.safeArea}>
       {isSuccess ? prepareList(data) : null}
@@ -112,26 +115,25 @@ const InventoryOrderHistory = (props: InventoryOrdersHistory) => {
           title={errMsg}
         />
       ) : null}
-    </SafeAreaView>
-  );
+    </SafeAreaView>)
 };
 export default InventoryOrderHistory;
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    flexGrow:1,
+    flexGrow: 1,
   },
   cell: {
     marginVertical: 10,
     marginHorizontal: 10,
   },
-  noDataView:{
-    flex:1,
-    justifyContent:'center',
-    alignItems:'center',
+  noDataView: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
   },
-  noDataImage:{
-    marginHorizontal:4,
+  noDataImage: {
+    marginHorizontal: 4,
   },
 });
 

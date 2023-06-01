@@ -299,3 +299,18 @@ export const allocateInventory = (orderId: number) =>
       return  APIManager.sharedInstance().fireInventoryAllocate(req, orderId)
     }
   });
+export const fetchDropdownsOrderedById = () => useQuery({
+  queryKey: ['dropdownsOrderedById'],
+  queryFn: () => APIManager.sharedInstance().fireOrderSubTypes(),
+  select: (response) => {
+    let uiObj: POSSelectData[] = response.map((item) => (
+      {
+        id: item.value,
+        name: item.text,
+        isSelected: false
+      }
+    ))
+    uiObj.splice(0,0,{id: '', name:'All', isSelected: false})
+    return uiObj
+  }
+})

@@ -33,3 +33,10 @@ export interface HistoryListResponse {
     inState?:              string;
     customerEmail?:        string;
 }
+
+export interface dropdownsOrderedByIdResp {
+    id: number;
+    fieldId: string;
+    value: string;
+    text: string;
+}

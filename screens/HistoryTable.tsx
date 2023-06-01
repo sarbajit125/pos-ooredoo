@@ -8,7 +8,13 @@ import {
   ListRenderItemInfo,
   Platform,
 } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../types";
 import { TransactionHistoryHook } from "../query-hooks/QueryHooks";
@@ -24,6 +30,13 @@ import { APIManager } from "../AppManger/ApiManger";
 import { shareAsync } from "expo-sharing";
 import { POSDateFormat, POSDownloadType } from "../constants/AppConstants";
 import * as FileSystem from "expo-file-system";
+import {
+  BottomSheetModal,
+  BottomSheetModalProvider,
+} from "@gorhom/bottom-sheet";
+import OoredooFilterBtn from "../components/Core/OoredooFilterBtn";
+import CrossButtonView from "../components/Core/BaseBottomSheetView";
+import OoredooFliterSheet from "../components/Core/OoredooFliterSheet";
 const HistoryTable = (props: HistoryNavProps) => {
   useEffect(() => {
     switch (props.route.params.id) {
@@ -42,6 +55,13 @@ const HistoryTable = (props: HistoryNavProps) => {
   const [toDate, setEndDate] = useState(
     dayjs(new Date(Date.now())).format(POSDateFormat).toString()
   );
+  const bottomSheetRef = useRef<BottomSheetModal>(null);
+  // variables
+  const snapPoints = useMemo(() => ["50%"], []);
+  // callbacks
+  const handleSheetChanges = useCallback((index: number) => {
+    console.log("handleSheetChanges", index);
+  }, []);
   const { data, isSuccess, error, isLoading } = TransactionHistoryHook(
     fromDate,
     toDate,
@@ -132,13 +152,45 @@ const HistoryTable = (props: HistoryNavProps) => {
     if (data.length != 0) {
       return (
         // Show table
-        <SafeAreaView>
-          <FlatList
-            data={data}
-            keyExtractor={(item) => item.orderId}
-            renderItem={(item) => renderCell(item)}
-          />
-        </SafeAreaView>
+        <BottomSheetModalProvider>
+          <SafeAreaView>
+            <FlatList
+              data={data}
+              keyExtractor={(item) => item.orderId}
+              renderItem={(item) => renderCell(item)}
+            />
+            <OoredooFilterBtn
+              btnCallback={() => bottomSheetRef.current?.present()}
+              styles={styles.filterBtn}
+            />
+          </SafeAreaView>
+          <BottomSheetModal
+            ref={bottomSheetRef}
+            index={0}
+            snapPoints={snapPoints}
+            onChange={handleSheetChanges}
+            handleIndicatorStyle={{ display: "none" }}
+            backgroundStyle={{ backgroundColor: "transparent" }}
+          >
+            <View style={styles.sheets}>
+              <CrossButtonView
+                crossBtnAction={() => bottomSheetRef.current?.close()}
+              />
+              <OoredooFliterSheet
+                actionBtnCallback={function (
+                  fromDate: string,
+                  endDate: string,
+                  serviceType: string
+                ): void {
+                  setFromDate(fromDate);
+                  setEndDate(endDate);
+                  setOrderType(serviceType);
+                }}
+                serviceCode={"transactionHistory"}
+              />
+            </View>
+          </BottomSheetModal>
+        </BottomSheetModalProvider>
       );
     } else {
       // Show no data found
@@ -190,7 +242,16 @@ const styles = StyleSheet.create({
   noDataImage: {
     marginHorizontal: 4,
   },
-  container:{
-    flex:1
-  }
+  container: {
+    flex: 1,
+  },
+  filterBtn: {
+    position: "absolute",
+    bottom: 60,
+    right: 16,
+  },
+  sheets: {
+    flex: 1,
+    backgroundColor: "transparent",
+  },
 });
