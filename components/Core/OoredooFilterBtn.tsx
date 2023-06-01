@@ -8,7 +8,7 @@ const OoredooFilterBtn = (props: OoredooFilterBtnProps) => {
       style={[props.styles ,styles.container]}
       onPress={() => props.btnCallback()}
     >
-      <MaterialCommunityIcons name="air-filter" size={25} color="grey" />
+      <MaterialCommunityIcons name="filter" size={24} color="grey" />
     </TouchableOpacity>
   );
 };

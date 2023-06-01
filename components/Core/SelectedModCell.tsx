@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, Image } from "react-native";
+import { StyleSheet, Text, View, Image, TouchableOpacity } from "react-native";
 import React from "react";
 import NotoRegular18 from "../OoredooFonts/Noto/NotoRegular18";
 import OoredooModBtn from "../OoredooModBtn";
@@ -33,22 +33,45 @@ const SelectedModCell = (props: SelectedModCellProps) => {
       );
     case "image":
       return (
-        <View key={props.id} style={styles.mainView}>
-          <View key={props.id} style={styles.cell}>
+        <View
+          key={props.id}
+          style={[
+            { height: props.heading === undefined ? 60 : 74 },
+            styles.mainView,
+          ]}
+        >
+          {props.heading === undefined ? null : (
+            <Header13RubikLbl style={styles.heading}>
+              {props.heading}
+            </Header13RubikLbl>
+          )}
+          <TouchableOpacity
+            style={styles.cell}
+            activeOpacity={0.5}
+            onPress={() => props.modifyCallback(props.id)}
+          >
             <NotoRegular18 style={styles.text}>{props.text}</NotoRegular18>
             <Image
               style={styles.image}
               source={require("../../assets/images/dropDownArrow.png")}
             />
-          </View>
+          </TouchableOpacity>
         </View>
       );
     case "none":
       return (
-        <View key={props.id} style={styles.mainView}>
-          <Header13RubikLbl style={styles.heading}>
-            {props.heading}
-          </Header13RubikLbl>
+        <View
+          key={props.id}
+          style={[
+            { height: props.heading === undefined ? 60 : 74 },
+            styles.mainView,
+          ]}
+        >
+          {props.heading === undefined ? null : (
+            <Header13RubikLbl style={styles.heading}>
+              {props.heading}
+            </Header13RubikLbl>
+          )}
           <View style={styles.cell}>
             <NotoRegular18 style={styles.text}>{props.text}</NotoRegular18>
           </View>

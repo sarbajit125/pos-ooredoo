@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, Image } from "react-native";
+import { StyleSheet, View } from "react-native";
 import React, { useState } from "react";
 import { ColorConstants } from "../../constants/Colors";
 import OoredooPayBtn from "../OoredooPayBtn";
@@ -8,21 +8,18 @@ import { TouchableOpacity } from "react-native-gesture-handler";
 import { POSDateFormat } from "../../constants/AppConstants";
 import { Ionicons } from "@expo/vector-icons";
 import SelectedModCell from "./SelectedModCell";
-
+import { fetchDropdownsOrderedById } from "../../query-hooks/QueryHooks";
+import { Dropdown } from "react-native-element-dropdown";
+import { Fontcache } from "../../constants/FontCache";
 const OoredooFliterSheet = ({
   actionBtnCallback,
   serviceCode,
 }: OoredooFilterSheetProps) => {
   const [fromDate, setFromDate] = useState<string>(POSDateFormat);
   const [toDate, setToDate] = useState<string>(POSDateFormat);
-  const [serviceType, setServiceType] = useState<string>("All");
-  const fetchServiceType = () => {
-    switch (serviceCode) {
-        case 'transactionHistory':
-
-
-    }
-  }
+  const [serviceType, setServiceType] = useState<string>("");
+  const [serviceName, setServiceName] = useState<string>("");
+  const orderSubTypeVM = fetchDropdownsOrderedById(serviceCode);
   return (
     <View style={styles.container}>
       <View style={styles.datesView}>
@@ -45,17 +42,22 @@ const OoredooFliterSheet = ({
           </View>
         </View>
       </View>
-      <View style={styles.typeView}>
-        <SelectedModCell
-          rightViewType={"button"}
-          text={serviceType}
-          id={"searchType"}
-          modifyCallback={(id) => {
-            console.log(id);
+      {orderSubTypeVM.isSuccess ? (
+        <Dropdown
+        style={[styles.dropdown]}
+        placeholderStyle={styles.placeholderStyle}
+        placeholder={'Select service type'}
+          data={orderSubTypeVM.data}
+          labelField="name"
+          valueField="id"
+          value={serviceName}
+          dropdownPosition="top"
+          onChange={(item) => {
+            console.log(item.name)
+            setServiceName(item.name)
           }}
-          heading="Select Service Type"
         />
-      </View>
+      ) : null}
       <View style={styles.btnView}>
         <OoredooPayBtn
           onPress={() => actionBtnCallback(fromDate, toDate, serviceType)}
@@ -87,29 +89,38 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: ColorConstants.grey_898,
     flexDirection: "row",
-    height:50,
-    alignItems:'center',
+    height: 50,
+    alignItems: "center",
   },
   dateText: {
     flex: 1,
     padding: 3,
-    marginLeft:3,
+    marginLeft: 3,
   },
   calenderIconView: {
     width: 25,
     height: 25,
-    marginHorizontal:4,
+    marginHorizontal: 4,
   },
-  typeView: {
-    height:90,
+  dropdown: {
+    height: 50,
+    borderColor: ColorConstants.grey_898,
+    borderWidth: 0.5,
+    borderRadius: 8,
+    paddingHorizontal: 8,
+    marginVertical:3,
   },
   btnView: {
     marginVertical: 8,
     marginHorizontal: 8,
   },
-  heading:{
-    marginVertical:2,
-    padding:3,
+  heading: {
+    marginVertical: 2,
+    padding: 3,
+  },
+  placeholderStyle: {
+    fontFamily: Fontcache.notoRegular,
+    fontSize: 14
   },
 });
 export interface OoredooFilterSheetProps {
