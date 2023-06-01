@@ -308,7 +308,7 @@ const InventoryOrderDetails = (props: InventoryDetailsNavProps) => {
                     item.transferredQuantity.toString(),
                     item.startSerial || "",
                   ]}
-                  key={index}
+                  id={index}
                 />
               ))}
             </View>

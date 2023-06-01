@@ -180,6 +180,7 @@ export const fetchInventoryOrdersList = (fromDate: string, toDate: string) =>
     queryKey: ["InvntoryOrdersList", fromDate],
     queryFn: () =>
       APIManager.sharedInstance().fireInventoryOrderHistory(fromDate, toDate),
+    staleTime:0,
   });
 export const uploadMemoToRequest = () =>
   useMutation({

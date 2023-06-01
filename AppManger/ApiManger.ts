@@ -243,7 +243,11 @@ export class APIManager {
         }
       );
       this.printJSON(response.data);
-      return response.data;
+      if (response.data.length === 0) {
+        throw new APIError('NO DATA FOUND', 404) 
+      } else {
+        return response.data;
+      }
     } catch (error) {
       throw this.errorhandling(error);
     }
@@ -353,6 +357,8 @@ export class APIManager {
     if (error instanceof AxiosError) {
       console.log(error.response?.data);
       throw new APIError(error.response?.data, error.response?.status ?? 400);
+    } else if (error instanceof APIError) {
+      throw error
     } else {
       throw new APIError("API process failed", 400);
     }

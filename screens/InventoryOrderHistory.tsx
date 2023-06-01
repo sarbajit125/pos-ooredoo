@@ -6,7 +6,7 @@ import {
   Text,
   View,
 } from "react-native";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { fetchInventoryOrdersList } from "../query-hooks/QueryHooks";
 import OoredooActivityView from "../components/OoredooActivityView";
 import OoredooBadReqView from "../components/errors/OoredooBadReqView";
@@ -21,12 +21,23 @@ import dayjs from "dayjs";
 import { POSUtilityManager } from "../AppManger/POSAppManager";
 
 const InventoryOrderHistory = (props: InventoryOrdersHistory) => {
+  const [showError, setShowError] = useState<boolean>(false);
+  const [errMsg, setErrMSg] = useState<string>("");
   const { data, isSuccess, isError, error, isLoading } =
     fetchInventoryOrdersList(
       dayjs().subtract(7, "days").format("YYYY-MM-DD"),
       dayjs(new Date(Date.now())).format("YYYY-MM-DD").toString()
     );
-
+  useEffect(()=>{
+    if (isError) {
+      if (error instanceof APIError) {
+        setErrMSg(error.message)
+      } else {
+        setErrMSg('SOMETHING WENT WRONG')
+      }
+      setShowError(true)
+    }
+  },[isError])
   const renderCell = (
     cellData: ListRenderItemInfo<InventoryOrderListResponse>
   ) => {
@@ -68,61 +79,37 @@ const InventoryOrderHistory = (props: InventoryOrdersHistory) => {
       </View>
     );
   };
-
-  if (isSuccess) {
-    if (data.length === 0) {
+  const prepareList = (data: InventoryOrderListResponse[]) => {
       return (
-        <SafeAreaView style={styles.safeArea}>
-          <OoredooBadReqView
-            modalVisible={true}
-            action={() => props.navigation.goBack()}
-            title={"NO DATA FOUND"}
-          />
-        </SafeAreaView>
+        <FlatList
+          data={data}
+          keyExtractor={(item) => item.orderId.toString()}
+          renderItem={(item) => renderCell(item)}
+        />
       );
-    } else {
-      return (
-        <SafeAreaView style={styles.safeArea}>
-          <FlatList
-            data={data}
-            keyExtractor={(item) => item.orderId.toString()}
-            renderItem={(item) => renderCell(item)}
-          />
-        </SafeAreaView>
-      );
-    }
-  } else if (isLoading) {
-    return (
-      <SafeAreaView style={styles.safeArea}>
-        <OoredooActivityView />
-      </SafeAreaView>
-    );
-  } else if (isError) {
-    let errMsg = "";
-    if (error instanceof APIError) {
-      errMsg = error.message;
-    } else {
-      errMsg = "SOMETHING WENT WRONG";
-    }
-    return (
-      <SafeAreaView style={styles.safeArea}>
+  };
+  return (
+    <SafeAreaView style={styles.safeArea}>
+      {isSuccess ? prepareList(data) : null}
+      {isLoading ? <OoredooActivityView /> : null}
+      {showError ? (
         <OoredooBadReqView
-          modalVisible={true}
-          action={() => props.navigation.goBack()}
+          modalVisible={showError}
+          action={function (): void {
+            setShowError(false);
+            props.navigation.goBack();
+          }}
           title={errMsg}
         />
-      </SafeAreaView>
-    );
-  } else {
-    return <SafeAreaView></SafeAreaView>;
-  }
+      ) : null}
+    </SafeAreaView>
+  );
 };
-
 export default InventoryOrderHistory;
-
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
+    flexGrow:1,
   },
   cell: {
     marginVertical: 10,
