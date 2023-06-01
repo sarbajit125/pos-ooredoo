@@ -103,7 +103,6 @@ export const StockDetailsHook = (posCode: string) =>
   useQuery({
     queryKey: ["stockStatus", posCode],
     queryFn: () => APIManager.sharedInstance().fetchStockStatus(posCode),
-    staleTime: 3600000,
   });
 export const TransactionHistoryHook = (
   orderType?: string,
@@ -177,7 +176,7 @@ export const InitateInventoryOrder = () =>
   });
 export const fetchInventoryOrdersList = (fromDate: string, toDate: string) =>
   useQuery({
-    queryKey: ["InvntoryOrdersList", fromDate],
+    queryKey: ["InvntoryOrdersList", fromDate, toDate],
     queryFn: () =>
       APIManager.sharedInstance().fireInventoryOrderHistory(fromDate, toDate),
     staleTime:0,
@@ -239,7 +238,6 @@ export const POSInventoryCatelogManger = () =>
   useQuery({
     queryKey: ["inventoryTypes"],
     queryFn: () => APIManager.sharedInstance().firePOSInventoryCatelog(),
-    staleTime: 300000,
   });
 export const callInventoryApproval = (orderId: string) =>
   useMutation({

@@ -17,6 +17,7 @@ export default function App() {
     defaultOptions: {
       queries: {
         staleTime: 1000 * 20,
+        retry: false,
       },
     },
   });

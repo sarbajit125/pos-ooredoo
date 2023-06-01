@@ -243,11 +243,7 @@ export class APIManager {
         }
       );
       this.printJSON(response.data);
-      if (response.data.length === 0) {
-        throw new APIError('NO DATA FOUND', 404) 
-      } else {
         return response.data;
-      }
     } catch (error) {
       throw this.errorhandling(error);
     }

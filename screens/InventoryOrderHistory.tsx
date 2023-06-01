@@ -1,9 +1,10 @@
 import {
   FlatList,
+  ImageBackground,
   ListRenderItemInfo,
   SafeAreaView,
   StyleSheet,
-  Text,
+  Image,
   View,
 } from "react-native";
 import React, { useEffect, useState } from "react";
@@ -19,25 +20,16 @@ import TransactionHistoryCell, {
 } from "../components/History/TransactionHistoryCell";
 import dayjs from "dayjs";
 import { POSUtilityManager } from "../AppManger/POSAppManager";
+import { POSDateFormat } from "../constants/AppConstants";
 
 const InventoryOrderHistory = (props: InventoryOrdersHistory) => {
   const [showError, setShowError] = useState<boolean>(false);
   const [errMsg, setErrMSg] = useState<string>("");
   const { data, isSuccess, isError, error, isLoading } =
     fetchInventoryOrdersList(
-      dayjs().subtract(7, "days").format("YYYY-MM-DD"),
-      dayjs(new Date(Date.now())).format("YYYY-MM-DD").toString()
+      dayjs().subtract(7, "days").format(POSDateFormat),
+      dayjs(new Date(Date.now())).format(POSDateFormat).toString()
     );
-  useEffect(()=>{
-    if (isError) {
-      if (error instanceof APIError) {
-        setErrMSg(error.message)
-      } else {
-        setErrMSg('SOMETHING WENT WRONG')
-      }
-      setShowError(true)
-    }
-  },[isError])
   const renderCell = (
     cellData: ListRenderItemInfo<InventoryOrderListResponse>
   ) => {
@@ -80,6 +72,13 @@ const InventoryOrderHistory = (props: InventoryOrdersHistory) => {
     );
   };
   const prepareList = (data: InventoryOrderListResponse[]) => {
+    if (data.length === 0) {
+      return (
+        <View style={styles.noDataView}>
+            <Image style={styles.noDataImage} source={require('../assets/images/NoDataFound.png')} />
+        </View>
+      )
+    } else {
       return (
         <FlatList
           data={data}
@@ -87,7 +86,18 @@ const InventoryOrderHistory = (props: InventoryOrdersHistory) => {
           renderItem={(item) => renderCell(item)}
         />
       );
+    }
   };
+  useEffect(()=>{
+    if (isError) {
+      if (error instanceof APIError) {
+        setErrMSg(error.message)
+      } else {
+        setErrMSg('SOMETHING WENT WRONG')
+      }
+      setShowError(true)
+    }
+  },[isError])
   return (
     <SafeAreaView style={styles.safeArea}>
       {isSuccess ? prepareList(data) : null}
@@ -114,6 +124,14 @@ const styles = StyleSheet.create({
   cell: {
     marginVertical: 10,
     marginHorizontal: 10,
+  },
+  noDataView:{
+    flex:1,
+    justifyContent:'center',
+    alignItems:'center',
+  },
+  noDataImage:{
+    marginHorizontal:4,
   },
 });
 

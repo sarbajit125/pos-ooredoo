@@ -21,7 +21,7 @@ const InventoryHistoryModal = ({
           </View>
           <ScrollView style={styles.table}>
             {rows.map((item, index) => (
-              <InventoryLogCell rows={item} key={index} />
+              <InventoryLogCell rows={item}  id={index} />
             ))}
           </ScrollView>
           <View style={styles.btnView}>
