@@ -153,7 +153,7 @@ const HistoryTable = (props: HistoryNavProps) => {
       return (
         // Show table
         <BottomSheetModalProvider>
-          <SafeAreaView>
+          <SafeAreaView style={styles.container}>
             <FlatList
               data={data}
               keyExtractor={(item) => item.orderId}

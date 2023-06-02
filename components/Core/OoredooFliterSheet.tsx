@@ -1,16 +1,21 @@
-import { StyleSheet, View } from "react-native";
+import {
+  StyleSheet,
+  View,
+  TouchableOpacity,
+  DatePickerIOSBase,
+} from "react-native";
 import React, { useState } from "react";
 import { ColorConstants } from "../../constants/Colors";
 import OoredooPayBtn from "../OoredooPayBtn";
 import Header13RubikLbl from "../OoredooFonts/Rubik/Header13RubikLbl";
 import Header14Noto from "../OoredooFonts/Noto/Header14Noto";
-import { TouchableOpacity } from "react-native-gesture-handler";
 import { POSDateFormat } from "../../constants/AppConstants";
 import { Ionicons } from "@expo/vector-icons";
-import SelectedModCell from "./SelectedModCell";
 import { fetchDropdownsOrderedById } from "../../query-hooks/QueryHooks";
 import { Dropdown } from "react-native-element-dropdown";
 import { Fontcache } from "../../constants/FontCache";
+import OoredooCalenderModal from "./OoredooCalenderModal";
+import dayjs from "dayjs";
 const OoredooFliterSheet = ({
   actionBtnCallback,
   serviceCode,
@@ -20,6 +25,8 @@ const OoredooFliterSheet = ({
   const [serviceType, setServiceType] = useState<string>("");
   const [serviceName, setServiceName] = useState<string>("");
   const orderSubTypeVM = fetchDropdownsOrderedById(serviceCode);
+  const [showPicker, togglePicker] = useState<boolean>(false);
+  const [calenderType, setCalenderType] = useState<string>("");
   return (
     <View style={styles.container}>
       <View style={styles.datesView}>
@@ -27,7 +34,13 @@ const OoredooFliterSheet = ({
           <Header13RubikLbl style={styles.heading}>Start Date</Header13RubikLbl>
           <View style={styles.selections}>
             <Header14Noto style={styles.dateText}>{fromDate}</Header14Noto>
-            <TouchableOpacity style={styles.calenderIconView}>
+            <TouchableOpacity
+              style={styles.calenderIconView}
+              onPress={() => {
+                setCalenderType("startDate");
+                togglePicker(true);
+              }}
+            >
               <Ionicons name="ios-calendar-outline" size={24} color="black" />
             </TouchableOpacity>
           </View>
@@ -35,8 +48,14 @@ const OoredooFliterSheet = ({
         <View style={styles.selectionView}>
           <Header13RubikLbl style={styles.heading}>End Date</Header13RubikLbl>
           <View style={styles.selections}>
-            <Header14Noto style={styles.dateText}>{fromDate}</Header14Noto>
-            <TouchableOpacity style={styles.calenderIconView}>
+            <Header14Noto style={styles.dateText}>{toDate}</Header14Noto>
+            <TouchableOpacity
+              style={styles.calenderIconView}
+              onPress={() => {
+                setCalenderType("endDate");
+                togglePicker(true);
+              }}
+            >
               <Ionicons name="ios-calendar-outline" size={24} color="black" />
             </TouchableOpacity>
           </View>
@@ -44,17 +63,35 @@ const OoredooFliterSheet = ({
       </View>
       {orderSubTypeVM.isSuccess ? (
         <Dropdown
-        style={[styles.dropdown]}
-        placeholderStyle={styles.placeholderStyle}
-        placeholder={'Select service type'}
+          style={[styles.dropdown]}
+          placeholderStyle={styles.placeholderStyle}
+          maxHeight={200}
           data={orderSubTypeVM.data}
           labelField="name"
           valueField="id"
-          value={serviceName}
+          value={serviceType}
           dropdownPosition="top"
           onChange={(item) => {
-            console.log(item.name)
-            setServiceName(item.name)
+            console.log(item.name);
+            setServiceName(item.name);
+            setServiceType(item.id);
+          }}
+        />
+      ) : null}
+      {showPicker ? (
+        <OoredooCalenderModal
+          showModal={showPicker}
+          serviceCode={calenderType}
+          actionBtnCallback={(serviceCode, date) => {
+            if (serviceCode === "startDate") {
+              setFromDate(dayjs(date).format(POSDateFormat));
+            } else {
+              setToDate(dayjs(date).format(POSDateFormat));
+            }
+            togglePicker(false);
+          }}
+          cancelBtnCallback={function (): void {
+            togglePicker(false);
           }}
         />
       ) : null}
@@ -108,7 +145,7 @@ const styles = StyleSheet.create({
     borderWidth: 0.5,
     borderRadius: 8,
     paddingHorizontal: 8,
-    marginVertical:3,
+    marginVertical: 3,
   },
   btnView: {
     marginVertical: 8,
@@ -120,7 +157,7 @@ const styles = StyleSheet.create({
   },
   placeholderStyle: {
     fontFamily: Fontcache.notoRegular,
-    fontSize: 14
+    fontSize: 14,
   },
 });
 export interface OoredooFilterSheetProps {
