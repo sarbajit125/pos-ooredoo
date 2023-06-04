@@ -25,6 +25,7 @@ import POSSuccessSheet from "../screens/POSSuccessScreen";
 import InventoryOrderHistory from "../screens/InventoryOrderHistory";
 import ProfileDetails from "../screens/ProfileDetails";
 import InventoryOrderDetails from "../screens/InventoryOrderDetails";
+import ShareQR from "../screens/ShareQR";
 
 export default function Navigation() {
   return (
@@ -88,6 +89,7 @@ function RootNavigator() {
       />
       <Stack.Screen name="ProfileDetails" component={ProfileDetails} />
       <Stack.Screen name="InventoryOrderDetails" component={InventoryOrderDetails} />
+      <Stack.Screen name="QRShare" component={ShareQR} />
     </Stack.Navigator>
   );
 }

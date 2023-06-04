@@ -32,6 +32,7 @@ export type RootStackParamList = {
   InventoryOrderHistory: undefined;
   InventoryOrderDetails: InventoryDetailsTypes;
   ProfileDetails: undefined;
+  QRShare: undefined;
 };
 export type HistoryType = {
   id: "transactionHistory" | "walletHistory";

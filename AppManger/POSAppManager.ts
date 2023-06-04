@@ -1,5 +1,6 @@
 import { ColorConstants } from "../constants/Colors";
 import { POSInventoryCatelogResponse } from "../responseModels/InventoryOrderDetailsResponse";
+import { APIError } from "../responseModels/responseModels";
 
 export interface POSWalletDAO {
   walletid: string;
@@ -208,6 +209,13 @@ export class POSUtilityManager {
       };
     }
   };
+  prepareErrorMsg = (error: unknown, customMsg?: string): string => {
+    if (error instanceof APIError) {
+      return error.message
+    } else {
+      return customMsg ?? 'SOMETHING WENT WRONG'
+    }
+  }
 }
 export const RastasWalletPlaceholder: POSWalletDAO = {
   type: "Rastas",

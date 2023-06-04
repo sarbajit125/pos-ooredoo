@@ -1,6 +1,5 @@
 import {
   FlatList,
-  ImageBackground,
   ListRenderItemInfo,
   SafeAreaView,
   StyleSheet,

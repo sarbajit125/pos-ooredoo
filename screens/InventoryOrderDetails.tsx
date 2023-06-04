@@ -8,7 +8,6 @@ import OoredooPayBtn from "../components/OoredooPayBtn";
 import OoredooCancelBtn from "../components/Core/OoredooCancelBtn";
 import {
   POSInventoryCatelogManger,
-  allocateInventory,
   callInventoryApproval,
   fetchInventoryDetails,
 } from "../query-hooks/QueryHooks";
@@ -36,6 +35,7 @@ const InventoryOrderDetails = (props: InventoryDetailsNavProps) => {
     setRequestedQuantity,
     setTransferredQuantity,
     setType,
+    setOrderId
   } = InventoryAllocateContext();
   const catelogVM = POSInventoryCatelogManger();
   const [showError, setShowError] = useState<boolean>(false);
@@ -48,7 +48,6 @@ const InventoryOrderDetails = (props: InventoryDetailsNavProps) => {
   const approvalVM = callInventoryApproval(
     props.route.params.orderId.toString()
   );
-  const allocateVM = allocateInventory(props.route.params.orderId);
   useEffect(() => {
     if (approvalVM.isSuccess) {
       let heading = `Approved Successfully ${approvalVM.data.orderId}`;
@@ -69,15 +68,6 @@ const InventoryOrderDetails = (props: InventoryDetailsNavProps) => {
       });
     }
   }, [approvalVM.isSuccess]);
-  useEffect(() => {
-    if (allocateVM.isSuccess) {
-      let heading = `Allocated Successfully ${allocateVM.data.orderId}`;
-      props.navigation.navigate("POSSuccess", {
-        resetTo: "Profile",
-        heading: heading,
-      });
-    }
-  }, [allocateVM.isSuccess]);
   const handleAPIError = (error: unknown) => {
     let errMsg = "";
     if (error instanceof APIError) {
@@ -185,6 +175,7 @@ const InventoryOrderDetails = (props: InventoryDetailsNavProps) => {
                 setProductURL(
                   `${orderDetails.orderMode}/${orderDetails.transferTypeId}/${orderDetails.sourceChannelId}/${orderDetails.targetChannelId}/products`
                 );
+                setOrderId(props.route.params.orderId)
                 props.navigation.navigate('InventoryConfirmation',{screen:'Allocation'})
               } else {
                 setDecisionType(mutateType);

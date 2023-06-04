@@ -22,6 +22,7 @@ import {
   InventoryAllocateReq,
   InventoryApprovalReq,
 } from "../responseModels/InventoryOrderDetailsResponse";
+import { QRGenerationReq } from "../responseModels/QRGenerationResponse";
 export const walletBalanceHook = () =>
   useMutation({
     mutationKey: ["walletbalance"],
@@ -313,4 +314,8 @@ export const fetchDropdownsOrderedById = (serviceCode: string) => useQuery({
     uiObj.splice(0,0,{id: '', name:'All', isSelected: false})
     return uiObj
   }
+})
+export const fetchQRCodeForUser = () => useMutation({
+  mutationKey:['qrGenerate'],
+  mutationFn: (request: QRGenerationReq) => APIManager.sharedInstance().fireQrGenerator(request),
 })

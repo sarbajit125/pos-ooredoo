@@ -73,6 +73,9 @@ const Profile = (props: ProfileNavProps) => {
       case 'profileDetails':
         props.navigation.navigate('ProfileDetails')
         break
+      case 'qrCodeGen':
+        props.navigation.navigate('QRShare')
+        break
       default:
         console.log(keyStr);
         break;

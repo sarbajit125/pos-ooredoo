@@ -11,3 +11,4 @@ export enum POSDownloadType {
 }
 
 export const POSDateFormat = "YYYY-MM-DD"
+export const POSQRTimer = 20

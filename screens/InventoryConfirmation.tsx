@@ -45,6 +45,7 @@ import { InventoryLineItem } from "../responseModels/InventoryRulesResponse";
 import UploadMemoBottomSheet from "../components/Core/UploadMemoBottomSheet";
 import { POSDateFormat } from "../constants/AppConstants";
 import dayjs from "dayjs";
+import OoredooDialog from "../components/Core/OoredooDiaglog";
 const InventoryConfirmation = (props: InventoryConfirmNavProps) => {
   const {
     type,
@@ -57,6 +58,7 @@ const InventoryConfirmation = (props: InventoryConfirmNavProps) => {
   const { data, isSuccess, isLoading, isError, error } =
     FetchInventoryProduct(productURL);
   const [showModal, setShowModal] = useState<boolean>(false);
+  const [showDialog, toggleDialog] = useState<boolean>(false);
   const [errMsg, setErrMsg] = useState<string>("");
   const [enteredQuantity, setEnteredQuantity] = useState<string>("0");
   const [successOrderId, setOrderid] = useState<number>(0);
@@ -226,14 +228,12 @@ const InventoryConfirmation = (props: InventoryConfirmNavProps) => {
         resetTo: "Profile",
       });
     } else if (allocationVM.isError) {
-      if (error instanceof APIError) {
-        setErrMsg(error.message);
+      if (allocationVM.error instanceof APIError) {
+        setErrMsg(allocationVM.error.message);
       } else {
         setErrMsg("SOMETHING WENT WRONG");
       }
       setShowModal(true);
-    } else {
-      return <OoredooActivityView />;
     }
   };
   const prepareInventoryRequest = () => {
@@ -380,18 +380,36 @@ const InventoryConfirmation = (props: InventoryConfirmNavProps) => {
             onPress={() =>
               props.route.params.screen === "Confirmation"
                 ? prepareInventoryRequest()
-                : prepareAllocateRequest()
+                :  toggleDialog(true)
             }
             title={"Confirm"}
           />
         </View>
-        {isError || serialError || OrderIsError ? (
+        {isError || serialError || OrderIsError || allocationVM.isError ? (
           <OoredooBadReqView
             modalVisible={showModal}
             action={() => setShowModal(false)}
             title={errMsg}
           />
         ) : null}
+        {showDialog ? (
+          <OoredooDialog
+            type={"none"}
+            modalVisisble={showDialog}
+            heading={"Please confirm"}
+            descText={"Do you want approve for Inventory allocation"}
+            actionBtnCallback={function (
+              approve: boolean,
+              remark?: string | undefined
+            ): void {
+              if (approve) {
+                prepareAllocateRequest()
+              } 
+              toggleDialog(false)
+            }}
+          />
+        ) : null}
+        {allocationVM.isLoading ? <OoredooActivityView /> : null}
       </SafeAreaView>
       <BottomSheetModal
         ref={bottomSheetRef}

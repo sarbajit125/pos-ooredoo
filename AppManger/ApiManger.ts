@@ -37,6 +37,7 @@ import {
   InventoryReqApprovalResp,
   POSInventoryCatelogResponse,
 } from "../responseModels/InventoryOrderDetailsResponse";
+import { QRGenerationReq, QRGenerationResp } from "../responseModels/QRGenerationResponse";
 export class APIManager {
   private static instance: APIManager;
   private constructor() {
@@ -363,6 +364,15 @@ export class APIManager {
       throw this.errorhandling(error);
     }
   };
+  fireQrGenerator = async (request:QRGenerationReq) => {
+    try {
+      const response = await axios.post<QRGenerationResp>(`api/pos/add/dynamic/qr`, request)
+      this.printJSON(response.data);
+      return response.data;
+    } catch (error) {
+      throw this.errorhandling(error);
+    }
+  }
   errorhandling = (error: unknown): APIError | UnauthorizedError => {
     if (error instanceof AxiosError) {
       console.log(error.response?.data);

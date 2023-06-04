@@ -29,6 +29,14 @@
     },
     "web": {
       "favicon": "./assets/images/favicon.png"
-    }
+    },
+    "plugins": [
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Allow POS-OOREDOO to use your location."
+        }
+      ]
+    ]
   }
 }
